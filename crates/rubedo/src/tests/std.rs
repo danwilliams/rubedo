@@ -90,6 +90,70 @@ mod path_ext {
 		assert_eq!(path.normalize(), Path::new("/tests/std.rs"));
 		assert_eq!(path.normalize(), PathBuf::from("/tests/std.rs"));
 	}
+
+	//		restrict															
+	#[test]
+	fn restrict() {
+		let cwd = env::current_dir().unwrap();
+		let mut path: PathBuf;
+		
+		path = PathBuf::from("");
+		assert_eq!(path.restrict(None), cwd);
+		
+		path = PathBuf::from(".");
+		assert_eq!(path.restrict(None), cwd);
+		
+		path = PathBuf::from("..");
+		assert_eq!(path.restrict(None), cwd);
+		
+		path = PathBuf::from("/");
+		assert_eq!(path.restrict(None), cwd);
+		
+		path = PathBuf::from("/tests/std.rs");
+		assert_eq!(path.restrict(None), cwd);
+		
+		path = PathBuf::from("tests/std.rs");
+		assert_eq!(path.restrict(None), cwd.join("tests/std.rs"));
+		
+		path = PathBuf::from("tests/../std.rs");
+		assert_eq!(path.restrict(None), cwd.join("std.rs"));
+		
+		path = PathBuf::from("tests/../../std.rs");
+		assert_eq!(path.restrict(None), cwd);
+		
+		path = PathBuf::from("tests/../../one/two/three/std.rs");
+		assert_eq!(path.restrict(None), cwd);
+		
+		path = PathBuf::from("../tests/std.rs");
+		assert_eq!(path.restrict(None), cwd);
+		
+		path = PathBuf::from("");
+		assert_eq!(path.restrict(Some(Path::new("/foo/bar"))), PathBuf::from("/foo/bar"));
+
+		path = PathBuf::from(".");
+		assert_eq!(path.restrict(Some(Path::new("."))), cwd);
+
+		path = PathBuf::from("/tests/std.rs");
+		assert_eq!(path.restrict(Some(Path::new("."))), cwd);
+		
+		path = PathBuf::from("tests/std.rs");
+		assert_eq!(path.restrict(Some(Path::new("."))), cwd.join("tests/std.rs"));
+		
+		path = PathBuf::from("/foo/tests/std.rs");
+		assert_eq!(path.restrict(Some(Path::new("/foo/bar"))), PathBuf::from("/foo/bar"));
+		
+		path = PathBuf::from("/foo/bar/tests/std.rs");
+		assert_eq!(path.restrict(Some(Path::new("/foo/bar"))), PathBuf::from("/foo/bar/tests/std.rs"));
+		
+		let path: &Path;
+		path = Path::new("/foo/bar/tests/std.rs");
+	//	assert_eq!(path.restrict(Some("/foo/bar")),                 Path::new("/foo/bar/tests/std.rs"));
+	//	assert_eq!(path.restrict(Some("/foo/bar".to_owned())),      Path::new("/foo/bar/tests/std.rs"));
+		assert_eq!(path.restrict(Some(Path::new("/foo/bar"))),      Path::new("/foo/bar/tests/std.rs"));
+		assert_eq!(path.restrict(Some(Path::new("/foo/bar"))),      PathBuf::from("/foo/bar/tests/std.rs"));
+		assert_eq!(path.restrict(Some(&PathBuf::from("/foo/bar"))), Path::new("/foo/bar/tests/std.rs"));
+		assert_eq!(path.restrict(Some(&PathBuf::from("/foo/bar"))), PathBuf::from("/foo/bar/tests/std.rs"));
+	}
 }
 
 
