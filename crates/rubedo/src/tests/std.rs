@@ -7,6 +7,26 @@
 mod path_ext {
 	use super::super::*;
 	
+	//		append																
+	#[test]
+	fn append() {
+		let mut path: PathBuf;
+		
+		path = PathBuf::from("");
+		assert_eq!(path.append(""), PathBuf::from(""));
+		
+		path = PathBuf::from("tests/std.rs");
+		assert_eq!(path.append(".bak"),                 PathBuf::from("tests/std.rs.bak"));
+		assert_eq!(path.append(".bak".to_owned()),      PathBuf::from("tests/std.rs.bak"));
+		assert_eq!(path.append(OsString::from(".bak")), PathBuf::from("tests/std.rs.bak"));
+		assert_eq!(path.append(PathBuf::from(".bak")),  PathBuf::from("tests/std.rs.bak"));
+		assert_eq!(path.append(Path::new(".bak")),      PathBuf::from("tests/std.rs.bak"));
+		
+		let path: &Path;
+		path = Path::new("tests/std.rs");
+		assert_eq!(path.append(".bak"), PathBuf::from("tests/std.rs.bak"));
+	}
+	
 	//		normalize															
 	#[test]
 	fn normalize() {

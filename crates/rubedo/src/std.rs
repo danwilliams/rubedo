@@ -21,6 +21,28 @@ use std::{
 //§		PathExt																	
 /// This trait provides additional functionality to [`Path`].
 pub trait PathExt {
+	//		append																
+	/// Appends a string to a path.
+	/// 
+	/// Adds a string to the end of a path, and returns the result as a new
+	/// path. This is specifically different to both [`push()`](PathBuf::push())
+	/// and [`join()`](Path::join()), as it simply appends the string without
+	/// having any further effect on the path. By contrast, `push()` and
+	/// `join()` will append a new string as a new path component, which will
+	/// then be normalized, and will also replace the path entirely if the
+	/// string is an absolute path.
+	/// 
+	/// # Parameters
+	/// 
+	/// * `suffix` - The string to append to the path.
+	/// 
+	/// # See Also
+	/// 
+	/// * [`std::path::Path::join()`]
+	/// * [`std::path::PathBuf::push()`]
+	/// 
+	fn append<P: AsRef<Path>>(&self, suffix: P) -> PathBuf;
+	
 	//		normalize															
 	/// Normalizes the path.
 	/// 
@@ -154,6 +176,14 @@ pub trait PathExt {
 }
 
 impl PathExt for Path {
+	//		append																
+	fn append<P: AsRef<Path>>(&self, suffix: P) -> PathBuf {
+		PathBuf::from([
+			self.as_os_str().to_os_string(),
+			OsString::from(suffix.as_ref()),
+		].into_iter().collect::<OsString>())
+	}
+	
 	//		normalize															
 	fn normalize(&self) -> PathBuf {
 		let cwd = env::current_dir().unwrap();
