@@ -155,6 +155,89 @@ mod path_ext {
 		assert_eq!(path.restrict(Some(&PathBuf::from("/foo/bar"))), PathBuf::from("/foo/bar/tests/std.rs"));
 	}
 	
+	//		strip_parentdirs													
+	#[test]
+	fn strip_parentdirs() {
+		let mut path: PathBuf;
+		
+		path = PathBuf::from("");
+		assert_eq!(path.strip_parentdirs(true), path);
+		
+		path = PathBuf::from(".");
+		assert_eq!(path.strip_parentdirs(true), path);
+		
+		path = PathBuf::from("..");
+		assert_eq!(path.strip_parentdirs(true), PathBuf::from(""));
+		
+		path = PathBuf::from("/");
+		assert_eq!(path.strip_parentdirs(true), path);
+		
+		path = PathBuf::from("/tests/std.rs");
+		assert_eq!(path.strip_parentdirs(true), PathBuf::from("/tests/std.rs"));
+		
+		path = PathBuf::from("tests/std.rs");
+		assert_eq!(path.strip_parentdirs(true), PathBuf::from("tests/std.rs"));
+		
+		path = PathBuf::from("../tests/std.rs");
+		assert_eq!(path.strip_parentdirs(true), PathBuf::from("tests/std.rs"));
+		
+		path = PathBuf::from("/../tests/std.rs");
+		assert_eq!(path.strip_parentdirs(true), PathBuf::from("/tests/std.rs"));
+		
+		path = PathBuf::from("../../../tests/std.rs");
+		assert_eq!(path.strip_parentdirs(true), PathBuf::from("tests/std.rs"));
+		
+		path = PathBuf::from("/tests/../std.rs");
+		assert_eq!(path.strip_parentdirs(true), PathBuf::from("/tests/std.rs"));
+		
+		path = PathBuf::from("tests/../std.rs");
+		assert_eq!(path.strip_parentdirs(true), PathBuf::from("tests/std.rs"));
+		
+		path = PathBuf::from("../tests/../../std.rs");
+		assert_eq!(path.strip_parentdirs(true), PathBuf::from("tests/std.rs"));
+		
+		path = PathBuf::from("");
+		assert_eq!(path.strip_parentdirs(false), path);
+		
+		path = PathBuf::from(".");
+		assert_eq!(path.strip_parentdirs(false), path);
+		
+		path = PathBuf::from("..");
+		assert_eq!(path.strip_parentdirs(false), PathBuf::from(""));
+		
+		path = PathBuf::from("/");
+		assert_eq!(path.strip_parentdirs(false), path);
+		
+		path = PathBuf::from("/tests/std.rs");
+		assert_eq!(path.strip_parentdirs(false), PathBuf::from("/tests/std.rs"));
+		
+		path = PathBuf::from("tests/std.rs");
+		assert_eq!(path.strip_parentdirs(false), PathBuf::from("tests/std.rs"));
+		
+		path = PathBuf::from("../tests/std.rs");
+		assert_eq!(path.strip_parentdirs(false), PathBuf::from("tests/std.rs"));
+		
+		path = PathBuf::from("/../tests/std.rs");
+		assert_eq!(path.strip_parentdirs(false), PathBuf::from("/../tests/std.rs"));
+		
+		path = PathBuf::from("../../../tests/std.rs");
+		assert_eq!(path.strip_parentdirs(false), PathBuf::from("tests/std.rs"));
+		
+		path = PathBuf::from("/tests/../std.rs");
+		assert_eq!(path.strip_parentdirs(false), PathBuf::from("/tests/../std.rs"));
+		
+		path = PathBuf::from("tests/../std.rs");
+		assert_eq!(path.strip_parentdirs(false), PathBuf::from("tests/../std.rs"));
+		
+		path = PathBuf::from("../tests/../../std.rs");
+		assert_eq!(path.strip_parentdirs(false), PathBuf::from("tests/../../std.rs"));
+		
+		let path: &Path;
+		path = Path::new("tests/std.rs");
+		assert_eq!(path.strip_parentdirs(false), Path::new("tests/std.rs"));
+		assert_eq!(path.strip_parentdirs(false), PathBuf::from("tests/std.rs"));
+	}
+	
 	//		strip_root															
 	#[test]
 	fn strip_root() {

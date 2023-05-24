@@ -101,6 +101,30 @@ pub trait PathExt {
 	/// 
 	fn restrict(&self, base: Option<&Path>) -> PathBuf;
 	
+	//		strip_parentdirs													
+	/// Removes references to parent directories, i.e. `..`.
+	/// 
+	/// Removes any [`ParentDir`](std::path::Component::ParentDir) components
+	/// from either the beginning of the path or anywhere in the path.
+	/// 
+	/// This function does not touch the filesystem, or check if the path is
+	/// valid or exists. It will also not attempt to resolve the parent
+	/// directory references that it removes, so they will be taken out with no
+	/// effect on the rest of the path.
+	/// 
+	/// # Parameters
+	/// 
+	/// * `remove_all` - If `true` then all parent directory references will be
+	///                  removed, otherwise only those at the beginning of the
+	///                  path will be removed.
+	/// 
+	/// # See Also
+	/// 
+	/// * [`std::path::Component`](std::path::Component)
+	/// * [`std::path::Path::components()`]
+	/// 
+	fn strip_parentdirs(&self, remove_all: bool) -> PathBuf;
+	
 	//		strip_root															
 	/// Makes the path relative by removing the root and/or prefix components.
 	/// 
@@ -188,6 +212,32 @@ impl PathExt for Path {
 			path = basepath
 		}
 		path
+	}
+	
+	//		strip_parentdirs													
+	fn strip_parentdirs(&self, remove_all: bool) -> PathBuf {
+		if self.as_os_str().is_empty() || (!remove_all && self.is_absolute()) {
+			return self.to_owned();
+		}
+		let mut at_start = true;
+		let mut segments: Vec<OsString> = vec!();
+		for component in self.components() {
+			match component {
+				PathComponent::Prefix(_) |
+				PathComponent::RootDir   |
+				PathComponent::CurDir    |
+				PathComponent::Normal(_) => {
+					segments.push(component.as_os_str().to_os_string());
+					at_start = false;
+				},
+				PathComponent::ParentDir => {
+					if !remove_all && !at_start {
+						segments.push(component.as_os_str().to_os_string());
+					}
+				},
+			}
+		}
+		segments.iter().collect()
 	}
 	
 	//		strip_root															
