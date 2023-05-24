@@ -100,6 +100,33 @@ pub trait PathExt {
 	/// * [`normalize()`](PathExt::normalize())
 	/// 
 	fn restrict(&self, base: Option<&Path>) -> PathBuf;
+	
+	//		strip_root															
+	/// Makes the path relative by removing the root and/or prefix components.
+	/// 
+	/// Removes any components from the path that are considered to be the root
+	/// or prefix of the path. The prefix is this context is not the same as in
+	/// [`strip_prefix()`](Path::strip_prefix()), which removes a specific
+	/// string prefix from the path. Rather, the prefix here is a
+	/// [`PrefixComponent`](std::path::PrefixComponent). A path is considered to
+	/// be absolute if it has a root on Unix, or if it has both root and prefix
+	/// on Windows. Therefore, in order to convert the path to be relative, both
+	/// the root and prefix must be removed.
+	/// 
+	/// This function does not touch the filesystem, or check if the path is
+	/// valid or exists. It will also not attempt to resolve special directory
+	/// references such as `.` or `..`.
+	/// 
+	/// # See Also
+	/// 
+	/// * [`std::path::Path::components()`]
+	/// * [`std::path::Path::has_root()`]
+	/// * [`std::path::Path::is_absolute()`]
+	/// * [`std::path::Path::strip_prefix()`]
+	/// * [`std::path::Prefix`](std::path::Prefix)
+	/// * [`std::path::PrefixComponent`](std::path::PrefixComponent)
+	/// 
+	fn strip_root(&self) -> PathBuf;
 }
 
 impl PathExt for Path {
@@ -161,6 +188,26 @@ impl PathExt for Path {
 			path = basepath
 		}
 		path
+	}
+	
+	//		strip_root															
+	fn strip_root(&self) -> PathBuf {
+		if self.as_os_str().is_empty() || self.is_relative() {
+			return self.to_owned();
+		}
+		let mut segments: Vec<OsString> = vec!();
+		for component in self.components() {
+			match component {
+				PathComponent::Prefix(_) |
+				PathComponent::RootDir   => {},
+				PathComponent::CurDir    |
+				PathComponent::ParentDir |
+				PathComponent::Normal(_) => {
+					segments.push(component.as_os_str().to_os_string());
+				},
+			}
+		}
+		segments.iter().collect()
 	}
 }
 

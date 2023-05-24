@@ -154,6 +154,49 @@ mod path_ext {
 		assert_eq!(path.restrict(Some(&PathBuf::from("/foo/bar"))), Path::new("/foo/bar/tests/std.rs"));
 		assert_eq!(path.restrict(Some(&PathBuf::from("/foo/bar"))), PathBuf::from("/foo/bar/tests/std.rs"));
 	}
+	
+	//		strip_root															
+	#[test]
+	fn strip_root() {
+		let mut path: PathBuf;
+		
+		path = PathBuf::from("");
+		assert_eq!(path.strip_root(), path);
+		
+		path = PathBuf::from(".");
+		assert_eq!(path.strip_root(), path);
+		
+		path = PathBuf::from("..");
+		assert_eq!(path.strip_root(), path);
+		
+		path = PathBuf::from("/");
+		assert_eq!(path.strip_root(), PathBuf::from(""));
+		
+		path = PathBuf::from("/tests/std.rs");
+		assert_eq!(path.strip_root(), PathBuf::from("tests/std.rs"));
+		
+		path = PathBuf::from("//tests/std.rs");
+		assert_eq!(path.strip_root(), PathBuf::from("tests/std.rs"));
+		
+		if cfg!(windows) {
+			path = PathBuf::from(r"C:\tests\std.rs");
+			assert_eq!(path.strip_root(), PathBuf::from(r"tests\std.rs"));
+			
+			path = PathBuf::from(r"C:tests\std.rs");
+			assert_eq!(path.strip_root(), PathBuf::from(r"tests\std.rs"));
+			
+			path = PathBuf::from(r"\tests\std.rs");
+			assert_eq!(path.strip_root(), PathBuf::from(r"tests\std.rs"));
+			
+			path = PathBuf::from(r"\\tests\std.rs");
+			assert_eq!(path.strip_root(), PathBuf::from(r"tests\std.rs"));
+		}
+		
+		let path: &Path;
+		path = Path::new("tests/std.rs");
+		assert_eq!(path.strip_root(), Path::new("tests/std.rs"));
+		assert_eq!(path.strip_root(), PathBuf::from("tests/std.rs"));
+	}
 }
 
 
