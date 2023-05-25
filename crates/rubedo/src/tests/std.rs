@@ -27,6 +27,26 @@ mod path_ext {
 		assert_eq!(path.append(".bak"), PathBuf::from("tests/std.rs.bak"));
 	}
 	
+	//		is_subjective														
+	#[test]
+	fn is_subjective() {
+		assert_eq!(PathBuf::from(".").is_subjective(),      true);
+		assert_eq!(PathBuf::from("./").is_subjective(),     true);
+		assert_eq!(PathBuf::from("./foo").is_subjective(),  true);
+		assert_eq!(PathBuf::from("..").is_subjective(),     true);
+		assert_eq!(PathBuf::from("../").is_subjective(),    true);
+		assert_eq!(PathBuf::from("../foo").is_subjective(), true);
+		assert_eq!(PathBuf::from("foo").is_subjective(),    false);
+		assert_eq!(PathBuf::from(".bak").is_subjective(),   false);
+		assert_eq!(PathBuf::from("..bak").is_subjective(),  false);
+		assert_eq!(PathBuf::from("/").is_subjective(),      false);
+		assert_eq!(PathBuf::from("/.").is_subjective(),     false);
+		assert_eq!(PathBuf::from("/..").is_subjective(),    false);
+		assert_eq!(PathBuf::from("/foo").is_subjective(),   false);
+		
+		assert_eq!(Path::new(".").is_subjective(),          true);
+	}
+	
 	//		normalize															
 	#[test]
 	fn normalize() {

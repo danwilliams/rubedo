@@ -43,6 +43,30 @@ pub trait PathExt {
 	/// 
 	fn append<P: AsRef<Path>>(&self, suffix: P) -> PathBuf;
 	
+	//		is_subjective														
+	/// Checks if the path is specifically relative to the current directory.
+	/// 
+	/// Returns `true` if the path starts with a reference to the current
+	/// directory, i.e. `.` or `..` (as `..` is the parent of the current
+	/// directory and therefore related to it), making it specifically and
+	/// explicitly related to the current working directory. This can be
+	/// described as a subjective relative path, as opposed to an objective
+	/// relative path which is generically relative because it lacks a root
+	/// component.
+	/// 
+	/// A path that is subjective is also always relative. It is not possible to
+	/// have a subjective absolute path, as that would be a contradiction in
+	/// terms. However, objective paths may be either absolute or relative.
+	/// There is therefore no method `is_objective()`, as it does not currently
+	/// appear to have a useful purpose.
+	/// 
+	/// # See Also
+	/// 
+	/// * [`std::path::Path::is_absolute()`]
+	/// * [`std::path::Path::is_relative()`]
+	/// 
+	fn is_subjective(&self) -> bool;
+	
 	//		normalize															
 	/// Normalizes the path.
 	/// 
@@ -182,6 +206,17 @@ impl PathExt for Path {
 			self.as_os_str().to_os_string(),
 			OsString::from(suffix.as_ref()),
 		].into_iter().collect::<OsString>())
+	}
+	
+	//		is_subjective														
+	#[allow(clippy::iter_nth_zero)]
+	fn is_subjective(&self) -> bool {
+			self.is_relative()
+		&&	self.components().count() > 0
+		&&	(
+				self.components().nth(0).unwrap() == PathComponent::CurDir
+			||	self.components().nth(0).unwrap() == PathComponent::ParentDir
+			)
 	}
 	
 	//		normalize															
