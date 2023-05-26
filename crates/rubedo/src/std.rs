@@ -145,7 +145,7 @@ pub trait PathExt {
 	/// 
 	/// * [`normalize()`](PathExt::normalize())
 	/// 
-	fn restrict(&self, base: Option<&Path>) -> PathBuf;
+	fn restrict<P: AsRef<Path>>(&self, base: P) -> PathBuf;
 	
 	//		strip_parentdirs													
 	/// Removes references to parent directories, i.e. `..`.
@@ -260,11 +260,8 @@ impl PathExt for Path {
 	}
 	
 	//		restrict															
-	fn restrict(&self, base: Option<&Path>) -> PathBuf {
-		let basepath = match base {
-			Some(base) => base.to_path_buf(),
-			None       => env::current_dir().unwrap(),
-		}.normalize();
+	fn restrict<P: AsRef<Path>>(&self, base: P) -> PathBuf {
+		let basepath = base.as_ref().normalize();
 		if self.as_os_str().is_empty() {
 			return basepath;
 		}
