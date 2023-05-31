@@ -13,3 +13,6 @@ proc-macro = true
 
 [dependencies]
 quote = "1.0.28"
+
+[dev-dependencies]
+trybuild = "1.0.80"

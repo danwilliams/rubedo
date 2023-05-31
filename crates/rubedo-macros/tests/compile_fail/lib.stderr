@@ -1,0 +1,87 @@
+error: proc macro panicked
+  --> tests/compile_fail/lib.rs:14:3
+   |
+14 |         ip!("1.2.3");
+   |         ^^^^^^^^^^^^
+   |
+   = help: message: Invalid IP address
+
+error: proc macro panicked
+  --> tests/compile_fail/lib.rs:17:3
+   |
+17 |         ip!("1.2.3.4.5");
+   |         ^^^^^^^^^^^^^^^^
+   |
+   = help: message: Invalid IP address
+
+error: proc macro panicked
+  --> tests/compile_fail/lib.rs:20:3
+   |
+20 |         ip!("1.2.3.999");
+   |         ^^^^^^^^^^^^^^^^
+   |
+   = help: message: Invalid IP address: AddrParseError(Ip)
+
+error: proc macro panicked
+  --> tests/compile_fail/lib.rs:23:3
+   |
+23 |         ip!(1, 2, 3);
+   |         ^^^^^^^^^^^^
+   |
+   = help: message: Invalid IP address
+
+error: proc macro panicked
+  --> tests/compile_fail/lib.rs:26:3
+   |
+26 |         ip!(1, 2, 3, 4, 5);
+   |         ^^^^^^^^^^^^^^^^^^
+   |
+   = help: message: Invalid IP address
+
+error: proc macro panicked
+  --> tests/compile_fail/lib.rs:29:3
+   |
+29 |         ip!(1, 2, 3, 999);
+   |         ^^^^^^^^^^^^^^^^^
+   |
+   = help: message: Invalid IP address: AddrParseError(Ip)
+
+error: proc macro panicked
+  --> tests/compile_fail/lib.rs:32:3
+   |
+32 |         ip!(1.2.3);
+   |         ^^^^^^^^^^
+   |
+   = help: message: Invalid IP address
+
+error: proc macro panicked
+  --> tests/compile_fail/lib.rs:35:3
+   |
+35 |         ip!(1.2.3.4.5);
+   |         ^^^^^^^^^^^^^^
+   |
+   = help: message: Invalid IP address
+
+error: proc macro panicked
+  --> tests/compile_fail/lib.rs:38:3
+   |
+38 |         ip!(1.2.3.999);
+   |         ^^^^^^^^^^^^^^
+   |
+   = help: message: Invalid IP address: AddrParseError(Ip)
+
+error: proc macro panicked
+  --> tests/compile_fail/lib.rs:41:3
+   |
+41 |         ip!(1.2,3.4);
+   |         ^^^^^^^^^^^^
+   |
+   = help: message: Invalid IP address
+
+error: proc macro panicked
+  --> tests/compile_fail/lib.rs:44:3
+   |
+44 |         ip!(1,2.3.4);
+   |         ^^^^^^^^^^^^
+   |
+   = help: message: Invalid IP address
