@@ -15,4 +15,7 @@ purpose of each crate in their respective README files.
     to the standard library and other popular crates, as well as some new
     functionality.
 
+  - [`rubedo-macros`](crates/rubedo-macros/README.md) - Proc macros for the
+    Rubedo crate.
+
 

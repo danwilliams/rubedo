@@ -16,3 +16,4 @@ lto = true       # Enable link-time optimisation
 
 [workspace.dependencies]
 rubedo = { path = "./crates/rubedo", version = "0.0.1" }
+rubedo-macros = { path = "./crates/rubedo-macros", version = "0.0.1" }
