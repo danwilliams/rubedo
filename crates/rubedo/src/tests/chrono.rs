@@ -2,6 +2,107 @@
 
 //		Tests
 
+//§		DurationExt																
+#[cfg(test)]
+mod duration_ext {
+	use super::super::*;
+	
+	//		humanize															
+	#[test]
+	fn humanize() {
+		let duration = Duration::seconds(0);
+		assert_eq!(duration.humanize(), "0 seconds");
+		
+		let duration = Duration::seconds(1);
+		assert_eq!(duration.humanize(), "1 second");
+		
+		let duration = Duration::seconds(2);
+		assert_eq!(duration.humanize(), "2 seconds");
+		
+		let duration = Duration::seconds(59);
+		assert_eq!(duration.humanize(), "59 seconds");
+		
+		let duration = Duration::seconds(60);
+		assert_eq!(duration.humanize(), "1 minute");
+		
+		let duration = Duration::seconds(61);
+		assert_eq!(duration.num_seconds(), 61);
+		assert_eq!(duration.humanize(), "1 minute");
+		
+		let duration = Duration::seconds(130);
+		assert_eq!(duration.humanize(), "2 minutes");
+		
+		let duration = Duration::seconds(3599);
+		assert_eq!(duration.humanize(), "59 minutes");
+		
+		let duration = Duration::seconds(3600);
+		assert_eq!(duration.humanize(), "1 hour");
+		
+		let duration = Duration::seconds(3601);
+		assert_eq!(duration.humanize(), "1 hour");
+		
+		let duration = Duration::seconds(7200);
+		assert_eq!(duration.humanize(), "2 hours");
+		
+		let duration = Duration::seconds(86399);
+		assert_eq!(duration.humanize(), "23 hours");
+		
+		let duration = Duration::seconds(86400);
+		assert_eq!(duration.humanize(), "1 day");
+		
+		let duration = Duration::seconds(86401);
+		assert_eq!(duration.humanize(), "1 day");
+		
+		let duration = Duration::seconds(172800);
+		assert_eq!(duration.humanize(), "2 days");
+		
+		let duration = Duration::seconds(604799);
+		assert_eq!(duration.humanize(), "6 days");
+		
+		let duration = Duration::seconds(604800);
+		assert_eq!(duration.humanize(), "1 week");
+		
+		let duration = Duration::seconds(604801);
+		assert_eq!(duration.humanize(), "1 week");
+		
+		let duration = Duration::seconds(1209600);
+		assert_eq!(duration.humanize(), "2 weeks");
+		
+		let duration = Duration::seconds(2591999);
+		assert_eq!(duration.humanize(), "4 weeks");
+		
+		let duration = Duration::seconds(2592000);
+		assert_eq!(duration.humanize(), "1 month");
+		
+		let duration = Duration::seconds(2592001);
+		assert_eq!(duration.humanize(), "1 month");
+		
+		let duration = Duration::seconds(5184000);
+		assert_eq!(duration.humanize(), "2 months");
+		
+		let duration = Duration::seconds(31535999);
+		assert_eq!(duration.humanize(), "12 months");
+		
+		let duration = Duration::seconds(31536000);
+		assert_eq!(duration.humanize(), "1 year");
+		
+		let duration = Duration::seconds(31536001);
+		assert_eq!(duration.humanize(), "1 year");
+		
+		let duration = Duration::seconds(63072000);
+		assert_eq!(duration.humanize(), "2 years");
+		
+		let duration = Duration::seconds(315360000);
+		assert_eq!(duration.humanize(), "10 years");
+		
+		let duration = Duration::seconds(3153600000);
+		assert_eq!(duration.humanize(), "100 years");
+		
+		let duration = Duration::seconds(31536000000);
+		assert_eq!(duration.humanize(), "1000 years");
+	}
+}
+
 //§		NaiveDateExt															
 #[cfg(test)]
 mod naivedate_ext {

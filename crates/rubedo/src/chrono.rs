@@ -8,11 +8,47 @@ mod tests;
 
 //		Packages
 
-use chrono::{prelude::*, NaiveDate, Utc};
+use crate::sugar::s;
+use chrono::{prelude::*, Duration, NaiveDate, Utc};
 
 
 
 //		Traits
+
+//§		DurationExt																
+/// This trait provides additional functionality to [`Duration`].
+pub trait DurationExt {
+	//		humanize															
+	/// Returns a human-readable string representation of the duration.
+	/// 
+	/// This will indicate the duration as an expression of the largest unit
+	/// available. For example, if the duration is 1 year, 2 months, 3 weeks,
+	/// 4 days, 5 hours, 6 minutes, and 7 seconds, it will return "1 year".
+	fn humanize(&self) -> String;
+}
+
+impl DurationExt for Duration {
+	//		humanize															
+	fn humanize(&self) -> String {
+		let seconds = self.num_seconds();
+		let units   = vec![
+			(31536000, "year"),    //  60 * 60 * 24 * 365		
+			(2592000,  "month"),   //  60 * 60 * 24 * 30		
+			(604800,   "week"),    //  60 * 60 * 24 * 7		
+			(86400,    "day"),     //  60 * 60 * 24			
+			(3600,     "hour"),    //  60 * 60					
+			(60,       "minute"),  //  60						
+			(1,        "second"),  //  1						
+		];
+		for (unit, name) in units {
+			if seconds >= unit {
+				let count = seconds / unit;
+				return format!("{} {}{}", count, name, if count == 1 { "" } else { "s" });
+			}
+		}
+		s!("0 seconds")
+	}
+}
 
 //§		NaiveDateExt															
 /// This trait provides additional functionality to [`NaiveDate`].
