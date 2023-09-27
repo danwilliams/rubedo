@@ -12,7 +12,7 @@ license.workspace = true
 proc-macro = true
 
 [dependencies]
-quote = "1.0.28"
+quote = "1.0.33"
 
 [dev-dependencies]
-trybuild = "1.0.80"
+trybuild = "1.0.85"
