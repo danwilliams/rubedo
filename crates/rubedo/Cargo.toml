@@ -1,6 +1,9 @@
 [package]
 name = "rubedo"
 version = "0.1.0"
+description = "Library of useful functionality and extensions"
+categories = []
+keywords = ["library", "utility"]
 
 authors.workspace = true
 edition.workspace = true

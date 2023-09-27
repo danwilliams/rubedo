@@ -1,6 +1,9 @@
 [package]
 name = "rubedo-macros"
 version = "0.1.0"
+description = "Proc macros for Rubedo"
+categories = []
+keywords = ["macro", "library", "utility"]
 
 authors.workspace = true
 edition.workspace = true

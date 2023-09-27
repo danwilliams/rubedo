@@ -1,18 +1,21 @@
 [workspace]
+resolver = "2"
 members = ["crates/*"]
 
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-authors = ["Dan Williams"]
+authors = ["Dan Williams <dan@dotfive.co.uk>"]
+repository = "https://github.com/danwilliams/rubedo"
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [profile.release]
 strip = true     # Automatically strip symbols from the binary
-opt-level = "z"  # Optimise for size
-lto = true       # Enable link-time optimisation
+opt-level = 3    # Maximum optimisation (this is the cargo default)
+lto = "thin"     # Enable link-time optimisation (fast)
 
 [workspace.dependencies]
 rubedo = { path = "./crates/rubedo", version = "0.0.1" }
