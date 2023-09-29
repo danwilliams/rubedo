@@ -15,18 +15,32 @@ The format is based on [Keep a Changelog][], and this project adheres to
 ### Added
 
   - Added std module to enhance Rust std lib
-      - Added Path.normalize()
-      - Added Path.restrict()
-      - Added Path.strip_root()
-      - Added Path.strip_parentdirs()
       - Added Path.append()
       - Added Path.is_subjective()
-  - Added macros for creation sugar
-      - Added s!() macro for String creation sugar
-      - Added ip!() macro for IpAddr creation sugar
+      - Added Path.normalize()
+      - Added Path.restrict()
+      - Added Path.strip_parentdirs()
+      - Added Path.strip_root()
   - Added chrono module to enhance Chrono library
-      - Added chrono::NaiveDateExt
       - Added chrono::Duration.humanize()
+      - Added chrono::NaiveDate.today()
+      - Added chrono::NaiveDate.days_in_month()
+      - Added chrono::NaiveDate.days_in_month_opt()
+      - Added chrono::NaiveDate.days_in_year_opt()
+      - Added chrono::NaiveDate.days_in_year_opt()
+      - Added chrono::NaiveDate.is_leap_year()
+      - Added chrono::NaiveDate.is_leap_year_opt()
+      - Added chrono::NaiveDate.start_of_month()
+      - Added chrono::NaiveDate.start_of_month_opt()
+      - Added chrono::NaiveDate.end_of_month_opt()
+      - Added chrono::NaiveDate.end_of_month_opt()
+      - Added chrono::NaiveDate.start_of_year()
+      - Added chrono::NaiveDate.start_of_year_opt()
+      - Added chrono::NaiveDate.end_of_year_opt()
+      - Added chrono::NaiveDate.end_of_year_opt()
+  - Added macros for creation sugar
+      - Added ip!() macro for IpAddr creation sugar
+      - Added s!() macro for String creation sugar
   - Added trybuild to catch proc_macro test failures
   - Added README documentation
 

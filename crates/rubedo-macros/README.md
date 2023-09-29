@@ -10,4 +10,13 @@ the proc macros before it can use them, but it can't compile them until it has
 compiled the code that uses them. This is a chicken-and-egg problem, and the
 solution is to put the proc macros in a separate crate.
 
+## Features
+
+### Macros
+
+The macros are provided to provide syntactic sugar for common operations.
+
+  - [`ip!`](https://docs.rs/rubedo-macros/latest/rubedo_macros/macro.ip.html)
+    Builds an IP address from a range of input types.
+
 
