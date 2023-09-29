@@ -10,6 +10,14 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.1.1 (29 September 2023)
+
+### Changed
+
+  - Improved README documentation
+  - Improved Rustdoc documentation
+
+
 ## 0.1.0 (27 September 2023)
 
 ### Added
