@@ -1,3 +1,7 @@
+//! This module provides extensions to the Rust standard library.
+
+
+
 //		Modules
 
 #[cfg(test)]

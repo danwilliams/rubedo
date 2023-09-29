@@ -1,3 +1,8 @@
+//! This module provides extensions to the [Chrono](https://crates.io/crates/chrono)
+//! crate.
+
+
+
 //		Modules
 
 #[cfg(test)]

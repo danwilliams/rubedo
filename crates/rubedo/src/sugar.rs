@@ -1,3 +1,10 @@
+//! This module provides macros that add syntactic sugar for common operations.
+//!
+//! Note that some macros are implemented as proc macros, which can be found in
+//! the [`rubedo-macros`](https://crates.io/crates/rubedo-macros) crate.
+
+
+
 //		Modules
 
 #[cfg(test)]

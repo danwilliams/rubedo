@@ -1,3 +1,11 @@
+//! This library provides macros that add syntactic sugar for common operations.
+//!
+//! Specifically, the macros implemented in this crate are proc macros, which
+//! have to live separately from other code. They are part of the [`rubedo`](https://crates.io/crates/rubedo)
+//! ecosystem.
+
+
+
 //		Packages
 
 use proc_macro::{TokenStream, TokenTree};
