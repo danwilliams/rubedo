@@ -19,7 +19,10 @@ mod tests;
 
 use futures::executor;
 use hyper::{body::HttpBody, body::to_bytes, Body, HeaderMap, header::HeaderValue, Response, StatusCode};
-use std::cmp::Ordering;
+use std::{
+	cmp::Ordering,
+	fmt::{Debug, Formatter},
+};
 
 
 
@@ -39,6 +42,15 @@ use std::cmp::Ordering;
 /// If specific headers or body content needs to be checked, it is recommended
 /// to use the standard functions as they will be more efficient and performant.
 /// 
+/// Note that the [`body`](UnpackedResponse.body) property, which is stored as a
+/// vector of bytes, will get converted to a [`String`] if it is run through the
+/// standard [`Debug`] formatter. This is because human-readable output is the
+/// intuitively-expected outcome in this situation. The conversion uses
+/// [`from_utf8_lossy()`](String::from_utf8_lossy()), so no errors will occur,
+/// but if the body is not valid UTF8 then the resulting `String` will not be
+/// exactly the same. If an accurate representation of the body is required,
+/// then it should be run through the `Debug` formatter directly.
+/// 
 /// # See Also
 /// 
 /// * [`http::Response`](https://docs.rs/http/latest/http/response/index.html)
@@ -47,7 +59,6 @@ use std::cmp::Ordering;
 /// * [`ResponseExt::unpack()`]
 /// * [`UnpackedResponseHeader`]
 /// 
-#[derive(Debug)]
 pub struct UnpackedResponse {
 	//		Public properties													
 	/// The response status code. This is an enum, so is not directly comparable
@@ -65,7 +76,8 @@ pub struct UnpackedResponse {
 	/// [`Bytes`](https://docs.rs/bytes/latest/bytes/struct.Bytes.html)
 	/// container, but gets stored here as a vector of bytes for convenience.
 	/// This may not be valid UTF8, so is not converted to a [`String`]. That
-	/// step is left as optional for the caller, if required.
+	/// step is left as optional for the caller, if required (and happens when
+	/// running the `UnpackedResponse` struct through the [`Debug`] formatter).
 	body:    Vec<u8>,
 }
 
@@ -74,6 +86,18 @@ impl PartialEq for UnpackedResponse {
     fn eq(&self, other: &Self) -> bool {
         self.status == other.status && self.headers == other.headers && self.body == other.body
     }
+}
+
+impl Debug for UnpackedResponse {
+	//		fmt																	
+	fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+		let body = String::from_utf8_lossy(&self.body);
+		f.debug_struct("UnpackedResponse")
+			.field("status",  &self.status)
+			.field("headers", &self.headers)
+			.field("body",    &body)
+			.finish()
+	}
 }
 
 //		UnpackedResponseHeader													

@@ -2,6 +2,30 @@
 
 //		Tests
 
+//		UnpackedResponse														
+
+#[cfg(test)]
+mod unpacked_response {
+	use super::super::*;
+	use crate::sugar::s;
+	
+	//		debug																
+	#[test]
+	fn debug() {
+		let crafted      = UnpackedResponse {
+			status:        StatusCode::OK,
+			headers:       vec![
+				UnpackedResponseHeader {
+					name:  s!("foo"),
+					value: s!("bar"),
+				},
+			],
+			body:          b"This is a test".to_vec(),
+		};
+		assert_eq!(format!("{:?}", crafted), r#"UnpackedResponse { status: 200, headers: [UnpackedResponseHeader { name: "foo", value: "bar" }], body: "This is a test" }"#);
+	}
+}
+
 //§		ResponseExt																
 #[cfg(test)]
 mod response_ext {
