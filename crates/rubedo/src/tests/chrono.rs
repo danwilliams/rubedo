@@ -209,6 +209,8 @@ mod naivedate_ext {
 	#[test]
 	fn end_of_month_opt__invalid() {
 		assert!(NaiveDate::end_of_month_opt(2000, 13).is_none());
+		assert!(NaiveDate::end_of_month_opt(2000000, 1).is_none());
+		assert!(NaiveDate::end_of_month_opt(2000000, 13).is_none());
 	}
 	
 	//		start_of_year														
