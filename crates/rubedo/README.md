@@ -114,6 +114,20 @@ struct is extended with the following methods:
   - [`end_of_year_opt()`](https://docs.rs/rubedo/latest/rubedo/chrono/trait.NaiveDateExt.html#tymethod.end_of_year_opt) -
     Returns the date of the last day of the given year.
 
+### hyper
+
+The `hyper` module provides extensions to the [Hyper](https://crates.io/crates/hyper)
+crate.
+
+#### Response
+
+The [`Response`](https://docs.rs/hyper/latest/hyper/struct.Response.html)
+struct is extended with the following methods:
+
+  - [`unpack()`](https://docs.rs/rubedo/latest/rubedo/chrono/trait.ResponseExt.html#tymethod.unpack) -
+    Unpacks the response and provides the headers and body in a more accessible
+    form, to allow it to be checked, compared, and printed easily.
+
 ### Macros
 
 Some macros are provided to provide syntactic sugar for common operations.
