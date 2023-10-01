@@ -10,6 +10,14 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.2.0 (01 October 2023)
+
+### Added
+
+  - Added hyper module to enhance Hyper library
+      - Added hyper::Response.unpack()
+
+
 ## 0.1.1 (29 September 2023)
 
 ### Changed
