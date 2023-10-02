@@ -10,7 +10,7 @@
 //		Modules
 
 #[cfg(test)]
-#[path = "tests/hyper.rs"]
+#[path = "tests/http.rs"]
 mod tests;
 
 

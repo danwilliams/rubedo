@@ -14,7 +14,7 @@ able to grant immortality, and is the main goal of alchemy. The philosopher's
 stone is also known as the "red stone" or the "red powder". The reasons for the
 choice of name are firstly that the "redness" is tangentially related to Rust
 through colour, and secondly that this crate will aspirationally help to turn
-your Rust code into gold... or at least make it easier to write.
+your Rust code into gold... well, maybe... or at least make it easier to write.
 
 ## Features
 
@@ -114,14 +114,15 @@ struct is extended with the following methods:
   - [`end_of_year_opt()`](https://docs.rs/rubedo/latest/rubedo/chrono/trait.NaiveDateExt.html#tymethod.end_of_year_opt) -
     Returns the date of the last day of the given year.
 
-### hyper
+### http
 
-The `hyper` module provides extensions to the [Hyper](https://crates.io/crates/hyper)
-crate.
+The `http` module provides extensions to the [HTTP](https://crates.io/crates/http),
+[Hyper](https://crates.io/crates/hyper), and [Axum](https://crates.io/crates/axum)
+crates.
 
 #### Response
 
-The [`Response`](https://docs.rs/hyper/latest/hyper/struct.Response.html)
+The [`Response`](https://docs.rs/http/latest/http/response/struct.Response.html)
 struct is extended with the following methods:
 
   - [`unpack()`](https://docs.rs/rubedo/latest/rubedo/chrono/trait.ResponseExt.html#tymethod.unpack) -

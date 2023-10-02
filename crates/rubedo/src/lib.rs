@@ -10,7 +10,7 @@
 //		Modules
 
 pub mod chrono;
-pub mod hyper;
+pub mod http;
 pub mod std;
 pub mod sugar;
 
