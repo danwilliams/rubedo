@@ -2,6 +2,28 @@
 
 //		Tests
 
+//		ResponseError															
+#[cfg(test)]
+mod response_error {
+	use super::super::*;
+	
+	//		debug																
+	#[test]
+	fn debug() {
+		let err = Err::<ResponseError, _>(ResponseError::ConversionError);
+		assert!(err.is_err());
+		assert_eq!(format!("{:?}", err), "Err(ConversionError)");
+	}
+	
+	//		display																
+	#[test]
+	fn display() {
+		let err = Err::<ResponseError, _>(ResponseError::ConversionError);
+		assert!(err.is_err());
+		assert_eq!(err.unwrap_err().to_string(), "Error encountered while converting response body to bytes");
+	}
+}
+
 //		UnpackedResponse														
 
 #[cfg(test)]

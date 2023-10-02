@@ -17,13 +17,12 @@ mod tests;
 
 //		Packages
 
-use axum::Error as AxumError;
+use crate::sugar::s;
 use futures::executor;
-use http::{Error as HttpError, Response, StatusCode};
+use http::{Response, StatusCode};
 use http_body::combinators::UnsyncBoxBody;
 use hyper::{
 	body::{Body as HyperBody, Bytes, to_bytes},
-	Error as HyperError,
 	HeaderMap,
 	header::HeaderValue,
 };
@@ -40,18 +39,14 @@ use std::{
 //		ResponseError															
 #[derive(Debug)]
 pub enum ResponseError {
-	HttpError(HttpError),
-	HyperError(HyperError),
-	AxumError(AxumError),
+	ConversionError,
 }
 
 impl Display for ResponseError {
 	//		fmt																	
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		let description = match self {
-			ResponseError::HttpError(err)  => format!("Http Response Error: {}", err),
-			ResponseError::HyperError(err) => format!("Hyper Response Error: {}", err),
-			ResponseError::AxumError(err)  => format!("Axum Response Error: {}", err),
+			ResponseError::ConversionError => s!("Error encountered while converting response body to bytes"),
 		};
 		write!(f, "{}", description)
 	}
@@ -167,39 +162,6 @@ impl PartialEq for UnpackedResponseHeader {
 
 //		Traits
 
-//§		ToResponseError															
-/// This trait provides a way to convert an error into a [`ResponseError`].
-trait ToResponseError<E> {
-	//		to_response_error													
-	/// Returns a [`ResponseError`] containing the error data.
-	/// 
-	/// This is used to convert an error into a [`ResponseError`] so that it can
-	/// be returned as part of a [`Response`]. This is useful so that generic
-	/// code can be written to handle a range of error sources.
-	fn to_response_error(self) -> ResponseError;
-}
-
-impl ToResponseError<HttpError> for HttpError {
-	//		to_response_error													
-	fn to_response_error(self) -> ResponseError {
-		ResponseError::HttpError(self)
-	}
-}
-
-impl ToResponseError<HyperError> for HyperError {
-	//		to_response_error													
-	fn to_response_error(self) -> ResponseError {
-		ResponseError::HyperError(self)
-	}
-}
-
-impl ToResponseError<AxumError> for AxumError {
-	//		to_response_error													
-	fn to_response_error(self) -> ResponseError {
-		ResponseError::AxumError(self)
-	}
-}
-
 //§		ResponseExt																
 /// This trait provides additional functionality to [`Response`].
 pub trait ResponseExt {
@@ -247,7 +209,6 @@ impl ResponseExt for Response<()> {
 impl<E> ResponseExt for Response<UnsyncBoxBody<Bytes, E>>
 where
 	E: Error + 'static,
-	E: ToResponseError<E>,
 {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
@@ -260,7 +221,7 @@ where
 					body:    body.to_vec(),
 				})
 			},
-			Err(e)   => Err(e.to_response_error()),
+			Err(_)   => Err(ResponseError::ConversionError),
 		}
 	}
 }
@@ -277,7 +238,7 @@ impl ResponseExt for Response<HyperBody> {
 					body:    body.to_vec(),
 				})
 			},
-			Err(e)   => Err(ResponseError::HyperError(e)),
+			Err(_)   => Err(ResponseError::ConversionError),
 		}
 	}
 }
