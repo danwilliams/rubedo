@@ -1,5 +1,6 @@
 # Changelog
 
+[Axum]:                https://crates.io/crates/axum
 [Chrono]:              https://crates.io/crates/chrono
 [Hyper]:               https://crates.io/crates/hyper
 [Keep a Changelog]:    https://keepachangelog.com/en/1.0.0/
@@ -9,6 +10,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
+
+
+## 0.3.0 (02 October 2023)
+
+### Added
+
+  - Extended `http::ResponseExt` to cover [Axum][]
+
+### Fixed
+
+  - Made `http::UnpackedResponse` fields public
+
+### Changed
+
+  - Renamed `hyper` module to `http`
 
 
 ## 0.2.0 (01 October 2023)
