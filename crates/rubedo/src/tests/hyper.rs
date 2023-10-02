@@ -53,6 +53,7 @@ mod unpacked_response {
 mod response_ext {
 	use super::super::*;
 	use crate::sugar::s;
+	use axum::response::IntoResponse;
 	
 	//		unpack																
 	#[test]
@@ -99,7 +100,7 @@ mod response_ext {
 	}
 	#[test]
 	fn unpack__hyper_body() {
-		let mut response = Response::builder()
+		let mut response = hyper::Response::builder()
 			.status(StatusCode::OK)
 			.body(HyperBody::from("This is a test"))
 			.unwrap()
@@ -111,6 +112,29 @@ mod response_ext {
 		let crafted      = UnpackedResponse {
 			status:        StatusCode::OK,
 			headers:       vec![],
+			body:          b"This is a test".to_vec(),
+		};
+		assert_eq!(unpacked, crafted);
+	}
+	#[test]
+	fn unpack__axum_body() {
+		let mut response = (
+			StatusCode::OK,
+			"This is a test",
+		).into_response();
+		let result       = response.unpack();
+		assert_eq!(result.is_ok(), true);
+		
+		let unpacked     = result.unwrap();
+		let crafted      = UnpackedResponse {
+			status:        StatusCode::OK,
+			headers:       vec![
+				//  Axum automatically adds a content-type header.
+				UnpackedResponseHeader {
+					name:  s!("content-type"),
+					value: s!("text/plain; charset=utf-8"),
+				},
+			],
 			body:          b"This is a test".to_vec(),
 		};
 		assert_eq!(unpacked, crafted);
@@ -219,6 +243,25 @@ mod functions {
 				value:    s!("baz"),
 			},
 		];
+		assert_eq!(converted, crafted);
+	}
+	
+	//		convert_response													
+	#[test]
+	fn convert_response__basic() {
+		let mut headers  = HeaderMap::new();
+		headers.insert("foo", HeaderValue::from_static("bar"));
+		let converted    = convert_response(StatusCode::OK, &headers, Bytes::from("This is a test"));
+		let crafted      = UnpackedResponse {
+			status:        StatusCode::OK,
+			headers:       vec![
+				UnpackedResponseHeader {
+					name:  s!("foo"),
+					value: s!("bar"),
+				},
+			],
+			body:          b"This is a test".to_vec(),
+		};
 		assert_eq!(converted, crafted);
 	}
 }

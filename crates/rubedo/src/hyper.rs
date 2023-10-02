@@ -103,8 +103,7 @@ pub struct UnpackedResponse {
 	/// only very rarely matter, even when logging, and sorting allows
 	/// duplicates to be spotted by eye more easily in logs.
 	pub headers: Vec<UnpackedResponseHeader>,
-	/// The response body. This originates from the response body as a
-	/// [`Bytes`](https://docs.rs/bytes/latest/bytes/struct.Bytes.html)
+	/// The response body. This originates from the response body as a [`Bytes`]
 	/// container, but gets stored here as a vector of bytes for convenience.
 	/// This may not be valid UTF8, so is not converted to a [`String`]. That
 	/// step is left as optional for the caller, if required (and happens when
@@ -166,7 +165,7 @@ impl PartialEq for UnpackedResponseHeader {
 /// This trait provides additional functionality to [`Response`].
 pub trait ResponseExt {
 	//		unpack																
-	/// Returns a [UnpackedResponse] containing the unpacked response data.
+	/// Returns an [`UnpackedResponse`] containing the unpacked response data.
 	/// 
 	/// This will unpack the response and provide the headers and body in a
 	/// more accessible form, to allow it to be checked and compared. This is
@@ -198,11 +197,7 @@ pub trait ResponseExt {
 impl ResponseExt for Response<()> {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
-		Ok(UnpackedResponse {
-			status:  self.status(),
-			headers: convert_headers(self.headers()),
-			body:    vec!(),
-		})
+		Ok(convert_response(self.status(), self.headers(), Bytes::new()))
 	}
 }
 
@@ -214,13 +209,7 @@ where
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
 		let body = executor::block_on(to_bytes(self.body_mut()));
 		match body {
-			Ok(body) => {
-				Ok(UnpackedResponse {
-					status:  self.status(),
-					headers: convert_headers(self.headers()),
-					body:    body.to_vec(),
-				})
-			},
+			Ok(body) => Ok(convert_response(self.status(), self.headers(), body)),
 			Err(_)   => Err(ResponseError::ConversionError),
 		}
 	}
@@ -231,13 +220,7 @@ impl ResponseExt for Response<HyperBody> {
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
 		let body = executor::block_on(to_bytes(self.body_mut()));
 		match body {
-			Ok(body) => {
-				Ok(UnpackedResponse {
-					status:  self.status(),
-					headers: convert_headers(self.headers()),
-					body:    body.to_vec(),
-				})
-			},
+			Ok(body) => Ok(convert_response(self.status(), self.headers(), body)),
 			Err(_)   => Err(ResponseError::ConversionError),
 		}
 	}
@@ -247,11 +230,7 @@ impl ResponseExt for Response<String> {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
 		let body = executor::block_on(to_bytes(self.body_mut())).unwrap();  //  Infallible
-		Ok(UnpackedResponse {
-			status:  self.status(),
-			headers: convert_headers(self.headers()),
-			body:    body.to_vec(),
-		})
+		Ok(convert_response(self.status(), self.headers(), body))
 	}
 }
 
@@ -269,10 +248,6 @@ impl ResponseExt for Response<String> {
 /// 
 /// # See Also
 /// 
-/// * [`axum::response`]
-/// * [`axum::response::Response`]
-/// * [`http::Response`]
-/// * [`hyper::Response`]
 /// * [`ResponseExt::unpack()`]
 /// * [`UnpackedResponse`]
 /// * [`UnpackedResponseHeader`]
@@ -291,6 +266,41 @@ fn convert_headers(headermap: &HeaderMap<HeaderValue>) -> Vec<UnpackedResponseHe
 		}
 	});
 	headers
+}
+
+//		convert_response														
+/// Returns an [`UnpackedResponse`] containing the unpacked response data.
+/// 
+/// This function carries out the common part of the conversion process for
+/// [`unpack()`]. As `unpack()` has a number of implementations, the common code
+/// is abstracted out into this function.
+/// 
+/// # Parameters
+/// 
+/// * `status`  - The response status code.
+/// * `headers` - The response headers.
+/// * `body`    - The response body.
+/// 
+/// # See Also
+///
+/// * [`axum::response`]
+/// * [`axum::response::Response`]
+/// * [`http::Response`]
+/// * [`hyper::Response`]
+/// * [`ResponseExt::unpack()`]
+/// * [`UnpackedResponse`]
+/// * [`UnpackedResponseHeader`]
+/// 
+fn convert_response(
+	status:  StatusCode,
+	headers: &HeaderMap<HeaderValue>,
+	body:    Bytes,
+) -> UnpackedResponse {
+	UnpackedResponse {
+		status,
+		headers: convert_headers(headers),
+		body:    body.to_vec(),
+	}
 }
 
 
