@@ -17,12 +17,41 @@ mod tests;
 
 //		Packages
 
+use axum;
 use futures::executor;
-use hyper::{body::HttpBody, body::to_bytes, Body, HeaderMap, header::HeaderValue, Response, StatusCode};
+use http;
+use hyper::{body::to_bytes, Body, HeaderMap, header::HeaderValue, Response, StatusCode};
 use std::{
 	cmp::Ordering,
-	fmt::{Debug, Formatter},
+	error::Error,
+	fmt::{Debug, Display, self},
 };
+
+
+
+//		Enums
+
+//		ResponseError															
+#[derive(Debug)]
+pub enum ResponseError {
+	HttpError(http::Error),
+	HyperError(hyper::Error),
+	AxumError(axum::Error),
+}
+
+impl Display for ResponseError {
+	//		fmt																	
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		let description = match self {
+			ResponseError::HttpError(err)  => format!("Http Response Error: {}", err),
+			ResponseError::HyperError(err) => format!("Hyper Response Error: {}", err),
+			ResponseError::AxumError(err)  => format!("Axum Response Error: {}", err),
+		};
+		write!(f, "{}", description)
+	}
+}
+
+impl Error for ResponseError {}
 
 
 
@@ -31,13 +60,12 @@ use std::{
 //		UnpackedResponse														
 /// An HTTP response in comparison-friendly form for interrogation.
 /// 
-/// Data in [`hyper::Response`] (and indeed [`http::Response`](https://docs.rs/http/latest/http/response/index.html))
-/// is stored in a specific form, made up of a header map object and a generic
-/// body type, which can be empty, a [`String`], or a streaming [`Body`] future.
-/// This struct provides a way to use the data in a more accessible form, to
-/// allow it to be checked and compared. This is useful for testing, as the
-/// entire set of headers plus body can be checked all at once, and also for
-/// printing/logging.
+/// Data in [`hyper::Response`] (and indeed [`http::Response`] as well) is
+/// stored in a specific form, made up of a header map object and a generic body
+/// type, which can be empty, a [`String`], or a streaming [`Body`] future. This
+/// struct provides a way to use the data in a more accessible form, to allow it
+/// to be checked and compared. This is useful for testing, as the entire set of
+/// headers plus body can be checked all at once, and also for printing/logging.
 /// 
 /// If specific headers or body content needs to be checked, it is recommended
 /// to use the standard functions as they will be more efficient and performant.
@@ -53,7 +81,7 @@ use std::{
 /// 
 /// # See Also
 /// 
-/// * [`http::Response`](https://docs.rs/http/latest/http/response/index.html)
+/// * [`http::Response`]
 /// * [`hyper::Response`]
 /// * [`ResponseExt`]
 /// * [`ResponseExt::unpack()`]
@@ -90,7 +118,7 @@ impl PartialEq for UnpackedResponse {
 
 impl Debug for UnpackedResponse {
 	//		fmt																	
-	fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		let body = String::from_utf8_lossy(&self.body);
 		f.debug_struct("UnpackedResponse")
 			.field("status",  &self.status)
@@ -156,15 +184,15 @@ pub trait ResponseExt {
 	/// # See Also
 	/// 
 	/// * [`UnpackedResponse`]
-	/// * [`http::Response`](https://docs.rs/http/latest/http/response/index.html)
+	/// * [`http::Response`]
 	/// * [`hyper::Response`]
 	/// 
-	fn unpack(&mut self) -> Result<UnpackedResponse, <Body as HttpBody>::Error>;
+	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError>;
 }
 
 impl ResponseExt for Response<()> {
 	//		unpack																
-	fn unpack(&mut self) -> Result<UnpackedResponse, <Body as HttpBody>::Error> {
+	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
 		Ok(UnpackedResponse {
 			status:  self.status(),
 			headers: convert_headers(self.headers()),
@@ -175,7 +203,7 @@ impl ResponseExt for Response<()> {
 
 impl ResponseExt for Response<Body> {
 	//		unpack																
-	fn unpack(&mut self) -> Result<UnpackedResponse, <Body as HttpBody>::Error> {
+	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
 		let body = executor::block_on(to_bytes(self.body_mut()));
 		match body {
 			Ok(body) => {
@@ -185,14 +213,14 @@ impl ResponseExt for Response<Body> {
 					body:    body.to_vec(),
 				})
 			},
-			Err(e)   => Err(e),
+			Err(e)   => Err(ResponseError::HyperError(e)),
 		}
 	}
 }
 
 impl ResponseExt for Response<String> {
 	//		unpack																
-	fn unpack(&mut self) -> Result<UnpackedResponse, <Body as HttpBody>::Error> {
+	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
 		let body = executor::block_on(to_bytes(self.body_mut())).unwrap();  //  Infallible
 		Ok(UnpackedResponse {
 			status:  self.status(),
@@ -216,7 +244,7 @@ impl ResponseExt for Response<String> {
 /// 
 /// # See Also
 ///
-/// * [`http::Response`](https://docs.rs/http/latest/http/response/index.html)
+/// * [`http::Response`]
 /// * [`hyper::Response`]
 /// * [`ResponseExt::unpack()`]
 /// * [`UnpackedResponse`]
