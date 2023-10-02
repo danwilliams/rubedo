@@ -1,9 +1,9 @@
-//! This module provides extensions to the [Hyper](https://crates.io/crates/hyper)
-//! crate.
+//! This module provides extensions to the [HTTP](https://crates.io/crates/http),
+//! [Hyper](https://crates.io/crates/hyper), and [Axum](https://crates.io/crates/axum)
+//! crates.
 //! 
-//! It does this instead of extending the [HTTP](https://crates.io/crates/http)
-//! crate because the extended Hyper implementation is more useful, and
-//! widely-used.
+//! Hyper and Axum are built on top of the HTTP crate, and Axum uses parts of
+//! Hyper, so it makes sense to combine all of these in one module.
 
 
 
@@ -19,8 +19,13 @@ mod tests;
 
 use axum;
 use futures::executor;
-use http;
-use hyper::{body::to_bytes, Body, HeaderMap, header::HeaderValue, Response, StatusCode};
+use http::{Response, StatusCode, self};
+use http_body::combinators::UnsyncBoxBody;
+use hyper::{
+	body::{Body as HyperBody, Bytes, to_bytes},
+	HeaderMap,
+	header::HeaderValue,
+};
 use std::{
 	cmp::Ordering,
 	error::Error,
@@ -62,7 +67,7 @@ impl Error for ResponseError {}
 /// 
 /// Data in [`hyper::Response`] (and indeed [`http::Response`] as well) is
 /// stored in a specific form, made up of a header map object and a generic body
-/// type, which can be empty, a [`String`], or a streaming [`Body`] future. This
+/// type, which can be empty, a [`String`], or a streaming body future. This
 /// struct provides a way to use the data in a more accessible form, to allow it
 /// to be checked and compared. This is useful for testing, as the entire set of
 /// headers plus body can be checked all at once, and also for printing/logging.
@@ -81,6 +86,8 @@ impl Error for ResponseError {}
 /// 
 /// # See Also
 /// 
+/// * [`axum::response`]
+/// * [`axum::response::Response`]
 /// * [`http::Response`]
 /// * [`hyper::Response`]
 /// * [`ResponseExt`]
@@ -183,9 +190,11 @@ pub trait ResponseExt {
 	/// 
 	/// # See Also
 	/// 
-	/// * [`UnpackedResponse`]
+	/// * [`axum::response`]
+	/// * [`axum::response::Response`]
 	/// * [`http::Response`]
 	/// * [`hyper::Response`]
+	/// * [`UnpackedResponse`]
 	/// 
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError>;
 }
@@ -201,7 +210,41 @@ impl ResponseExt for Response<()> {
 	}
 }
 
-impl ResponseExt for Response<Body> {
+impl ResponseExt for Response<UnsyncBoxBody<Bytes, http::Error>> {
+	//		unpack																
+	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
+		let body = executor::block_on(to_bytes(self.body_mut()));
+		match body {
+			Ok(body) => {
+				Ok(UnpackedResponse {
+					status:  self.status(),
+					headers: convert_headers(self.headers()),
+					body:    body.to_vec(),
+				})
+			},
+			Err(e)   => Err(ResponseError::HttpError(e)),
+		}
+	}
+}
+
+impl ResponseExt for Response<UnsyncBoxBody<Bytes, axum::Error>> {
+	//		unpack																
+	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
+		let body = executor::block_on(to_bytes(self.body_mut()));
+		match body {
+			Ok(body) => {
+				Ok(UnpackedResponse {
+					status:  self.status(),
+					headers: convert_headers(self.headers()),
+					body:    body.to_vec(),
+				})
+			},
+			Err(e)   => Err(ResponseError::AxumError(e)),
+		}
+	}
+}
+
+impl ResponseExt for Response<HyperBody> {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
 		let body = executor::block_on(to_bytes(self.body_mut()));
@@ -236,14 +279,16 @@ impl ResponseExt for Response<String> {
 
 //		convert_headers															
 /// Returns a vector of unpacked response headers.
-///
+/// 
 /// These are returned in a vector rather than a hashmap because there may be
 /// multiple headers with the same name. They are sorted by name, and then by
 /// value, allowing for reliable comparison. Sorting does break the original
 /// order of the headers, but this should only very rarely matter.
 /// 
 /// # See Also
-///
+/// 
+/// * [`axum::response`]
+/// * [`axum::response::Response`]
 /// * [`http::Response`]
 /// * [`hyper::Response`]
 /// * [`ResponseExt::unpack()`]

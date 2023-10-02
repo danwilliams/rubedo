@@ -76,10 +76,10 @@ mod response_ext {
 		assert_eq!(unpacked, crafted);
 	}
 	#[test]
-	fn unpack__body() {
+	fn unpack__hyper_body() {
 		let mut response = Response::builder()
 			.status(StatusCode::OK)
-			.body(Body::from("This is a test"))
+			.body(HyperBody::from("This is a test"))
 			.unwrap()
 		;
 		let result       = response.unpack();
