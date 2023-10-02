@@ -92,21 +92,21 @@ pub struct UnpackedResponse {
 	/// The response status code. This is an enum, so is not directly comparable
 	/// to a number. It can be converted to a number, but this is not done here
 	/// because it is not necessary for the purposes of this struct.
-	status: StatusCode,
+	pub status: StatusCode,
 	/// The response headers. These are in a vector rather than a hashmap
 	/// because there may be multiple headers with the same name. They are
 	/// sorted by name, and then by value, allowing for reliable comparison.
 	/// Sorting does break the original order of the headers, but this should
 	/// only very rarely matter, even when logging, and sorting allows
 	/// duplicates to be spotted by eye more easily in logs.
-	headers: Vec<UnpackedResponseHeader>,
+	pub headers: Vec<UnpackedResponseHeader>,
 	/// The response body. This originates from the response body as a
 	/// [`Bytes`](https://docs.rs/bytes/latest/bytes/struct.Bytes.html)
 	/// container, but gets stored here as a vector of bytes for convenience.
 	/// This may not be valid UTF8, so is not converted to a [`String`]. That
 	/// step is left as optional for the caller, if required (and happens when
 	/// running the `UnpackedResponse` struct through the [`Debug`] formatter).
-	body:    Vec<u8>,
+	pub body:    Vec<u8>,
 }
 
 impl PartialEq for UnpackedResponse {
@@ -143,9 +143,9 @@ impl Debug for UnpackedResponse {
 pub struct UnpackedResponseHeader {
 	//		Public properties													
 	/// The response header name.
-	name:  String,
+	pub name:  String,
 	/// The response header value.
-	value: String,
+	pub value: String,
 }
 
 impl PartialEq for UnpackedResponseHeader {
