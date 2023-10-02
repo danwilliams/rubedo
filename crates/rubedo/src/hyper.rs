@@ -17,12 +17,13 @@ mod tests;
 
 //		Packages
 
-use axum;
+use axum::Error as AxumError;
 use futures::executor;
-use http::{Response, StatusCode, self};
+use http::{Error as HttpError, Response, StatusCode};
 use http_body::combinators::UnsyncBoxBody;
 use hyper::{
 	body::{Body as HyperBody, Bytes, to_bytes},
+	Error as HyperError,
 	HeaderMap,
 	header::HeaderValue,
 };
@@ -39,9 +40,9 @@ use std::{
 //		ResponseError															
 #[derive(Debug)]
 pub enum ResponseError {
-	HttpError(http::Error),
-	HyperError(hyper::Error),
-	AxumError(axum::Error),
+	HttpError(HttpError),
+	HyperError(HyperError),
+	AxumError(AxumError),
 }
 
 impl Display for ResponseError {
@@ -210,7 +211,7 @@ impl ResponseExt for Response<()> {
 	}
 }
 
-impl ResponseExt for Response<UnsyncBoxBody<Bytes, http::Error>> {
+impl ResponseExt for Response<UnsyncBoxBody<Bytes, HttpError>> {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
 		let body = executor::block_on(to_bytes(self.body_mut()));
@@ -227,7 +228,7 @@ impl ResponseExt for Response<UnsyncBoxBody<Bytes, http::Error>> {
 	}
 }
 
-impl ResponseExt for Response<UnsyncBoxBody<Bytes, axum::Error>> {
+impl ResponseExt for Response<UnsyncBoxBody<Bytes, AxumError>> {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
 		let body = executor::block_on(to_bytes(self.body_mut()));
