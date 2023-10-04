@@ -31,7 +31,8 @@ use serde_with::{DisplayFromStr, serde_as};
 use std::{
 	cmp::Ordering,
 	error::Error,
-	fmt::{Debug, Display, self},
+	fmt::{Debug, Display, Write, self},
+	ops::{Add, AddAssign},
 	str::FromStr,
 };
 
@@ -199,7 +200,7 @@ impl PartialEq for UnpackedResponseHeader {
 /// 
 /// * [`UnpackedResponse`]
 /// 
-#[derive(Deserialize, Serialize)]
+#[derive(Default, Deserialize, Serialize)]
 pub struct UnpackedResponseBody(Vec<u8>);
 
 impl UnpackedResponseBody {
@@ -366,6 +367,185 @@ impl UnpackedResponseBody {
 	pub fn to_bytes(&self) -> Vec<u8> {
 		self.0.clone()
 	}
+	
+	//		clear																
+	/// Removes all contents from the response body.
+	/// 
+	/// This method removes all data from the response body, resetting it to an
+	/// empty state. This method has no effect on the capacity of the response
+	/// body, and so does not affect any allocation.
+	/// 
+	pub fn clear(&mut self) {
+		self.0.clear();
+	}
+	
+	//		empty																
+	/// Returns an empty response body.
+	/// 
+	/// This method returns an empty response body. This is equivalent to
+	/// creating a new response body with [`UnpackedResponseBody::new()`], but
+	/// without having to supply any parameters.
+	/// 
+	pub fn empty() -> Self {
+		Self(Vec::new())
+	}
+	
+	//		is_empty															
+	/// Returns whether the response body is empty.
+	/// 
+	/// This method returns whether the response body is empty. This is
+	/// equivalent to checking whether the length of the response body is zero.
+	/// 
+	pub fn is_empty(&self) -> bool {
+		self.0.is_empty()
+	}
+	
+	//		len																	
+	/// Returns the length of the response body.
+	/// 
+	/// This method returns the length of the response body, in bytes. This is
+	/// equivalent to the length of the vector of bytes that the response body
+	/// contains.
+	/// 
+	pub fn len(&self) -> usize {
+		self.0.len()
+	}
+	
+	//		push																
+	/// Appends a byte to the response body.
+	/// 
+	/// Appends a given byte onto the end of the response body's existing byte
+	/// data. The response body is not required to be valid UTF8, so this method
+	/// does not check the validity of the byte before appending it.
+	/// 
+	/// This method accepts a [`u8`] instead of a [`char`] because a `char`
+	/// represents a single Unicode scalar value. In Rust, a `char` is always 4
+	/// bytes long because it can represent any Unicode scalar value, including
+	/// those outside the Basic Multilingual Plane. If `push()` accepted a
+	/// `char`, it would be signaling that `UnpackedResponseBody` is
+	/// Unicode-aware and can handle any Unicode character - which is not the
+	/// case. A `u8`, on the other hand, represents a single byte. By having
+	/// `push()` accept a `u8`, it's signaling that `UnpackedResponseBody` is
+	/// byte-oriented.
+	/// 
+	/// # Parameters
+	/// 
+	/// * `byte` - The byte to append to the response body.
+	/// 
+	/// # See Also
+	/// 
+	/// * [`UnpackedResponseBody::push_bytes()`]
+	/// * [`UnpackedResponseBody::push_str()`]
+	/// 
+	pub fn push(&mut self, byte: u8) {
+		self.0.push(byte)
+	}
+	
+	//		push_bytes															
+	/// Appends a byte slice to the response body.
+	///
+	/// Appends a given byte slice onto the end of the response body. The byte
+	/// slice is appended to the end of the response body's existing byte data.
+	/// The response body is not required to be valid UTF8, so this method does
+	/// not check the validity of the byte slice before appending it.
+	///
+	/// # Parameters
+	///
+	/// * `bytes` - The byte slice to append to the response body.
+	///
+	/// # See Also
+	///
+	/// * [`UnpackedResponseBody::push()`]
+	/// * [`UnpackedResponseBody::push_str()`]
+	///
+	pub fn push_bytes(&mut self, bytes: &[u8]) {
+		self.0.extend_from_slice(bytes);
+	}
+	
+	//		push_str															
+	/// Appends a string slice to the response body.
+	/// 
+	/// Appends a given string slice onto the end of the response body. The
+	/// string slice is converted to bytes and then appended to the end of the
+	/// response body's existing byte data. The response body is not required to
+	/// be valid UTF8, so this method does not check the validity of the string
+	/// slice before appending it.
+	/// 
+	/// # Parameters
+	/// 
+	/// * `string` - The string slice to append to the response body.
+	/// 
+	/// # See Also
+	/// 
+	/// * [`UnpackedResponseBody::push()`]
+	/// * [`UnpackedResponseBody::push_bytes()`]
+	/// 
+	pub fn push_str(&mut self, string: &str) {
+		self.0.extend_from_slice(string.as_bytes());
+	}
+}
+
+impl Add<&[u8]> for UnpackedResponseBody {
+	type Output = Self;
+	
+	//		add																	
+	fn add(mut self, other: &[u8]) -> Self {
+		self.push_bytes(other);
+		self
+	}
+}
+
+impl<const N: usize> Add<&[u8; N]> for UnpackedResponseBody {
+	type Output = Self;
+	
+	//		add																	
+	fn add(mut self, other: &[u8; N]) -> Self {
+		self.push_bytes(other);
+		self
+	}
+}
+
+impl Add<&str> for UnpackedResponseBody {
+	type Output = Self;
+	
+	//		add																	
+	fn add(mut self, other: &str) -> Self {
+		self.push_str(other);
+		self
+	}
+}
+
+impl AddAssign<&[u8]> for UnpackedResponseBody {
+	//		add_assign															
+	fn add_assign(&mut self, other: &[u8]) {
+		self.push_bytes(other);
+	}
+}
+
+impl<const N: usize> AddAssign<&[u8; N]> for UnpackedResponseBody {
+	//		add_assign															
+	fn add_assign(&mut self, other: &[u8; N]) {
+		self.push_bytes(other);
+	}
+}
+
+impl AddAssign<&str> for UnpackedResponseBody {
+	//		add_assign															
+	fn add_assign(&mut self, other: &str) {
+		self.push_str(other);
+	}
+}
+
+impl Clone for UnpackedResponseBody {
+	//		clone																
+	fn clone(&self) -> Self {
+		Self(self.0.clone())
+	}
+	
+	//		clone_from															
+	fn clone_from(&mut self, source: &Self) {
+		self.0.clone_from(&source.0);
+	}
 }
 
 impl Debug for UnpackedResponseBody {
@@ -399,6 +579,14 @@ impl PartialEq for UnpackedResponseBody {
 	//		eq																	
 	fn eq(&self, other: &Self) -> bool {
 		self.0 == other.0
+	}
+}
+
+impl Write for UnpackedResponseBody {
+	//		write_str															
+	fn write_str(&mut self, s: &str) -> fmt::Result {
+		self.push_str(s);
+		Ok(())
 	}
 }
 

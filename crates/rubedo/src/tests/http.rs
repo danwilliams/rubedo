@@ -319,19 +319,162 @@ mod unpacked_response_body__struct {
 		//	to_bytes() doesn't consume or affect the original response body.
 		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
 	}
+	
+	//		clear																
+	#[test]
+	fn clear() {
+		let mut body = UnpackedResponseBody(b"This is a test".to_vec());
+		body.clear();
+		assert_eq!(body, UnpackedResponseBody(b"".to_vec()));
+	}
+	
+	//		empty																
+	#[test]
+	fn empty() {
+		let body = UnpackedResponseBody::empty();
+		assert_eq!(body, UnpackedResponseBody(b"".to_vec()));
+	}
+	
+	//		is_empty															
+	#[test]
+	fn is_empty() {
+		let body = UnpackedResponseBody(b"This is a test".to_vec());
+		assert_eq!(body.is_empty(), false);
+		let body = UnpackedResponseBody(b"".to_vec());
+		assert_eq!(body.is_empty(), true);
+	}
+	
+	//		len																	
+	#[test]
+	fn len() {
+		let body = UnpackedResponseBody(b"This is a test".to_vec());
+		assert_eq!(body.len(), 14);
+	}
+	
+	//		push																
+	#[test]
+	fn push() {
+		let mut body = UnpackedResponseBody(b"This is a test".to_vec());
+		body.push(33);
+		assert_eq!(body, UnpackedResponseBody(b"This is a test!".to_vec()));
+	}
+	
+	//		push_bytes															
+	#[test]
+	fn push_bytes__byte_array() {
+		let mut body = UnpackedResponseBody(b"This".to_vec());
+		body.push_bytes(b" is a test");
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn push_bytes__byte_slice() {
+		let mut body = UnpackedResponseBody(b"This".to_vec());
+		body.push_bytes(&b" is a test"[..]);
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	
+	//		push_str															
+	#[test]
+	fn push_str() {
+		let mut body = UnpackedResponseBody(b"This is".to_vec());
+		body.push_str(" a test");
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
 }
 
 mod unpacked_response_body__traits {
 	use super::super::*;
 	use assert_json_diff::assert_json_eq;
-	use claims::assert_ok_eq;
+	use claims::{assert_ok, assert_ok_eq};
 	use serde_json::json;
+	
+	//		add																	
+	#[test]
+	fn add__byte_array() {
+		let body = UnpackedResponseBody(b"This is".to_vec());
+		assert_eq!(body + b" a test", UnpackedResponseBody(b"This is a test".to_vec()));
+		//	We cannot compare to the original response body after using the +
+		//	operator, because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(body, UnpackedResponseBody(b"This is".to_vec()));
+	}
+	#[test]
+	fn add__byte_slice() {
+		let body = UnpackedResponseBody(b"This is".to_vec());
+		assert_eq!(body + &b" a test"[..], UnpackedResponseBody(b"This is a test".to_vec()));
+		//	We cannot compare to the original response body after using the +
+		//	operator, because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(body, UnpackedResponseBody(b"This is".to_vec()));
+	}
+	#[test]
+	fn add__str() {
+		let body = UnpackedResponseBody(b"This is".to_vec());
+		assert_eq!(body + " a test", UnpackedResponseBody(b"This is a test".to_vec()));
+		//	We cannot compare to the original response body after using the +
+		//	operator, because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(body, UnpackedResponseBody(b"This is".to_vec()));
+	}
+	
+	//		add_assign															
+	#[test]
+	fn add_assign__byte_array() {
+		let mut body  = UnpackedResponseBody(b"This is".to_vec());
+		body         += b" a test";
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn add_assign__byte_slice() {
+		let mut body  = UnpackedResponseBody(b"This is".to_vec());
+		body         += &b" a test"[..];
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn add_assign__str() {
+		let mut body  = UnpackedResponseBody(b"This is".to_vec());
+		body         += " a test";
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	
+	//		clone																
+	#[test]
+	fn clone() {
+		let mut body = UnpackedResponseBody(b"This is a test".to_vec());
+		let clone    = body.clone();
+		assert_eq!(clone, UnpackedResponseBody(b"This is a test".to_vec()));
+		body.clear();
+		body.push_str("This is a different test");
+		assert_eq!(body,  UnpackedResponseBody(b"This is a different test".to_vec()));
+		assert_eq!(clone, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	
+	//		clone_from															
+	#[test]
+	fn clone_from() {
+		let mut body  = UnpackedResponseBody(b"This is a test".to_vec());
+		let mut clone = UnpackedResponseBody(b"This is another test".to_vec());
+		clone.clone_from(&body);
+		assert_eq!(body,  UnpackedResponseBody(b"This is a test".to_vec()));
+		assert_eq!(clone, UnpackedResponseBody(b"This is a test".to_vec()));
+		body.clear();
+		body.push_str("This is a different test");
+		assert_eq!(body,  UnpackedResponseBody(b"This is a different test".to_vec()));
+		assert_eq!(clone, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
 	
 	//		debug																
 	#[test]
 	fn debug() {
 		let body = UnpackedResponseBody(b"This is a test".to_vec());
 		assert_eq!(format!("{:?}", body), r#"UnpackedResponseBody("This is a test")"#);
+	}
+	
+	//		default																
+	#[test]
+	fn default() {
+		let body = UnpackedResponseBody::default();
+		assert_eq!(body, UnpackedResponseBody(b"".to_vec()));
 	}
 	
 	//		display																
@@ -370,6 +513,14 @@ mod unpacked_response_body__traits {
 		let body = UnpackedResponseBody(b"This is a test".to_vec());
 		let json = json!(b"This is a test".to_vec()).to_string();
 		assert_ok_eq!(serde_json::from_str::<UnpackedResponseBody>(&json), body);
+	}
+	
+	//		write_str															
+	#[test]
+	fn write_str() {
+		let mut body = UnpackedResponseBody(b"This is".to_vec());
+		assert_ok!(body.write_str(" a test"));
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
 	}
 }
 
