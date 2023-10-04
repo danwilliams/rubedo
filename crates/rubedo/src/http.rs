@@ -536,6 +536,18 @@ impl AddAssign<&str> for UnpackedResponseBody {
 	}
 }
 
+impl AsMut<[u8]> for UnpackedResponseBody {
+	fn as_mut(&mut self) -> &mut [u8] {
+		self.as_mut_bytes()
+	}
+}
+
+impl AsRef<[u8]> for UnpackedResponseBody {
+	fn as_ref(&self) -> &[u8] {
+		self.as_bytes()
+	}
+}
+
 impl Clone for UnpackedResponseBody {
 	//		clone																
 	fn clone(&self) -> Self {

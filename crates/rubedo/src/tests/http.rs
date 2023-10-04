@@ -437,6 +437,28 @@ mod unpacked_response_body__traits {
 		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
 	}
 	
+	//		as_ref																
+	#[test]
+	fn as_ref() {
+		//	Same tests as for as_bytes().
+		let body       = UnpackedResponseBody(b"This is a test".to_vec());
+		let byte_slice = body.as_ref();
+		assert_eq!(byte_slice, b"This is a test".to_vec());
+		assert_eq!(body,       UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	
+	//		as_mut																
+	#[test]
+	fn as_mut() {
+		//	Same tests as for as_mut_bytes().
+		let mut body = UnpackedResponseBody(b"This is a test".to_vec());
+		let byte_vec = body.as_mut();
+		assert_eq!(*byte_vec, b"This is a test".to_vec());
+		byte_vec[10] = 84;
+		assert_eq!(*byte_vec, b"This is a Test".to_vec());
+		assert_eq!(body,      UnpackedResponseBody(b"This is a Test".to_vec()));
+	}
+	
 	//		clone																
 	#[test]
 	fn clone() {
