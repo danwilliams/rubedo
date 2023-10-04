@@ -239,7 +239,89 @@ mod unpacked_response_header {
 //		UnpackedResponseBody													
 
 #[cfg(test)]
-mod unpacked_response_body {
+mod unpacked_response_body__struct {
+	use super::super::*;
+	
+	//		new																	
+	#[test]
+	fn new() {
+		let body = UnpackedResponseBody::new(b"This is a test".to_vec());
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	
+	//		as_bytes															
+	#[test]
+	fn as_bytes() {
+		let body       = UnpackedResponseBody(b"This is a test".to_vec());
+		let byte_slice = body.as_bytes();
+		
+		//	Ensure the byte slice matches the original response body's bytes.
+		assert_eq!(byte_slice, b"This is a test".to_vec());
+		
+		//	We can't modify the byte slice due to immutability.
+		//	Uncommenting the line below would cause a compilation error:
+		//byte_slice[10] = 84;
+		
+		//	as_bytes() doesn't consume the original response body.
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	
+	//		as_mut_bytes														
+	#[test]
+	fn as_mut_bytes() {
+		let mut body = UnpackedResponseBody(b"This is a test".to_vec());
+		let byte_vec = body.as_mut_bytes();
+		
+		//	Ensure the byte vector matches the original response body's bytes.
+		assert_eq!(*byte_vec, b"This is a test".to_vec());
+		
+		// We can modify the byte vector.
+		byte_vec[10] = 84;
+		assert_eq!(*byte_vec, b"This is a Test".to_vec());
+		
+		//	as_mut_bytes() doesn't consume the original response body, but modifying
+		//	the returned vector will have affected the response body's contents.
+		assert_eq!(body, UnpackedResponseBody(b"This is a Test".to_vec()));
+	}
+	
+	//		into_bytes															
+	#[test]
+	fn into_bytes() {
+		let body         = UnpackedResponseBody(b"This is a test".to_vec());
+		let mut byte_vec = body.into_bytes();
+		
+		//	Ensure the byte vector matches the original response body's bytes.
+		assert_eq!(byte_vec, b"This is a test".to_vec());
+		
+		// We can modify the byte vector.
+		byte_vec[10]     = 84;
+		assert_eq!(byte_vec, b"This is a Test".to_vec());
+		
+		//	We can't use the original response body after calling into_bytes(),
+		//	because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		// assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	
+	//		to_bytes															
+	#[test]
+	fn to_bytes() {
+		let body           = UnpackedResponseBody(b"This is a test".to_vec());
+		let mut byte_clone = body.to_bytes();
+		
+		//	Ensure the clone matches the original response body's bytes.
+		assert_eq!(byte_clone, b"This is a test".to_vec());
+		
+		//	We can modify the cloned byte vector.
+		byte_clone[10]     = 84;
+		assert_eq!(byte_clone, b"This is a Test".to_vec());
+		
+		//	to_bytes() doesn't consume or affect the original response body.
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+}
+
+mod unpacked_response_body__traits {
 	use super::super::*;
 	use assert_json_diff::assert_json_eq;
 	use claims::assert_ok_eq;

@@ -168,8 +168,8 @@ impl PartialEq for UnpackedResponseHeader {
 /// purpose of this struct is to formalise the data structure used by
 /// [`UnpackedResponse`] for storing the body.
 ///
-/// This originates from the response body as a [`Bytes`] container, but gets
-/// stored here as a vector of bytes for convenience. This may not be valid
+/// The data originates from the response body as a [`Bytes`] container, but
+/// gets stored here as a vector of bytes for convenience. This may not be valid
 /// UTF8, so is not converted to a [`String`]. That step is left as optional for
 /// the caller, if required (and happens when running through the [`Debug`] or
 /// [`Display`] formatters).
@@ -182,9 +182,15 @@ impl PartialEq for UnpackedResponseHeader {
 /// representation of the body is required then it should be extracted and
 /// converted to a `Vec<u8>`, and then run through the `Debug` or `Display`
 /// formatters directly.
-/// 
-/// Note that serialisation/deserialisation of this struct directly will use and
-/// expect a vector of bytes, but when part of `UnpackedResponse` it will be
+///
+/// This struct is very similar in nature to the standard Rust [`String`]
+/// struct, in that it is a wrapper around a vector of bytes, and so its design
+/// and function names are modelled after it. The main difference is that it
+/// does not require its contents to be valid UTF8, and also that it is a tuple
+/// struct rather than a regular struct.
+///
+/// Note that serialisation/deserialisation of this struct directly will produce
+/// and expect a vector of bytes, but when part of `UnpackedResponse` it will be
 /// converted to and from a `String`. This is because the serialisation has been
 /// applied to the `UnpackedResponse` struct as a whole. This behaviour may be
 /// changed later.
@@ -195,6 +201,172 @@ impl PartialEq for UnpackedResponseHeader {
 /// 
 #[derive(Deserialize, Serialize)]
 pub struct UnpackedResponseBody(Vec<u8>);
+
+impl UnpackedResponseBody {
+	//		new																	
+	/// Creates a new response body instance.
+	/// 
+	/// # Parameters
+	/// 
+	/// * `vec` - The response body as a vector of bytes.
+	/// 
+	pub fn new(vec: Vec<u8>) -> Self {
+		Self(vec)
+	}
+	
+	//		as_bytes															
+	/// Returns a byte slice of the response body's contents.
+	/// 
+	/// Provides a read-only view of the byte data within the response body,
+	/// without consuming the data. The returned slice is a reference to the
+	/// actual data stored in the response body, not a copy. Because of this, it
+	/// is not possible to mutate the contents of the response body through the
+	/// returned slice. It does not allocate new memory or change the ownership
+	/// of the byte data. This method is useful when you need to work with the
+	/// bytes of the response body in a read-only fashion, or when you want to
+	/// avoid copying the data.
+	/// 
+	///   - This method returns a slice (`&[u8]`) referencing the bytes of the
+	///     response body contents.
+	///   - The original response body value remains intact, and can still be
+	///     used afterward.
+	///   - No reallocation or copying of data occurs since it's just providing
+	///     a view into the original memory.
+	/// 
+	/// Use this method when you need to work with the byte data in a
+	/// non-destructive, read-only manner while keeping the original response
+	/// body intact.
+	///
+	/// # See Also
+	/// 
+	/// * [`UnpackedResponseBody::as_mut_bytes()`]
+	/// * [`UnpackedResponseBody::into_bytes()`]
+	/// * [`UnpackedResponseBody::to_bytes()`]
+	/// 
+	pub fn as_bytes(&self) -> &[u8] {
+		&self.0
+	}
+	
+	//		as_mut_bytes														
+	/// Returns a mutable referenced to the response body's contents.
+	/// 
+	/// Provides a mutable view of the byte data within the response body,
+	/// without consuming the data. The returned vector is a reference to the
+	/// actual data stored in the response body, not a copy. This method is
+	/// useful when you need to work with, and modify, the bytes of the response
+	/// body directly, without copying the data.
+	/// 
+	///   - This method returns a mutable vector (`&mut Vec<u8>`) referencing
+	///     the bytes of the response body contents.
+	///   - The original response body value remains intact, and can still be
+	///     used afterward.
+	///   - No reallocation or copying of data occurs since it's just providing
+	///     a reference to the original memory.
+	/// 
+	/// Use this method when you need to work directly with the byte data in a
+	/// mutable manner.
+	/// 
+	/// Note that unlike the function's [`String::as_mut_vec()`] counterpart,
+	/// this method is not unsafe. This is because the response body is not
+	/// required to be valid UTF8, so there is no risk of invalid UTF8 being
+	/// created.
+	/// 
+	/// Note also that a better name for this method could be `as_mut_vec()`,
+	/// which would be consistent with the standard library's
+	/// `String::as_mut_vec()` method, which this method is modelled after, but
+	/// that would break consistency with the other methods on this struct. In
+	/// addition, there is another method called [`str::as_bytes_mut()`], which
+	/// appears to be named quite inconsistently with other comparable methods,
+	/// and so calling this method `as_mut_bytes()` might cause confusion, but
+	/// is at least self-consistent.
+	/// 
+	/// # See Also
+	/// 
+	/// * [`UnpackedResponseBody::as_bytes()`]
+	/// * [`UnpackedResponseBody::into_bytes()`]
+	/// * [`UnpackedResponseBody::to_bytes()`]
+	/// 
+	pub fn as_mut_bytes(&mut self) -> &mut Vec<u8> {
+		&mut self.0
+	}
+	
+	//		into_bytes															
+	/// Returns the response body as a vector of bytes.
+	/// 
+	/// This consumes the response body, without cloning or copying, and returns
+	/// a new vector containing the bytes of the response body. It transfers
+	/// ownership of the byte data from the response body to the new vector.
+	/// This method is useful when you need to move the byte data out of the
+	/// response body, for example to pass it to a function that expects a
+	/// `Vec<u8>`, or when you want to modify the byte data in-place without
+	/// affecting the original response body.
+	/// 
+	///   - This method consumes the response body contents and returns a
+	///     `Vec<u8>` containing its bytes.
+	///   - After calling this method, the original response body value is no
+	///     longer available for use, because it has been moved.
+	///   - Transforms the response body into a vector of bytes without any
+	///     copying.
+	/// 
+	/// Use this method when you want to consume the response body and obtain
+	/// ownership of its byte data in the form of a `Vec<u8>`. This is useful
+	/// when you need to modify or move the byte data, or when you want to pass
+	/// it to functions that expect a `Vec<u8>`.
+	/// 
+	/// Note that a better name for this method might be `into_vec()`, but that
+	/// would be inconsistent with the standard library's
+	/// [`String::into_bytes()`] method, which this method is modelled after.
+	///
+	/// # See Also
+	/// 
+	/// * [`UnpackedResponseBody::as_bytes()`]
+	/// * [`UnpackedResponseBody::as_mut_bytes()`]
+	/// * [`UnpackedResponseBody::to_bytes()`]
+	/// 
+	pub fn into_bytes(self) -> Vec<u8> {
+		self.0
+	}
+	
+	//		to_bytes															
+	/// Returns a copy of the response body data converted to a vector of bytes.
+	/// 
+	/// This does not consume the response body, but clones it. Following Rust's
+	/// naming conventions and idioms, this method "converts" the data content
+	/// of the response body into a byte representation, in a `Vec<u8>`. (No
+	/// actual conversion takes place because the data is already stored
+	/// internally as a vector of bytes, but this is academic and could change
+	/// in future, so "conversion" is implied and expected as a theoretical
+	/// behaviour.) Ownership of the cloned and converted byte data is
+	/// transferred to the caller, and there are no side effects on the internal
+	/// state of the `UnpackedResponseBody` instance.
+	/// 
+	///   - This method returns a `Vec<u8>` vector of bytes without consuming
+	///     the response body contents.
+	///   - The original response body value remains intact, and can still be
+	///     used afterward.
+	///   - The response body data is copied, and converted/transformed into
+	///     the output value returned.
+	/// 
+	/// Use this method when you need to obtain a copy of the response body's
+	/// byte data in the form of a `Vec<u8>`, without consuming the response
+	/// body itself. This is useful when you need to pass the byte data to a
+	/// function that expects a `Vec<u8>`, or when you want to modify the byte
+	/// data without affecting the original response body.
+	/// 
+	/// Note that a better name for this method might be `to_vec()`, but that
+	/// would be inconsistent with the standard library's
+	/// [`String::into_bytes()`] method.
+	/// 
+	/// # See Also
+	/// 
+	/// * [`UnpackedResponseBody::as_bytes()`]
+	/// * [`UnpackedResponseBody::as_mut_bytes()`]
+	/// * [`UnpackedResponseBody::into_bytes()`]
+	/// 
+	pub fn to_bytes(&self) -> Vec<u8> {
+		self.0.clone()
+	}
+}
 
 impl Debug for UnpackedResponseBody {
 	//		fmt																	
