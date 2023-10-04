@@ -38,7 +38,7 @@ mod unpacked_response {
 	//		debug																
 	#[test]
 	fn debug() {
-		let crafted      = UnpackedResponse {
+		let response     = UnpackedResponse {
 			status:        StatusCode::OK,
 			headers:       vec![
 				UnpackedResponseHeader {
@@ -48,13 +48,13 @@ mod unpacked_response {
 			],
 			body:          UnpackedResponseBody(b"This is a test".to_vec()),
 		};
-		assert_eq!(format!("{:?}", crafted), r#"UnpackedResponse { status: 200, headers: [UnpackedResponseHeader { name: "foo", value: "bar" }], body: UnpackedResponseBody("This is a test") }"#);
+		assert_eq!(format!("{:?}", response), r#"UnpackedResponse { status: 200, headers: [UnpackedResponseHeader { name: "foo", value: "bar" }], body: UnpackedResponseBody("This is a test") }"#);
 	}
 	
 	//		partial_eq															
 	#[test]
 	fn partial_eq() {
-		let crafted      = UnpackedResponse {
+		let response     = UnpackedResponse {
 			status:        StatusCode::OK,
 			headers:       vec![
 				UnpackedResponseHeader {
@@ -64,7 +64,7 @@ mod unpacked_response {
 			],
 			body:          UnpackedResponseBody(b"This is a test".to_vec()),
 		};
-		assert_ne!(crafted, UnpackedResponse {
+		assert_ne!(response, UnpackedResponse {
 			status:        StatusCode::NOT_FOUND,
 			headers:       vec![
 				UnpackedResponseHeader {
@@ -74,7 +74,7 @@ mod unpacked_response {
 			],
 			body:          UnpackedResponseBody(b"This is a test".to_vec()),
 		});
-		assert_eq!(crafted, UnpackedResponse {
+		assert_eq!(response, UnpackedResponse {
 			status:        StatusCode::OK,
 			headers:       vec![
 				UnpackedResponseHeader {
@@ -84,7 +84,7 @@ mod unpacked_response {
 			],
 			body:          UnpackedResponseBody(b"This is a test".to_vec()),
 		});
-		assert_ne!(crafted, UnpackedResponse {
+		assert_ne!(response, UnpackedResponse {
 			status:        StatusCode::OK,
 			headers:       vec![
 				UnpackedResponseHeader {
@@ -94,7 +94,7 @@ mod unpacked_response {
 			],
 			body:          UnpackedResponseBody(b"This is a test".to_vec()),
 		});
-		assert_ne!(crafted, UnpackedResponse {
+		assert_ne!(response, UnpackedResponse {
 			status:        StatusCode::OK,
 			headers:       vec![
 				UnpackedResponseHeader {
@@ -104,7 +104,7 @@ mod unpacked_response {
 			],
 			body:          UnpackedResponseBody(b"This is a test".to_vec()),
 		});
-		assert_ne!(crafted, UnpackedResponse {
+		assert_ne!(response, UnpackedResponse {
 			status:        StatusCode::OK,
 			headers:       vec![
 				UnpackedResponseHeader {
@@ -119,7 +119,7 @@ mod unpacked_response {
 	//		serialize															
 	#[test]
 	fn serialize() {
-		let crafted        = UnpackedResponse {
+		let response       = UnpackedResponse {
 			status:          StatusCode::OK,
 			headers:         vec![
 				UnpackedResponseHeader {
@@ -139,13 +139,13 @@ mod unpacked_response {
 			],
 			"body":          "This is a test",
 		});
-		assert_json_eq!(json!(crafted), json);
+		assert_json_eq!(json!(response), json);
 	}
 	
 	//		deserialize															
 	#[test]
 	fn deserialize() {
-		let crafted        = UnpackedResponse {
+		let response       = UnpackedResponse {
 			status:          StatusCode::OK,
 			headers:         vec![
 				UnpackedResponseHeader {
@@ -165,7 +165,7 @@ mod unpacked_response {
 			],
 			"body":          "This is a test",
 		}).to_string();
-		assert_ok_eq!(serde_json::from_str::<UnpackedResponse>(&json), crafted);
+		assert_ok_eq!(serde_json::from_str::<UnpackedResponse>(&json), response);
 	}
 }
 
@@ -181,28 +181,28 @@ mod unpacked_response_header {
 	//		partial_eq															
 	#[test]
 	fn partial_eq() {
-		let crafted = UnpackedResponseHeader {
-			name:     s!("foo"),
-			value:    s!("bar"),
+		let header = UnpackedResponseHeader {
+			name:    s!("foo"),
+			value:   s!("bar"),
 		};
-		assert_eq!(crafted, UnpackedResponseHeader {
-			name:     s!("foo"),
-			value:    s!("bar"),
+		assert_eq!(header, UnpackedResponseHeader {
+			name:    s!("foo"),
+			value:   s!("bar"),
 		});
-		assert_ne!(crafted, UnpackedResponseHeader {
-			name:     s!("foo"),
-			value:    s!("baz"),
+		assert_ne!(header, UnpackedResponseHeader {
+			name:    s!("foo"),
+			value:   s!("baz"),
 		});
-		assert_ne!(crafted, UnpackedResponseHeader {
-			name:     s!("baz"),
-			value:    s!("bar"),
+		assert_ne!(header, UnpackedResponseHeader {
+			name:    s!("baz"),
+			value:   s!("bar"),
 		});
 	}
 	
 	//		serialize															
 	#[test]
 	fn serialize() {
-		let crafted    = vec![
+		let headers    = vec![
 			UnpackedResponseHeader {
 				name:    s!("foo"),
 				value:   s!("bar"),
@@ -214,13 +214,13 @@ mod unpacked_response_header {
 				"value": "bar",
 			},
 		]);
-		assert_json_eq!(json!(crafted), json);
+		assert_json_eq!(json!(headers), json);
 	}
 	
 	//		deserialize															
 	#[test]
 	fn deserialize() {
-		let crafted    = vec![
+		let headers    = vec![
 			UnpackedResponseHeader {
 				name:    s!("foo"),
 				value:   s!("bar"),
@@ -232,7 +232,7 @@ mod unpacked_response_header {
 				"value": "bar",
 			},
 		]).to_string();
-		assert_ok_eq!(serde_json::from_str::<Vec<UnpackedResponseHeader>>(&json), crafted);
+		assert_ok_eq!(serde_json::from_str::<Vec<UnpackedResponseHeader>>(&json), headers);
 	}
 }
 
@@ -248,46 +248,46 @@ mod unpacked_response_body {
 	//		debug																
 	#[test]
 	fn debug() {
-		let crafted = UnpackedResponseBody(b"This is a test".to_vec());
-		assert_eq!(format!("{:?}", crafted), r#"UnpackedResponseBody("This is a test")"#);
+		let body = UnpackedResponseBody(b"This is a test".to_vec());
+		assert_eq!(format!("{:?}", body), r#"UnpackedResponseBody("This is a test")"#);
 	}
 	
 	//		display																
 	#[test]
 	fn display() {
-		let crafted = UnpackedResponseBody(b"This is a test".to_vec());
-		assert_eq!(format!("{}", crafted), r#"This is a test"#);
+		let body = UnpackedResponseBody(b"This is a test".to_vec());
+		assert_eq!(format!("{}", body), r#"This is a test"#);
 	}
 	
 	//		from_str															
 	#[test]
 	fn from_str() {
-		let crafted = UnpackedResponseBody::from_str("This is a test");
-		assert_ok_eq!(crafted, UnpackedResponseBody(b"This is a test".to_vec()));
+		let body = UnpackedResponseBody::from_str("This is a test");
+		assert_ok_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
 	}
 	
 	//		partial_eq															
 	#[test]
 	fn partial_eq() {
-		let crafted = UnpackedResponseBody(b"This is a test".to_vec());
-		assert_eq!(crafted, UnpackedResponseBody(b"This is a test".to_vec()));
-		assert_ne!(crafted, UnpackedResponseBody(b"This is different".to_vec()));
+		let body = UnpackedResponseBody(b"This is a test".to_vec());
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+		assert_ne!(body, UnpackedResponseBody(b"This is different".to_vec()));
 	}
 	
 	//		serialize															
 	#[test]
 	fn serialize() {
-		let crafted = UnpackedResponseBody(b"This is a test".to_vec());
-		let json    = json!(b"This is a test".to_vec());
-		assert_json_eq!(json!(crafted), json);
+		let body = UnpackedResponseBody(b"This is a test".to_vec());
+		let json = json!(b"This is a test".to_vec());
+		assert_json_eq!(json!(body), json);
 	}
 	
 	//		deserialize															
 	#[test]
 	fn deserialize() {
-		let crafted = UnpackedResponseBody(b"This is a test".to_vec());
-		let json    = json!(b"This is a test".to_vec()).to_string();
-		assert_ok_eq!(serde_json::from_str::<UnpackedResponseBody>(&json), crafted);
+		let body = UnpackedResponseBody(b"This is a test".to_vec());
+		let json = json!(b"This is a test".to_vec()).to_string();
+		assert_ok_eq!(serde_json::from_str::<UnpackedResponseBody>(&json), body);
 	}
 }
 
