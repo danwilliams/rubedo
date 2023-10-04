@@ -1,6 +1,6 @@
 [package]
 name = "rubedo"
-version = "0.3.0"
+version = "0.3.1"
 description = "Library of useful functionality and extensions"
 categories = []
 keywords = ["library", "utility"]

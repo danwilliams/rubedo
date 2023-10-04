@@ -12,6 +12,18 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.3.1 (04 October 2023)
+
+### Added
+
+  - Implemented `Serialize` and `Deserialize` for `UnpackedResponse`
+
+### Changed
+
+  - Changed `http::UnpackedResponse.body` to use a new `UnpackedResponseBody`
+    struct
+
+
 ## 0.3.0 (02 October 2023)
 
 ### Added
