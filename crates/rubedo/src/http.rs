@@ -26,6 +26,8 @@ use hyper::{
 	HeaderMap,
 	header::HeaderValue,
 };
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde_with::{DisplayFromStr, serde_as};
 use std::{
 	cmp::Ordering,
 	error::Error,
@@ -92,12 +94,21 @@ impl Error for ResponseError {}
 /// * [`ResponseExt::unpack()`]
 /// * [`UnpackedResponseHeader`]
 /// 
-#[derive(Debug)]
+#[serde_as]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct UnpackedResponse {
 	//		Public properties													
 	/// The response status code. This is an enum, so is not directly comparable
-	/// to a number. It can be converted to a number, but this is not done here
-	/// because it is not necessary for the purposes of this struct.
+	/// to a number. The standard [`Display`] formatter will convert it to a
+	/// string in the format `"200 OK"`, but the standard [`FromStr`]
+	/// implementation will error if this is given back to it, as it expects
+	/// only `"200"`. Because this round-trip is basically broken, this struct
+	/// provides custom serialisation and deserialisation functions to convert
+	/// the status code to and from an actual number (a [`u16`]). This allows
+	/// the struct to be serialised and deserialised in a round-trip without
+	/// error, and is also the more intuitive representation of the status code
+	/// in serialised form such as JSON.
+	#[serde(serialize_with = "serialize_status_code", deserialize_with = "deserialize_status_code")]
 	pub status: StatusCode,
 	/// The response headers. These are in a vector rather than a hashmap
 	/// because there may be multiple headers with the same name. They are
@@ -112,6 +123,7 @@ pub struct UnpackedResponse {
 	/// step is left as optional for the caller, if required (and happens when
 	/// running the `UnpackedResponse` struct through the [`Debug`] or
 	/// [`Display`] formatters).
+	#[serde_as(as = "DisplayFromStr")]
 	pub body:    UnpackedResponseBody,
 }
 
@@ -133,7 +145,7 @@ impl PartialEq for UnpackedResponse {
 /// 
 /// * [`UnpackedResponse`]
 /// 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct UnpackedResponseHeader {
 	//		Public properties													
 	/// The response header name.
@@ -171,10 +183,17 @@ impl PartialEq for UnpackedResponseHeader {
 /// converted to a `Vec<u8>`, and then run through the `Debug` or `Display`
 /// formatters directly.
 /// 
+/// Note that serialisation/deserialisation of this struct directly will use and
+/// expect a vector of bytes, but when part of `UnpackedResponse` it will be
+/// converted to and from a `String`. This is because the serialisation has been
+/// applied to the `UnpackedResponse` struct as a whole. This behaviour may be
+/// changed later.
+/// 
 /// # See Also
 /// 
 /// * [`UnpackedResponse`]
 /// 
+#[derive(Deserialize, Serialize)]
 pub struct UnpackedResponseBody(Vec<u8>);
 
 impl Debug for UnpackedResponseBody {
@@ -355,6 +374,59 @@ fn convert_response(
 		headers: convert_headers(headers),
 		body:    UnpackedResponseBody(body.to_vec()),
 	}
+}
+
+//		serialize_status_code													
+/// Returns the status code as a number.
+///
+/// This function is used by [`serde`] to serialize the status code as a number
+/// rather than an enum. This is necessary because the [`UnpackedResponse`]
+/// struct is used for comparison, and the status code is not directly
+/// comparable to a number.
+///
+/// # Parameters
+///
+/// * `status_code` - The status code to serialize.
+/// * `serializer`  - The serializer to use.
+///
+/// # See Also
+///
+/// * [`deserialize_status_code()`]
+/// * [`http::StatusCode`]
+/// * [`UnpackedResponse`]
+///
+fn serialize_status_code<S>(status_code: &StatusCode, serializer: S) -> Result<S::Ok, S::Error>
+where
+	S: Serializer,
+{
+	serializer.serialize_u16(status_code.as_u16())
+}
+
+//		deserialize_status_code													
+/// Returns the status code as an enum.
+///
+/// This function is used by [`serde`] to deserialize the status code as an
+/// enum rather than a number. This is necessary because the
+/// [`UnpackedResponse`] struct is used for comparison, and the status code is
+/// not directly comparable to a number.
+///
+/// # Parameters
+///
+/// * `deserializer` - The deserializer to use.
+///
+/// # See Also
+///
+/// * [`http::StatusCode`]
+/// * [`serialize_status_code()`]
+/// * [`UnpackedResponse`]
+///
+fn deserialize_status_code<'de, D>(deserializer: D) -> Result<StatusCode, D::Error>
+where
+	D: Deserializer<'de>,
+{
+	let status_code_value: u16 = Deserialize::deserialize(deserializer)?;
+	let status_code            = StatusCode::from_u16(status_code_value).map_err(serde::de::Error::custom)?;
+	Ok(status_code)
 }
 
 

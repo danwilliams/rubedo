@@ -30,6 +30,8 @@ mod response_error {
 mod unpacked_response {
 	use super::super::*;
 	use crate::sugar::s;
+	use assert_json_diff::assert_json_eq;
+	use serde_json::json;
 	
 	//		debug																
 	#[test]
@@ -111,6 +113,58 @@ mod unpacked_response {
 			body:          UnpackedResponseBody(b"This is different".to_vec()),
 		});
 	}
+	
+	//		serialize															
+	#[test]
+	fn serialize() {
+		let crafted        = UnpackedResponse {
+			status:          StatusCode::OK,
+			headers:         vec![
+				UnpackedResponseHeader {
+					name:    s!("foo"),
+					value:   s!("bar"),
+				},
+			],
+			body:            UnpackedResponseBody(b"This is a test".to_vec()),
+		};
+		let json           = json!({
+			"status":        200,
+			"headers":       [
+				{
+					"name":  "foo",
+					"value": "bar",
+				},
+			],
+			"body":          "This is a test",
+		});
+		assert_json_eq!(json!(crafted), json);
+	}
+	
+	//		deserialize															
+	#[test]
+	fn deserialize() {
+		let crafted        = UnpackedResponse {
+			status:          StatusCode::OK,
+			headers:         vec![
+				UnpackedResponseHeader {
+					name:    s!("foo"),
+					value:   s!("bar"),
+				},
+			],
+			body:            UnpackedResponseBody(b"This is a test".to_vec()),
+		};
+		let json           = json!({
+			"status":        200,
+			"headers":       [
+				{
+					"name":  "foo",
+					"value": "bar",
+				},
+			],
+			"body":          "This is a test",
+		}).to_string();
+		assert_eq!(serde_json::from_str::<UnpackedResponse>(&json).unwrap(), crafted);
+	}
 }
 
 //		UnpackedResponseHeader													
@@ -118,6 +172,8 @@ mod unpacked_response {
 #[cfg(test)]
 mod unpacked_response_header {
 	use super::super::*;
+	use assert_json_diff::assert_json_eq;
+	use serde_json::json;
 	
 	//		partial_eq															
 	#[test]
@@ -139,6 +195,42 @@ mod unpacked_response_header {
 			value:    s!("bar"),
 		});
 	}
+	
+	//		serialize															
+	#[test]
+	fn serialize() {
+		let crafted    = vec![
+			UnpackedResponseHeader {
+				name:    s!("foo"),
+				value:   s!("bar"),
+			},
+		];
+		let json       = json!([
+			{
+				"name":  "foo",
+				"value": "bar",
+			},
+		]);
+		assert_json_eq!(json!(crafted), json);
+	}
+	
+	//		deserialize															
+	#[test]
+	fn deserialize() {
+		let crafted    = vec![
+			UnpackedResponseHeader {
+				name:    s!("foo"),
+				value:   s!("bar"),
+			},
+		];
+		let json       = json!([
+			{
+				"name":  "foo",
+				"value": "bar",
+			},
+		]).to_string();
+		assert_eq!(serde_json::from_str::<Vec<UnpackedResponseHeader>>(&json).unwrap(), crafted);
+	}
 }
 
 //		UnpackedResponseBody													
@@ -146,6 +238,8 @@ mod unpacked_response_header {
 #[cfg(test)]
 mod unpacked_response_body {
 	use super::super::*;
+	use assert_json_diff::assert_json_eq;
+	use serde_json::json;
 	
 	//		debug																
 	#[test]
@@ -174,6 +268,22 @@ mod unpacked_response_body {
 		let crafted = UnpackedResponseBody(b"This is a test".to_vec());
 		assert_eq!(crafted, UnpackedResponseBody(b"This is a test".to_vec()));
 		assert_ne!(crafted, UnpackedResponseBody(b"This is different".to_vec()));
+	}
+	
+	//		serialize															
+	#[test]
+	fn serialize() {
+		let crafted = UnpackedResponseBody(b"This is a test".to_vec());
+		let json    = json!(b"This is a test".to_vec());
+		assert_json_eq!(json!(crafted), json);
+	}
+	
+	//		deserialize															
+	#[test]
+	fn deserialize() {
+		let crafted = UnpackedResponseBody(b"This is a test".to_vec());
+		let json    = json!(b"This is a test".to_vec()).to_string();
+		assert_eq!(serde_json::from_str::<UnpackedResponseBody>(&json).unwrap(), crafted);
 	}
 }
 
@@ -275,6 +385,12 @@ mod response_ext {
 mod functions {
 	use super::super::*;
 	use crate::sugar::s;
+	use serde_assert::{
+		Deserializer as TestDeserializer,
+		Serializer as TestSerializer,
+		Token,
+		Tokens,
+	};
 	
 	//		convert_headers														
 	#[test]
@@ -392,6 +508,28 @@ mod functions {
 			body:          UnpackedResponseBody(b"This is a test".to_vec()),
 		};
 		assert_eq!(converted, crafted);
+	}
+	
+	//		serialize_status_code												
+	#[test]
+	fn serialize_status_code__basic() {
+		let status_code = StatusCode::OK;
+		let serializer  = TestSerializer::builder().build();
+		let result      = serialize_status_code(&status_code, &serializer);
+		assert_eq!(result.is_ok(), true);
+		assert_eq!(result.unwrap(), Tokens(vec![Token::U16(200)]));
+	}
+	
+	//		deserialize_status_code												
+	#[test]
+	fn deserialize_status_code__basic() {
+		let mut deserializer = TestDeserializer::builder()
+			.tokens(Tokens(vec![Token::U16(200)]))
+			.build()
+		;
+		let result           = deserialize_status_code(&mut deserializer);
+		assert_eq!(result.is_ok(), true);
+		assert_eq!(result.unwrap(), StatusCode::OK);
 	}
 }
 
