@@ -30,6 +30,7 @@ use std::{
 	cmp::Ordering,
 	error::Error,
 	fmt::{Debug, Display, self},
+	str::FromStr,
 };
 
 
@@ -73,12 +74,13 @@ impl Error for ResponseError {}
 /// 
 /// Note that the [`body`](UnpackedResponse.body) property, which is stored as a
 /// vector of bytes, will get converted to a [`String`] if it is run through the
-/// standard [`Debug`] formatter. This is because human-readable output is the
-/// intuitively-expected outcome in this situation. The conversion uses
-/// [`from_utf8_lossy()`](String::from_utf8_lossy()), so no errors will occur,
-/// but if the body is not valid UTF8 then the resulting `String` will not be
-/// exactly the same. If an accurate representation of the body is required,
-/// then it should be run through the `Debug` formatter directly.
+/// standard [`Debug`] or [`Display`] formatters. This is because human-readable
+/// output is the intuitively-expected outcome in this situation. The conversion
+/// uses [`from_utf8_lossy()`](String::from_utf8_lossy()), so no errors will
+/// occur, but if the body is not valid UTF8 then the resulting `String` will
+/// not be exactly the same. If an accurate representation of the body is
+/// required then it should be extracted and converted to a `Vec<u8>`, and then
+/// run through the `Debug` or `Display` formatters directly.
 /// 
 /// # See Also
 /// 
@@ -90,6 +92,7 @@ impl Error for ResponseError {}
 /// * [`ResponseExt::unpack()`]
 /// * [`UnpackedResponseHeader`]
 /// 
+#[derive(Debug)]
 pub struct UnpackedResponse {
 	//		Public properties													
 	/// The response status code. This is an enum, so is not directly comparable
@@ -107,8 +110,9 @@ pub struct UnpackedResponse {
 	/// container, but gets stored here as a vector of bytes for convenience.
 	/// This may not be valid UTF8, so is not converted to a [`String`]. That
 	/// step is left as optional for the caller, if required (and happens when
-	/// running the `UnpackedResponse` struct through the [`Debug`] formatter).
-	pub body:    Vec<u8>,
+	/// running the `UnpackedResponse` struct through the [`Debug`] or
+	/// [`Display`] formatters).
+	pub body:    UnpackedResponseBody,
 }
 
 impl PartialEq for UnpackedResponse {
@@ -116,18 +120,6 @@ impl PartialEq for UnpackedResponse {
     fn eq(&self, other: &Self) -> bool {
         self.status == other.status && self.headers == other.headers && self.body == other.body
     }
-}
-
-impl Debug for UnpackedResponse {
-	//		fmt																	
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		let body = String::from_utf8_lossy(&self.body);
-		f.debug_struct("UnpackedResponse")
-			.field("status",  &self.status)
-			.field("headers", &self.headers)
-			.field("body",    &body)
-			.finish()
-	}
 }
 
 //		UnpackedResponseHeader													
@@ -154,6 +146,68 @@ impl PartialEq for UnpackedResponseHeader {
 	//		eq																	
 	fn eq(&self, other: &Self) -> bool {
 		self.name == other.name && self.value == other.value
+	}
+}
+
+//		UnpackedResponseBody													
+/// An HTTP response body.
+/// 
+/// A simple representation of an HTTP response body as a vector of bytes. The
+/// purpose of this struct is to formalise the data structure used by
+/// [`UnpackedResponse`] for storing the body.
+///
+/// This originates from the response body as a [`Bytes`] container, but gets
+/// stored here as a vector of bytes for convenience. This may not be valid
+/// UTF8, so is not converted to a [`String`]. That step is left as optional for
+/// the caller, if required (and happens when running through the [`Debug`] or
+/// [`Display`] formatters).
+/// 
+/// The conversion to a `String` when run through the `Debug` and `Display`
+/// formatters is because human-readable output is the intuitively-expected
+/// outcome in this situation. The conversion uses [`from_utf8_lossy()`](String::from_utf8_lossy()),
+/// so no errors will occur, but if the body is not valid UTF8 then the
+/// resulting `String` will not be exactly the same. If an accurate
+/// representation of the body is required then it should be extracted and
+/// converted to a `Vec<u8>`, and then run through the `Debug` or `Display`
+/// formatters directly.
+/// 
+/// # See Also
+/// 
+/// * [`UnpackedResponse`]
+/// 
+pub struct UnpackedResponseBody(Vec<u8>);
+
+impl Debug for UnpackedResponseBody {
+	//		fmt																	
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		let body = String::from_utf8_lossy(&self.0);
+		f.debug_tuple("UnpackedResponseBody")
+			.field(&body)
+			.finish()
+	}
+}
+
+impl Display for UnpackedResponseBody {
+	//		fmt																	
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		let body = String::from_utf8_lossy(&self.0);
+		write!(f, "{}", body)
+	}
+}
+
+impl FromStr for UnpackedResponseBody {
+	type Err = ResponseError;
+	
+	//		from_str															
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		Ok(Self(s.as_bytes().to_vec()))
+	}
+}
+
+impl PartialEq for UnpackedResponseBody {
+	//		eq																	
+	fn eq(&self, other: &Self) -> bool {
+		self.0 == other.0
 	}
 }
 
@@ -299,7 +353,7 @@ fn convert_response(
 	UnpackedResponse {
 		status,
 		headers: convert_headers(headers),
-		body:    body.to_vec(),
+		body:    UnpackedResponseBody(body.to_vec()),
 	}
 }
 

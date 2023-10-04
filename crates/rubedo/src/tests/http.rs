@@ -42,9 +42,138 @@ mod unpacked_response {
 					value: s!("bar"),
 				},
 			],
-			body:          b"This is a test".to_vec(),
+			body:          UnpackedResponseBody(b"This is a test".to_vec()),
 		};
-		assert_eq!(format!("{:?}", crafted), r#"UnpackedResponse { status: 200, headers: [UnpackedResponseHeader { name: "foo", value: "bar" }], body: "This is a test" }"#);
+		assert_eq!(format!("{:?}", crafted), r#"UnpackedResponse { status: 200, headers: [UnpackedResponseHeader { name: "foo", value: "bar" }], body: UnpackedResponseBody("This is a test") }"#);
+	}
+	
+	//		partial_eq															
+	#[test]
+	fn partial_eq() {
+		let crafted      = UnpackedResponse {
+			status:        StatusCode::OK,
+			headers:       vec![
+				UnpackedResponseHeader {
+					name:  s!("foo"),
+					value: s!("bar"),
+				},
+			],
+			body:          UnpackedResponseBody(b"This is a test".to_vec()),
+		};
+		assert_ne!(crafted, UnpackedResponse {
+			status:        StatusCode::NOT_FOUND,
+			headers:       vec![
+				UnpackedResponseHeader {
+					name:  s!("foo"),
+					value: s!("bar"),
+				},
+			],
+			body:          UnpackedResponseBody(b"This is a test".to_vec()),
+		});
+		assert_eq!(crafted, UnpackedResponse {
+			status:        StatusCode::OK,
+			headers:       vec![
+				UnpackedResponseHeader {
+					name:  s!("foo"),
+					value: s!("bar"),
+				},
+			],
+			body:          UnpackedResponseBody(b"This is a test".to_vec()),
+		});
+		assert_ne!(crafted, UnpackedResponse {
+			status:        StatusCode::OK,
+			headers:       vec![
+				UnpackedResponseHeader {
+					name:  s!("foo"),
+					value: s!("baz"),
+				},
+			],
+			body:          UnpackedResponseBody(b"This is a test".to_vec()),
+		});
+		assert_ne!(crafted, UnpackedResponse {
+			status:        StatusCode::OK,
+			headers:       vec![
+				UnpackedResponseHeader {
+					name:  s!("baz"),
+					value: s!("bar"),
+				},
+			],
+			body:          UnpackedResponseBody(b"This is a test".to_vec()),
+		});
+		assert_ne!(crafted, UnpackedResponse {
+			status:        StatusCode::OK,
+			headers:       vec![
+				UnpackedResponseHeader {
+					name:  s!("foo"),
+					value: s!("bar"),
+				},
+			],
+			body:          UnpackedResponseBody(b"This is different".to_vec()),
+		});
+	}
+}
+
+//		UnpackedResponseHeader													
+
+#[cfg(test)]
+mod unpacked_response_header {
+	use super::super::*;
+	
+	//		partial_eq															
+	#[test]
+	fn partial_eq() {
+		let crafted = UnpackedResponseHeader {
+			name:     s!("foo"),
+			value:    s!("bar"),
+		};
+		assert_eq!(crafted, UnpackedResponseHeader {
+			name:     s!("foo"),
+			value:    s!("bar"),
+		});
+		assert_ne!(crafted, UnpackedResponseHeader {
+			name:     s!("foo"),
+			value:    s!("baz"),
+		});
+		assert_ne!(crafted, UnpackedResponseHeader {
+			name:     s!("baz"),
+			value:    s!("bar"),
+		});
+	}
+}
+
+//		UnpackedResponseBody													
+
+#[cfg(test)]
+mod unpacked_response_body {
+	use super::super::*;
+	
+	//		debug																
+	#[test]
+	fn debug() {
+		let crafted = UnpackedResponseBody(b"This is a test".to_vec());
+		assert_eq!(format!("{:?}", crafted), r#"UnpackedResponseBody("This is a test")"#);
+	}
+	
+	//		display																
+	#[test]
+	fn display() {
+		let crafted = UnpackedResponseBody(b"This is a test".to_vec());
+		assert_eq!(format!("{}", crafted), r#"This is a test"#);
+	}
+	
+	//		from_str															
+	#[test]
+	fn from_str() {
+		let crafted = UnpackedResponseBody::from_str("This is a test").unwrap();
+		assert_eq!(crafted, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	
+	//		partial_eq															
+	#[test]
+	fn partial_eq() {
+		let crafted = UnpackedResponseBody(b"This is a test".to_vec());
+		assert_eq!(crafted, UnpackedResponseBody(b"This is a test".to_vec()));
+		assert_ne!(crafted, UnpackedResponseBody(b"This is different".to_vec()));
 	}
 }
 
@@ -76,7 +205,7 @@ mod response_ext {
 					value: s!("bar"),
 				},
 			],
-			body:          b"".to_vec(),
+			body:          UnpackedResponseBody(b"".to_vec()),
 		};
 		assert_eq!(unpacked, crafted);
 	}
@@ -94,7 +223,7 @@ mod response_ext {
 		let crafted      = UnpackedResponse {
 			status:        StatusCode::OK,
 			headers:       vec![],
-			body:          b"This is a test".to_vec(),
+			body:          UnpackedResponseBody(b"This is a test".to_vec()),
 		};
 		assert_eq!(unpacked, crafted);
 	}
@@ -112,7 +241,7 @@ mod response_ext {
 		let crafted      = UnpackedResponse {
 			status:        StatusCode::OK,
 			headers:       vec![],
-			body:          b"This is a test".to_vec(),
+			body:          UnpackedResponseBody(b"This is a test".to_vec()),
 		};
 		assert_eq!(unpacked, crafted);
 	}
@@ -135,7 +264,7 @@ mod response_ext {
 					value: s!("text/plain; charset=utf-8"),
 				},
 			],
-			body:          b"This is a test".to_vec(),
+			body:          UnpackedResponseBody(b"This is a test".to_vec()),
 		};
 		assert_eq!(unpacked, crafted);
 	}
@@ -260,7 +389,7 @@ mod functions {
 					value: s!("bar"),
 				},
 			],
-			body:          b"This is a test".to_vec(),
+			body:          UnpackedResponseBody(b"This is a test".to_vec()),
 		};
 		assert_eq!(converted, crafted);
 	}
