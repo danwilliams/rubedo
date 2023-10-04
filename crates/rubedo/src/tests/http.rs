@@ -6,12 +6,13 @@
 #[cfg(test)]
 mod response_error {
 	use super::super::*;
+	use claims::assert_err;
 	
 	//		debug																
 	#[test]
 	fn debug() {
 		let err = Err::<ResponseError, _>(ResponseError::ConversionError);
-		assert!(err.is_err());
+		assert_err!(&err);
 		assert_eq!(format!("{:?}", err), "Err(ConversionError)");
 	}
 	
@@ -19,7 +20,7 @@ mod response_error {
 	#[test]
 	fn display() {
 		let err = Err::<ResponseError, _>(ResponseError::ConversionError);
-		assert!(err.is_err());
+		assert_err!(&err);
 		assert_eq!(err.unwrap_err().to_string(), "Error encountered while converting response body to bytes");
 	}
 }
@@ -31,6 +32,7 @@ mod unpacked_response {
 	use super::super::*;
 	use crate::sugar::s;
 	use assert_json_diff::assert_json_eq;
+	use claims::assert_ok_eq;
 	use serde_json::json;
 	
 	//		debug																
@@ -163,7 +165,7 @@ mod unpacked_response {
 			],
 			"body":          "This is a test",
 		}).to_string();
-		assert_eq!(serde_json::from_str::<UnpackedResponse>(&json).unwrap(), crafted);
+		assert_ok_eq!(serde_json::from_str::<UnpackedResponse>(&json), crafted);
 	}
 }
 
@@ -173,6 +175,7 @@ mod unpacked_response {
 mod unpacked_response_header {
 	use super::super::*;
 	use assert_json_diff::assert_json_eq;
+	use claims::assert_ok_eq;
 	use serde_json::json;
 	
 	//		partial_eq															
@@ -229,7 +232,7 @@ mod unpacked_response_header {
 				"value": "bar",
 			},
 		]).to_string();
-		assert_eq!(serde_json::from_str::<Vec<UnpackedResponseHeader>>(&json).unwrap(), crafted);
+		assert_ok_eq!(serde_json::from_str::<Vec<UnpackedResponseHeader>>(&json), crafted);
 	}
 }
 
@@ -239,6 +242,7 @@ mod unpacked_response_header {
 mod unpacked_response_body {
 	use super::super::*;
 	use assert_json_diff::assert_json_eq;
+	use claims::assert_ok_eq;
 	use serde_json::json;
 	
 	//		debug																
@@ -258,8 +262,8 @@ mod unpacked_response_body {
 	//		from_str															
 	#[test]
 	fn from_str() {
-		let crafted = UnpackedResponseBody::from_str("This is a test").unwrap();
-		assert_eq!(crafted, UnpackedResponseBody(b"This is a test".to_vec()));
+		let crafted = UnpackedResponseBody::from_str("This is a test");
+		assert_ok_eq!(crafted, UnpackedResponseBody(b"This is a test".to_vec()));
 	}
 	
 	//		partial_eq															
@@ -283,7 +287,7 @@ mod unpacked_response_body {
 	fn deserialize() {
 		let crafted = UnpackedResponseBody(b"This is a test".to_vec());
 		let json    = json!(b"This is a test".to_vec()).to_string();
-		assert_eq!(serde_json::from_str::<UnpackedResponseBody>(&json).unwrap(), crafted);
+		assert_ok_eq!(serde_json::from_str::<UnpackedResponseBody>(&json), crafted);
 	}
 }
 
@@ -293,6 +297,7 @@ mod response_ext {
 	use super::super::*;
 	use crate::sugar::s;
 	use axum::response::IntoResponse;
+	use claims::assert_ok_eq;
 	
 	//		unpack																
 	#[test]
@@ -303,10 +308,7 @@ mod response_ext {
 			.body(())
 			.unwrap()
 		;
-		let result       = response.unpack();
-		assert_eq!(result.is_ok(), true);
-		
-		let unpacked     = result.unwrap();
+		let unpacked     = response.unpack();
 		let crafted      = UnpackedResponse {
 			status:        StatusCode::OK,
 			headers:       vec![
@@ -317,7 +319,7 @@ mod response_ext {
 			],
 			body:          UnpackedResponseBody(b"".to_vec()),
 		};
-		assert_eq!(unpacked, crafted);
+		assert_ok_eq!(unpacked, crafted);
 	}
 	#[test]
 	fn unpack__string() {
@@ -326,16 +328,13 @@ mod response_ext {
 			.body(s!("This is a test"))
 			.unwrap()
 		;
-		let result       = response.unpack();
-		assert_eq!(result.is_ok(), true);
-		
-		let unpacked     = result.unwrap();
+		let unpacked     = response.unpack();
 		let crafted      = UnpackedResponse {
 			status:        StatusCode::OK,
 			headers:       vec![],
 			body:          UnpackedResponseBody(b"This is a test".to_vec()),
 		};
-		assert_eq!(unpacked, crafted);
+		assert_ok_eq!(unpacked, crafted);
 	}
 	#[test]
 	fn unpack__hyper_body() {
@@ -344,16 +343,13 @@ mod response_ext {
 			.body(HyperBody::from("This is a test"))
 			.unwrap()
 		;
-		let result       = response.unpack();
-		assert_eq!(result.is_ok(), true);
-		
-		let unpacked     = result.unwrap();
+		let unpacked     = response.unpack();
 		let crafted      = UnpackedResponse {
 			status:        StatusCode::OK,
 			headers:       vec![],
 			body:          UnpackedResponseBody(b"This is a test".to_vec()),
 		};
-		assert_eq!(unpacked, crafted);
+		assert_ok_eq!(unpacked, crafted);
 	}
 	#[test]
 	fn unpack__axum_body() {
@@ -361,10 +357,7 @@ mod response_ext {
 			StatusCode::OK,
 			"This is a test",
 		).into_response();
-		let result       = response.unpack();
-		assert_eq!(result.is_ok(), true);
-		
-		let unpacked     = result.unwrap();
+		let unpacked     = response.unpack();
 		let crafted      = UnpackedResponse {
 			status:        StatusCode::OK,
 			headers:       vec![
@@ -376,7 +369,7 @@ mod response_ext {
 			],
 			body:          UnpackedResponseBody(b"This is a test".to_vec()),
 		};
-		assert_eq!(unpacked, crafted);
+		assert_ok_eq!(unpacked, crafted);
 	}
 }
 
@@ -385,6 +378,7 @@ mod response_ext {
 mod functions {
 	use super::super::*;
 	use crate::sugar::s;
+	use claims::assert_ok_eq;
 	use serde_assert::{
 		Deserializer as TestDeserializer,
 		Serializer as TestSerializer,
@@ -516,8 +510,7 @@ mod functions {
 		let status_code = StatusCode::OK;
 		let serializer  = TestSerializer::builder().build();
 		let result      = serialize_status_code(&status_code, &serializer);
-		assert_eq!(result.is_ok(), true);
-		assert_eq!(result.unwrap(), Tokens(vec![Token::U16(200)]));
+		assert_ok_eq!(result, Tokens(vec![Token::U16(200)]));
 	}
 	
 	//		deserialize_status_code												
@@ -528,8 +521,7 @@ mod functions {
 			.build()
 		;
 		let result           = deserialize_status_code(&mut deserializer);
-		assert_eq!(result.is_ok(), true);
-		assert_eq!(result.unwrap(), StatusCode::OK);
+		assert_ok_eq!(result, StatusCode::OK);
 	}
 }
 

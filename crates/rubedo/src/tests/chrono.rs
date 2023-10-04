@@ -107,6 +107,7 @@ mod duration_ext {
 #[cfg(test)]
 mod naivedate_ext {
 	use super::super::*;
+	use claims::{assert_none, assert_some_eq};
 	
 	//		today																
 	#[test]
@@ -131,11 +132,11 @@ mod naivedate_ext {
 	//		days_in_month_opt													
 	#[test]
 	fn days_in_month_opt__valid() {
-		assert_eq!(NaiveDate::days_in_month_opt(2000, 1).unwrap(), 31);
+		assert_some_eq!(NaiveDate::days_in_month_opt(2000, 1), 31);
 	}
 	#[test]
 	fn days_in_month_opt__invalid() {
-		assert!(NaiveDate::days_in_month_opt(2000, 13).is_none());
+		assert_none!(NaiveDate::days_in_month_opt(2000, 13));
 	}
 	
 	//		days_in_year														
@@ -153,11 +154,11 @@ mod naivedate_ext {
 	//		days_in_year_opt													
 	#[test]
 	fn days_in_year_opt__normal() {
-		assert_eq!(NaiveDate::days_in_year_opt(2001).unwrap(), 365);
+		assert_some_eq!(NaiveDate::days_in_year_opt(2001), 365);
 	}
 	#[test]
 	fn days_in_year_opt__leap() {
-		assert_eq!(NaiveDate::days_in_year_opt(2000).unwrap(), 366);
+		assert_some_eq!(NaiveDate::days_in_year_opt(2000), 366);
 	}
 	
 	//		is_leap_year														
@@ -173,8 +174,8 @@ mod naivedate_ext {
 	//		is_leap_year_opt													
 	#[test]
 	fn is_leap_year_opt() {
-		assert_eq!(NaiveDate::is_leap_year_opt(2000).unwrap(), true);
-		assert_eq!(NaiveDate::is_leap_year_opt(2001).unwrap(), false);
+		assert_some_eq!(NaiveDate::is_leap_year_opt(2000), true);
+		assert_some_eq!(NaiveDate::is_leap_year_opt(2001), false);
 	}
 	
 	//		start_of_month														
@@ -187,11 +188,11 @@ mod naivedate_ext {
 	//		start_of_month_opt													
 	#[test]
 	fn start_of_month_opt__valid() {
-		assert_eq!(NaiveDate::start_of_month_opt(2000, 1).unwrap(), NaiveDate::from_ymd_opt(2000, 1, 1).unwrap());
+		assert_some_eq!(NaiveDate::start_of_month_opt(2000, 1), NaiveDate::from_ymd_opt(2000, 1, 1).unwrap());
 	}
 	#[test]
 	fn start_of_month_opt__invalid() {
-		assert!(NaiveDate::start_of_month_opt(2000, 13).is_none());
+		assert_none!(NaiveDate::start_of_month_opt(2000, 13));
 	}
 	
 	//		end_of_month														
@@ -204,13 +205,13 @@ mod naivedate_ext {
 	//		end_of_month_opt													
 	#[test]
 	fn end_of_month_opt__valid() {
-		assert_eq!(NaiveDate::end_of_month_opt(2000, 1).unwrap(), NaiveDate::from_ymd_opt(2000, 1, 31).unwrap());
+		assert_some_eq!(NaiveDate::end_of_month_opt(2000, 1), NaiveDate::from_ymd_opt(2000, 1, 31).unwrap());
 	}
 	#[test]
 	fn end_of_month_opt__invalid() {
-		assert!(NaiveDate::end_of_month_opt(2000, 13).is_none());
-		assert!(NaiveDate::end_of_month_opt(2000000, 1).is_none());
-		assert!(NaiveDate::end_of_month_opt(2000000, 13).is_none());
+		assert_none!(NaiveDate::end_of_month_opt(2000, 13));
+		assert_none!(NaiveDate::end_of_month_opt(2000000, 1));
+		assert_none!(NaiveDate::end_of_month_opt(2000000, 13));
 	}
 	
 	//		start_of_year														
@@ -223,7 +224,7 @@ mod naivedate_ext {
 	//		start_of_year_opt													
 	#[test]
 	fn start_of_year_opt() {
-		assert_eq!(NaiveDate::start_of_year_opt(2000).unwrap(), NaiveDate::from_ymd_opt(2000, 1, 1).unwrap());
+		assert_some_eq!(NaiveDate::start_of_year_opt(2000), NaiveDate::from_ymd_opt(2000, 1, 1).unwrap());
 	}
 	
 	//		end_of_year														
@@ -236,7 +237,7 @@ mod naivedate_ext {
 	//		end_of_year_opt													
 	#[test]
 	fn end_of_year_opt() {
-		assert_eq!(NaiveDate::end_of_year_opt(2000).unwrap(), NaiveDate::from_ymd_opt(2000, 12, 31).unwrap());
+		assert_some_eq!(NaiveDate::end_of_year_opt(2000), NaiveDate::from_ymd_opt(2000, 12, 31).unwrap());
 	}
 }
 
