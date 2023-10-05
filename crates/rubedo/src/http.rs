@@ -588,6 +588,41 @@ impl Display for UnpackedResponseBody {
 	}
 }
 
+impl From<char> for UnpackedResponseBody {
+	//		from																
+	/// Converts a [`char`] to an [`UnpackedResponseBody`].
+	/// 
+	/// Note that it does this in the way that is most compatible with
+	/// [`String`] conversion. The [`char`] type in Rust represents a Unicode
+	/// scalar value. That means a single `char` value corresponds to one
+	/// Unicode character. But Unicode characters can have a wide range of
+	/// values, from `0` to `0x10FFFF` (this range excludes the surrogate
+	/// pairs), and this value range doesn't fit into a single byte. That's why
+	/// `char` in Rust is 4 bytes, because it has to accommodate any possible
+	/// Unicode scalar value. The UTF-8 encoded representation of the 'ñ'
+	/// character is `[195, 177`, but in memory, a `char` containing `'ñ'` does
+	/// not hold the bytes `[195, 177]`. Instead, it holds the Unicode scalar
+	/// value for 'ñ', which is `U+00F1`, or in integer terms, `241`. When we
+	/// convert a char to a [`u32`] directly, we're taking this scalar value
+	/// (like `241` for `'ñ'`) and representing it in memory as a 4-byte
+	/// integer. So using code such as `(c as u32).to_le_bytes().to_vec()` would
+	/// result in [241, 0, 0, 0], and not [195, 177]. This behaviour would not
+	/// match expectation and would not match the behaviour of [`String`]
+	/// conversion. To get the UTF-8 encoded bytes of a `char`, we need to use
+	/// encoding methods because we're effectively translating from the Unicode
+	/// scalar value to its UTF-8 byte sequence. This is what the
+	/// [`encode_utf8()`](char::encode_utf8()) method provides. To put it
+	/// another way: `char` isn't storing bytes, it's storing a Unicode scalar
+	/// value. UTF-8 is one of the ways to represent that value (and the most
+	/// common one in Rust).
+	/// 
+	fn from(c: char) -> Self {
+		let mut bytes = [0; 4];
+		let used      = c.encode_utf8(&mut bytes).len();
+		Self(bytes[..used].to_vec())
+	}
+}
+
 impl From<&str> for UnpackedResponseBody {
 	//		from																
 	/// Converts a `&str` to an [`UnpackedResponseBody`].
@@ -633,41 +668,6 @@ impl<'a> From<Cow<'a, str>> for UnpackedResponseBody {
 	/// Converts a clone-on-write string to an [`UnpackedResponseBody`].
 	fn from(s: Cow<'a, str>) -> Self {
 		Self(s.into_owned().as_bytes().to_vec())
-	}
-}
-
-impl From<char> for UnpackedResponseBody {
-	//		from																
-	/// Converts a [`char`] to an [`UnpackedResponseBody`].
-	/// 
-	/// Note that it does this in the way that is most compatible with
-	/// [`String`] conversion. The [`char`] type in Rust represents a Unicode
-	/// scalar value. That means a single `char` value corresponds to one
-	/// Unicode character. But Unicode characters can have a wide range of
-	/// values, from `0` to `0x10FFFF` (this range excludes the surrogate
-	/// pairs), and this value range doesn't fit into a single byte. That's why
-	/// `char` in Rust is 4 bytes, because it has to accommodate any possible
-	/// Unicode scalar value. The UTF-8 encoded representation of the 'ñ'
-	/// character is `[195, 177`, but in memory, a `char` containing `'ñ'` does
-	/// not hold the bytes `[195, 177]`. Instead, it holds the Unicode scalar
-	/// value for 'ñ', which is `U+00F1`, or in integer terms, `241`. When we
-	/// convert a char to a [`u32`] directly, we're taking this scalar value
-	/// (like `241` for `'ñ'`) and representing it in memory as a 4-byte
-	/// integer. So using code such as `(c as u32).to_le_bytes().to_vec()` would
-	/// result in [241, 0, 0, 0], and not [195, 177]. This behaviour would not
-	/// match expectation and would not match the behaviour of [`String`]
-	/// conversion. To get the UTF-8 encoded bytes of a `char`, we need to use
-	/// encoding methods because we're effectively translating from the Unicode
-	/// scalar value to its UTF-8 byte sequence. This is what the
-	/// [`encode_utf8()`](char::encode_utf8()) method provides. To put it
-	/// another way: `char` isn't storing bytes, it's storing a Unicode scalar
-	/// value. UTF-8 is one of the ways to represent that value (and the most
-	/// common one in Rust).
-	/// 
-	fn from(c: char) -> Self {
-		let mut bytes = [0; 4];
-		let used      = c.encode_utf8(&mut bytes).len();
-		Self(bytes[..used].to_vec())
 	}
 }
 
