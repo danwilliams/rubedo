@@ -320,6 +320,13 @@ mod unpacked_response_body__struct {
 		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
 	}
 	
+	//		to_string															
+	#[test]
+	fn to_string() {
+		let body = UnpackedResponseBody(b"This is a test".to_vec());
+		assert_eq!(body.to_string(), "This is a test");
+	}
+	
 	//		clear																
 	#[test]
 	fn clear() {
@@ -506,11 +513,103 @@ mod unpacked_response_body__traits {
 		assert_eq!(format!("{}", body), r#"This is a test"#);
 	}
 	
+	//		from																
+	#[test]
+	fn from__str() {
+		let body = UnpackedResponseBody::from("This is a test");
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn from__str_ref() {
+		let str  = "This is a test";
+		let body = UnpackedResponseBody::from(str);
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn from__mut_str() {
+		let mut string = s!("This is a test");
+		let mut_str    = string.as_mut_str();
+		let body       = UnpackedResponseBody::from(mut_str);
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn from__string() {
+		let string = s!("This is a test");
+		let body   = UnpackedResponseBody::from(string);
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn from__string_ref() {
+		let string = s!("This is a test");
+		let body   = UnpackedResponseBody::from(&string);
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn from__box_str() {
+		let box_str = s!("This is a test").into_boxed_str();
+		let body    = UnpackedResponseBody::from(box_str);
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn from__cow_borrowed() {
+		let cow: Cow<'_, str> = Cow::Borrowed("This is a test");
+		let body              = UnpackedResponseBody::from(cow);
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn from__cow_owned() {
+		let cow: Cow<'_, str> = Cow::Owned(s!("This is a test"));
+		let body              = UnpackedResponseBody::from(cow);
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn from__char_one() {
+		let body = UnpackedResponseBody::from('A');
+		assert_eq!(body, UnpackedResponseBody(vec![65]));
+		assert_eq!(body, UnpackedResponseBody::from(s!("A")));
+		assert_eq!(body, UnpackedResponseBody(s!("A").into_bytes()));
+	}
+	#[test]
+	fn from__char_two() {
+		let body = UnpackedResponseBody::from('ñ');
+		assert_eq!(body, UnpackedResponseBody(vec![195, 177]));
+		assert_eq!(body, UnpackedResponseBody::from(s!("ñ")));
+		assert_eq!(body, UnpackedResponseBody(s!("ñ").into_bytes()));
+	}
+	#[test]
+	fn from__char_three() {
+		let three_byte_single_width = UnpackedResponseBody::from('Ḁ');
+		assert_eq!(three_byte_single_width, UnpackedResponseBody(vec![225, 184, 128]));
+		assert_eq!(three_byte_single_width, UnpackedResponseBody::from(s!("Ḁ")));
+		assert_eq!(three_byte_single_width, UnpackedResponseBody(s!("Ḁ").into_bytes()));
+		let three_byte_double_width = UnpackedResponseBody::from('你');
+		assert_eq!(three_byte_double_width, UnpackedResponseBody(vec![228, 189, 160]));
+		assert_eq!(three_byte_double_width, UnpackedResponseBody::from(s!("你")));
+		assert_eq!(three_byte_double_width, UnpackedResponseBody(s!("你").into_bytes()));
+	}
+	#[test]
+	fn from__char_four() {
+		let body = UnpackedResponseBody::from('𐍈');
+		assert_eq!(body, UnpackedResponseBody(vec![240, 144, 141, 136]));
+		assert_eq!(body, UnpackedResponseBody::from(s!("𐍈")));
+		assert_eq!(body, UnpackedResponseBody(s!("𐍈").into_bytes()));
+	}
+	#[test]
+	fn from__u8() {
+		let body = UnpackedResponseBody::from(65);
+		assert_eq!(body, UnpackedResponseBody(vec![65]));
+		assert_eq!(body, UnpackedResponseBody(b"A".to_vec()));
+	}
+	
 	//		from_str															
 	#[test]
 	fn from_str() {
-		let body = UnpackedResponseBody::from_str("This is a test");
-		assert_ok_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+		//	Basic ASCII string
+		assert_ok_eq!(UnpackedResponseBody::from_str("Test"), UnpackedResponseBody(b"Test".to_vec()));
+		//	Strings containing different sizes of UTF8 characters
+		assert_ok_eq!(UnpackedResponseBody::from_str("ñ"),    UnpackedResponseBody(s!("ñ").into_bytes()));
+		assert_ok_eq!(UnpackedResponseBody::from_str("Ḁ"),    UnpackedResponseBody(s!("Ḁ").into_bytes()));
+		assert_ok_eq!(UnpackedResponseBody::from_str("𐍈"),    UnpackedResponseBody(s!("𐍈").into_bytes()));
 	}
 	
 	//		partial_eq															
