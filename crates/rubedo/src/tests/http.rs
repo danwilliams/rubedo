@@ -380,6 +380,14 @@ mod unpacked_response_body__struct {
 		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
 	}
 	
+	//		push_char															
+	#[test]
+	fn push_char() {
+		let mut body = UnpackedResponseBody(b"This is a test".to_vec());
+		body.push_char(&'!');
+		assert_eq!(body, UnpackedResponseBody(b"This is a test!".to_vec()));
+	}
+	
 	//		push_str															
 	#[test]
 	fn push_str() {
@@ -389,6 +397,7 @@ mod unpacked_response_body__struct {
 	}
 }
 
+#[cfg(test)]
 mod unpacked_response_body__traits {
 	use super::super::*;
 	use assert_json_diff::assert_json_eq;
@@ -415,6 +424,52 @@ mod unpacked_response_body__traits {
 		//assert_eq!(body, UnpackedResponseBody(b"This is".to_vec()));
 	}
 	#[test]
+	fn add__char_one() {
+		let body = UnpackedResponseBody(b"This is ".to_vec());
+		assert_eq!(body + 'A', UnpackedResponseBody(s!("This is A").into_bytes()));
+		//	We cannot compare to the original response body after using the +
+		//	operator, because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(body, UnpackedResponseBody(s!("This is ").into_bytes()));
+	}
+	#[test]
+	fn add__char_two() {
+		let body = UnpackedResponseBody(b"This is ".to_vec());
+		assert_eq!(body + 'ñ', UnpackedResponseBody(s!("This is ñ").into_bytes()));
+		//	We cannot compare to the original response body after using the +
+		//	operator, because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(body, UnpackedResponseBody(s!("This is ").into_bytes()));
+	}
+	#[test]
+	fn add__char_three() {
+		let body = UnpackedResponseBody(b"This is ".to_vec());
+		assert_eq!(body + 'Ḁ', UnpackedResponseBody(s!("This is Ḁ").into_bytes()));
+		//	We cannot compare to the original response body after using the +
+		//	operator, because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(body, UnpackedResponseBody(s!("This is ").into_bytes()));
+	}
+	#[test]
+	fn add__char_four() {
+		let body = UnpackedResponseBody(b"This is ".to_vec());
+		assert_eq!(body + '𐍈', UnpackedResponseBody(s!("This is 𐍈").into_bytes()));
+		//	We cannot compare to the original response body after using the +
+		//	operator, because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(body, UnpackedResponseBody(s!("This is ").into_bytes()));
+	}
+	#[test]
+	fn add__char_ref() {
+		let body = UnpackedResponseBody(b"This is ".to_vec());
+		let char = 'A';
+		assert_eq!(body + &char, UnpackedResponseBody(s!("This is A").into_bytes()));
+		//	We cannot compare to the original response body after using the +
+		//	operator, because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(body, UnpackedResponseBody(s!("This is ").into_bytes()));
+	}
+	#[test]
 	fn add__str() {
 		let body = UnpackedResponseBody(b"This is".to_vec());
 		assert_eq!(body + " a test", UnpackedResponseBody(b"This is a test".to_vec()));
@@ -422,6 +477,112 @@ mod unpacked_response_body__traits {
 		//	operator, because it has been consumed.
 		//	Uncommenting the line below would cause a compilation error:
 		//assert_eq!(body, UnpackedResponseBody(b"This is".to_vec()));
+	}
+	#[test]
+	fn add__str_ref() {
+		let body = UnpackedResponseBody(b"This is".to_vec());
+		let str  = " a test";
+		assert_eq!(body + str, UnpackedResponseBody(b"This is a test".to_vec()));
+		//	We cannot compare to the original response body after using the +
+		//	operator, because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(body, UnpackedResponseBody(b"This is".to_vec()));
+	}
+	#[test]
+	fn add__string() {
+		let body = UnpackedResponseBody(b"This is".to_vec());
+		assert_eq!(body + s!(" a test"), UnpackedResponseBody(b"This is a test".to_vec()));
+		//	We cannot compare to the original response body after using the +
+		//	operator, because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(body, UnpackedResponseBody(b"This is".to_vec()));
+	}
+	#[test]
+	fn add__string_ref() {
+		let body   = UnpackedResponseBody(b"This is".to_vec());
+		let string = s!(" a test");
+		assert_eq!(body + &string, UnpackedResponseBody(b"This is a test".to_vec()));
+		//	We cannot compare to the original response body after using the +
+		//	operator, because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(body, UnpackedResponseBody(b"This is".to_vec()));
+	}
+	#[test]
+	fn add__box_str() {
+		let body   = UnpackedResponseBody(b"This is".to_vec());
+		assert_eq!(body + s!(" a test").into_boxed_str(), UnpackedResponseBody(b"This is a test".to_vec()));
+		//	We cannot compare to the original response body after using the +
+		//	operator, because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(body, UnpackedResponseBody(b"This is".to_vec()));
+	}
+	#[test]
+	fn add__cow_borrowed() {
+		let body              = UnpackedResponseBody(b"This is".to_vec());
+		let cow: Cow<'_, str> = Cow::Borrowed(" a test");
+		assert_eq!(body + cow, UnpackedResponseBody(b"This is a test".to_vec()));
+		//	We cannot compare to the original response body after using the +
+		//	operator, because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(body, UnpackedResponseBody(b"This is".to_vec()));
+	}
+	#[test]
+	fn add__cow_owned() {
+		let body              = UnpackedResponseBody(b"This is".to_vec());
+		let cow: Cow<'_, str> = Cow::Owned(s!(" a test"));
+		assert_eq!(body + cow, UnpackedResponseBody(b"This is a test".to_vec()));
+		//	We cannot compare to the original response body after using the +
+		//	operator, because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(body, UnpackedResponseBody(b"This is".to_vec()));
+	}
+	#[test]
+	fn add__u8() {
+		let body = UnpackedResponseBody(b"This is a test".to_vec());
+		assert_eq!(body + 33, UnpackedResponseBody(b"This is a test!".to_vec()));
+		//	We cannot compare to the original response body after using the +
+		//	operator, because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn add__vec_u8() {
+		let body = UnpackedResponseBody(b"This is".to_vec());
+		assert_eq!(body + b" a test".to_vec(), UnpackedResponseBody(b"This is a test".to_vec()));
+		//	We cannot compare to the original response body after using the +
+		//	operator, because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(body, UnpackedResponseBody(b"This is".to_vec()));
+	}
+	#[test]
+	fn add__vec_u8_ref() {
+		let body = UnpackedResponseBody(b"This is".to_vec());
+		let vec  = b" a test".to_vec();
+		assert_eq!(body + &vec, UnpackedResponseBody(b"This is a test".to_vec()));
+		//	We cannot compare to the original response body after using the +
+		//	operator, because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(body, UnpackedResponseBody(b"This is".to_vec()));
+	}
+	#[test]
+	fn add__unpacked_response_body() {
+		let body1 = UnpackedResponseBody(b"This is".to_vec());
+		let body2 = UnpackedResponseBody(b" a test".to_vec());
+		assert_eq!(body1 + body2, UnpackedResponseBody(b"This is a test".to_vec()));
+		//	We cannot compare to the original response body after using the +
+		//	operator, because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(body1, UnpackedResponseBody(b"This is".to_vec()));
+	}
+	#[test]
+	fn add__unpacked_response_body_ref() {
+		let body1 = UnpackedResponseBody(b"This is".to_vec());
+		let body2 = UnpackedResponseBody(b" a test".to_vec());
+		assert_eq!(body1 + &body2, UnpackedResponseBody(b"This is a test".to_vec()));
+		//	We cannot compare to the original response body after using the +
+		//	operator, because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(body1, UnpackedResponseBody(b"This is".to_vec()));
 	}
 	
 	//		add_assign															
@@ -438,10 +599,114 @@ mod unpacked_response_body__traits {
 		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
 	}
 	#[test]
+	fn add_assign__char_one() {
+		let mut body  = UnpackedResponseBody(b"This is ".to_vec());
+		body         += 'A';
+		assert_eq!(body, UnpackedResponseBody(s!("This is A").into_bytes()));
+	}
+	#[test]
+	fn add_assign__char_two() {
+		let mut body  = UnpackedResponseBody(b"This is ".to_vec());
+		body         += 'ñ';
+		assert_eq!(body, UnpackedResponseBody(s!("This is ñ").into_bytes()));
+	}
+	#[test]
+	fn add_assign__char_three() {
+		let mut body  = UnpackedResponseBody(b"This is ".to_vec());
+		body         += 'Ḁ';
+		assert_eq!(body, UnpackedResponseBody(s!("This is Ḁ").into_bytes()));
+	}
+	#[test]
+	fn add_assign__char_four() {
+		let mut body  = UnpackedResponseBody(b"This is ".to_vec());
+		body         += '𐍈';
+		assert_eq!(body, UnpackedResponseBody(s!("This is 𐍈").into_bytes()));
+	}
+	#[test]
+	fn add_assign__char_ref() {
+		let mut body  = UnpackedResponseBody(b"This is ".to_vec());
+		let char      = 'A';
+		body         += &char;
+		assert_eq!(body, UnpackedResponseBody(s!("This is A").into_bytes()));
+	}
+	#[test]
 	fn add_assign__str() {
 		let mut body  = UnpackedResponseBody(b"This is".to_vec());
 		body         += " a test";
 		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn add_assign__str_ref() {
+		let mut body  = UnpackedResponseBody(b"This is".to_vec());
+		let str       = " a test";
+		body         += str;
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn add_assign__string() {
+		let mut body  = UnpackedResponseBody(b"This is".to_vec());
+		body         += s!(" a test");
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn add_assign__string_ref() {
+		let mut body  = UnpackedResponseBody(b"This is".to_vec());
+		let string    = s!(" a test");
+		body         += &string;
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn add_assign__box_str() {
+		let mut body = UnpackedResponseBody(b"This is".to_vec());
+		let box_str  = s!(" a test").into_boxed_str();
+		body        += box_str;
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn add_assign__cow_borrowed() {
+		let mut body           = UnpackedResponseBody(b"This is".to_vec());
+		let cow: Cow<'_, str>  = Cow::Borrowed(" a test");
+		body                  += cow;
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn add_assign__cow_owned() {
+		let mut body           = UnpackedResponseBody(b"This is".to_vec());
+		let cow: Cow<'_, str>  = Cow::Owned(s!(" a test"));
+		body                  += cow;
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn add_assign__u8() {
+		let mut body  = UnpackedResponseBody(b"This is a test".to_vec());
+		body         += 33;
+		assert_eq!(body, UnpackedResponseBody(b"This is a test!".to_vec()));
+	}
+	#[test]
+	fn add_assign__vec_u8() {
+		let mut body  = UnpackedResponseBody(b"This is".to_vec());
+		body         += b" a test".to_vec();
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn add_assign__vec_u8_ref() {
+		let mut body  = UnpackedResponseBody(b"This is".to_vec());
+		let vec       = b" a test".to_vec();
+		body         += &vec;
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn add_assign__unpacked_response_body() {
+		let mut body  = UnpackedResponseBody(b"This is".to_vec());
+		body         += UnpackedResponseBody(b" a test".to_vec());
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn add_assign__unpacked_response_body_ref() {
+		let mut body1  = UnpackedResponseBody(b"This is".to_vec());
+		let body2      = UnpackedResponseBody(b" a test".to_vec());
+		body1          += &body2;
+		assert_eq!(body1, UnpackedResponseBody(b"This is a test".to_vec()));
 	}
 	
 	//		as_ref																
@@ -514,6 +779,22 @@ mod unpacked_response_body__traits {
 	}
 	
 	//		from																
+	#[test]
+	fn from__byte_array() {
+		let body = UnpackedResponseBody::from(b"This is a test");
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn from__byte_slice() {
+		let body = UnpackedResponseBody::from(&b"This is a test"[..]);
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn from__char_ref() {
+		let char = 'A';
+		let body = UnpackedResponseBody::from(&char);
+		assert_eq!(body, UnpackedResponseBody(b"A".to_vec()));
+	}
 	#[test]
 	fn from__char_one() {
 		let body = UnpackedResponseBody::from('A');
@@ -599,6 +880,17 @@ mod unpacked_response_body__traits {
 		let body = UnpackedResponseBody::from(65);
 		assert_eq!(body, UnpackedResponseBody(vec![65]));
 		assert_eq!(body, UnpackedResponseBody(b"A".to_vec()));
+	}
+	#[test]
+	fn from__vec_u8() {
+		let body = UnpackedResponseBody::from(b"This is a test".to_vec());
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+	}
+	#[test]
+	fn from__vec_u8_ref() {
+		let vec  = b"This is a test".to_vec();
+		let body = UnpackedResponseBody::from(&vec);
+		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
 	}
 	
 	//		from_str															

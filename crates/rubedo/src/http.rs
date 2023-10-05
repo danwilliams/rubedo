@@ -428,7 +428,9 @@ impl UnpackedResponseBody {
 	/// Unicode-aware and can handle any Unicode character - which is not the
 	/// case. A `u8`, on the other hand, represents a single byte. By having
 	/// `push()` accept a `u8`, it's signaling that `UnpackedResponseBody` is
-	/// byte-oriented.
+	/// byte-oriented. A specific [`push_char()`](UnpackedResponseBody::push_char())
+	/// method is also available, but `push()` is the most general method for
+	/// appending bytes to the response body.
 	/// 
 	/// # Parameters
 	/// 
@@ -437,6 +439,7 @@ impl UnpackedResponseBody {
 	/// # See Also
 	/// 
 	/// * [`UnpackedResponseBody::push_bytes()`]
+	/// * [`UnpackedResponseBody::push_char()`]
 	/// * [`UnpackedResponseBody::push_str()`]
 	/// 
 	pub fn push(&mut self, byte: u8) {
@@ -458,10 +461,34 @@ impl UnpackedResponseBody {
 	/// # See Also
 	///
 	/// * [`UnpackedResponseBody::push()`]
+	/// * [`UnpackedResponseBody::push_char()`]
 	/// * [`UnpackedResponseBody::push_str()`]
 	///
 	pub fn push_bytes(&mut self, bytes: &[u8]) {
 		self.0.extend_from_slice(bytes);
+	}
+	
+	//		push_char															
+	/// Appends a [`char`] to the response body.
+	///
+	/// Appends a given character onto the end of the response body. The `char`
+	/// is converted to bytes and then appended to the end of the response
+	/// body's existing byte data.
+	///
+	/// # Parameters
+	///
+	/// * `char` - The `char` to append to the response body.
+	///
+	/// # See Also
+	///
+	/// * [`UnpackedResponseBody::push()`]
+	/// * [`UnpackedResponseBody::push_bytes()`]
+	/// * [`UnpackedResponseBody::push_str()`]
+	///
+	pub fn push_char(&mut self, char: &char) {
+		let mut bytes = [0; 4];
+		let used      = char.encode_utf8(&mut bytes).len();
+		self.0.extend(&bytes[..used]);
 	}
 	
 	//		push_str															
@@ -469,9 +496,7 @@ impl UnpackedResponseBody {
 	/// 
 	/// Appends a given string slice onto the end of the response body. The
 	/// string slice is converted to bytes and then appended to the end of the
-	/// response body's existing byte data. The response body is not required to
-	/// be valid UTF8, so this method does not check the validity of the string
-	/// slice before appending it.
+	/// response body's existing byte data.
 	/// 
 	/// # Parameters
 	/// 
@@ -480,6 +505,7 @@ impl UnpackedResponseBody {
 	/// # See Also
 	/// 
 	/// * [`UnpackedResponseBody::push()`]
+	/// * [`UnpackedResponseBody::push_char()`]
 	/// * [`UnpackedResponseBody::push_bytes()`]
 	/// 
 	pub fn push_str(&mut self, string: &str) {
@@ -509,6 +535,28 @@ impl<const N: usize> Add<&[u8; N]> for UnpackedResponseBody {
 	}
 }
 
+impl Add<char> for UnpackedResponseBody {
+	type Output = Self;
+	
+	//		add																	
+	/// Adds a [`char`] to an [`UnpackedResponseBody`].
+	fn add(mut self, other: char) -> Self {
+		self.push_char(&other);
+		self
+	}
+}
+
+impl Add<&char> for UnpackedResponseBody {
+	type Output = Self;
+	
+	//		add																	
+	/// Adds a `&char` to an [`UnpackedResponseBody`].
+	fn add(mut self, other: &char) -> Self {
+		self.push_char(other);
+		self
+	}
+}
+
 impl Add<&str> for UnpackedResponseBody {
 	type Output = Self;
 	
@@ -516,6 +564,105 @@ impl Add<&str> for UnpackedResponseBody {
 	/// Adds a `&str` to an [`UnpackedResponseBody`].
 	fn add(mut self, other: &str) -> Self {
 		self.push_str(other);
+		self
+	}
+}
+
+impl Add<String> for UnpackedResponseBody {
+	type Output = Self;
+	
+	//		add																	
+	/// Adds a [`String`] to an [`UnpackedResponseBody`].
+	fn add(mut self, other: String) -> Self {
+		self.push_str(&other);
+		self
+	}
+}
+
+impl Add<&String> for UnpackedResponseBody {
+	type Output = Self;
+	
+	//		add																	
+	/// Adds a `&String` to an [`UnpackedResponseBody`].
+	fn add(mut self, other: &String) -> Self {
+		self.push_str(other);
+		self
+	}
+}
+
+impl Add<Box<str>> for UnpackedResponseBody {
+	type Output = Self;
+	
+	//		add																	
+	/// Adds a boxed [`str`] slice to an [`UnpackedResponseBody`].
+	fn add(mut self, other: Box<str>) -> Self::Output {
+		self.push_str(&other);
+		self
+	}
+}
+
+impl<'a> Add<Cow<'a, str>> for UnpackedResponseBody {
+	type Output = Self;
+	
+	//		add																	
+	/// Adds a clone-on-write string to an [`UnpackedResponseBody`].
+	fn add(mut self, other: Cow<'a, str>) -> Self::Output {
+		self.push_str(&other);
+		self
+	}
+}
+
+impl Add<u8> for UnpackedResponseBody {
+	type Output = Self;
+	
+	//		add																	
+	/// Adds a [`u8`] to an [`UnpackedResponseBody`].
+	fn add(mut self, other: u8) -> Self {
+		self.push(other);
+		self
+	}
+}
+
+impl Add<Vec<u8>> for UnpackedResponseBody {
+	type Output = Self;
+	
+	//		add																	
+	/// Adds a `Vec[u8]` to an [`UnpackedResponseBody`].
+	fn add(mut self, other: Vec<u8>) -> Self {
+		self.push_bytes(&other);
+		self
+	}
+}
+
+impl Add<&Vec<u8>> for UnpackedResponseBody {
+	type Output = Self;
+	
+	//		add																	
+	/// Adds a `&Vec[u8]` to an [`UnpackedResponseBody`].
+	fn add(mut self, other: &Vec<u8>) -> Self {
+		self.push_bytes(other);
+		self
+	}
+}
+
+impl Add<UnpackedResponseBody> for UnpackedResponseBody {
+	type Output = Self;
+	
+	//		add																	
+	/// Adds an `UnpackedResponseBody` to an [`UnpackedResponseBody`].
+	fn add(mut self, other: Self) -> Self {
+		self.push_bytes(&other.0);
+		self
+	}
+}
+
+impl Add<&UnpackedResponseBody> for UnpackedResponseBody {
+	type Output = Self;
+	
+	//		add																	
+	/// Adds an `&UnpackedResponseBody` to an [`UnpackedResponseBody`].
+	fn add(mut self, other: &Self) -> Self {
+		self.push_bytes(other.as_bytes());
 		self
 	}
 }
@@ -536,11 +683,99 @@ impl<const N: usize> AddAssign<&[u8; N]> for UnpackedResponseBody {
 	}
 }
 
+impl AddAssign<char> for UnpackedResponseBody {
+	//		add_assign															
+	/// Adds a [`char`] to an [`UnpackedResponseBody`].
+	fn add_assign(&mut self, other: char) {
+		self.push_char(&other);
+	}
+}
+
+impl AddAssign<&char> for UnpackedResponseBody {
+	//		add_assign															
+	/// Adds a `&char` to an [`UnpackedResponseBody`].
+	fn add_assign(&mut self, other: &char) {
+		self.push_char(other);
+	}
+}
+
 impl AddAssign<&str> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a `&str` to an [`UnpackedResponseBody`].
 	fn add_assign(&mut self, other: &str) {
 		self.push_str(other);
+	}
+}
+
+impl AddAssign<String> for UnpackedResponseBody {
+	//		add_assign															
+	/// Adds a [`String`] to an [`UnpackedResponseBody`].
+	fn add_assign(&mut self, other: String) {
+		self.push_str(&other);
+	}
+}
+
+impl AddAssign<&String> for UnpackedResponseBody {
+	//		add_assign															
+	/// Adds a `&String` to an [`UnpackedResponseBody`].
+	fn add_assign(&mut self, other: &String) {
+		self.push_str(other);
+	}
+}
+
+impl AddAssign<Box<str>> for UnpackedResponseBody {
+	//		add_assign															
+	/// Adds a boxed [`str`] slice to an [`UnpackedResponseBody`].
+	fn add_assign(&mut self, other: Box<str>) {
+		self.push_str(&other);
+	}
+}
+
+impl<'a> AddAssign<Cow<'a, str>> for UnpackedResponseBody {
+	//		add_assign															
+	/// Adds a clone-on-write string to an [`UnpackedResponseBody`].
+	fn add_assign(&mut self, other: Cow<'a, str>){
+		self.push_str(&other);
+	}
+}
+
+impl AddAssign<u8> for UnpackedResponseBody {
+	//		add_assign															
+	/// Adds a [`u8`] to an [`UnpackedResponseBody`].
+	fn add_assign(&mut self, other: u8) {
+		self.push(other);
+	}
+}
+
+impl AddAssign<Vec<u8>> for UnpackedResponseBody {
+	//		add_assign															
+	/// Adds a `Vec<u8>` to an [`UnpackedResponseBody`].
+	fn add_assign(&mut self, other: Vec<u8>) {
+		self.push_bytes(&other);
+	}
+}
+
+impl AddAssign<&Vec<u8>> for UnpackedResponseBody {
+	//		add_assign															
+	/// Adds a `&Vec<u8>` to an [`UnpackedResponseBody`].
+	fn add_assign(&mut self, other: &Vec<u8>) {
+		self.push_bytes(other);
+	}
+}
+
+impl AddAssign<UnpackedResponseBody> for UnpackedResponseBody {
+	//		add_assign															
+	/// Adds an `UnpackedResponseBody` to an [`UnpackedResponseBody`].
+	fn add_assign(&mut self, other: Self) {
+		self.push_bytes(&other.0);
+	}
+}
+
+impl AddAssign<&UnpackedResponseBody> for UnpackedResponseBody {
+	//		add_assign															
+	/// Adds an `&UnpackedResponseBody` to an [`UnpackedResponseBody`].
+	fn add_assign(&mut self, other: &Self) {
+		self.push_bytes(other.as_bytes());
 	}
 }
 
@@ -588,6 +823,22 @@ impl Display for UnpackedResponseBody {
 	}
 }
 
+impl From<&[u8]> for UnpackedResponseBody {
+	//		from																
+	/// Converts a `&[u8]` to an [`UnpackedResponseBody`].
+	fn from(b: &[u8]) -> Self {
+		UnpackedResponseBody(b.to_vec())
+	}
+}
+
+impl<const N: usize> From<&[u8; N]> for UnpackedResponseBody {
+	//		from																
+	/// Converts a `&[u8; N]` to an [`UnpackedResponseBody`].
+	fn from(b: &[u8; N]) -> Self {
+		UnpackedResponseBody(b.to_vec())
+	}
+}
+
 impl From<char> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`char`] to an [`UnpackedResponseBody`].
@@ -620,6 +871,14 @@ impl From<char> for UnpackedResponseBody {
 		let mut bytes = [0; 4];
 		let used      = c.encode_utf8(&mut bytes).len();
 		Self(bytes[..used].to_vec())
+	}
+}
+
+impl From<&char> for UnpackedResponseBody {
+	//		from																
+	/// Converts a `&char` to an [`UnpackedResponseBody`].
+	fn from(c: &char) -> Self {
+		Self::from(c.to_owned())
 	}
 }
 
@@ -676,6 +935,22 @@ impl From<u8> for UnpackedResponseBody {
 	/// Converts a [`u8`] to an [`UnpackedResponseBody`].
 	fn from(c: u8) -> Self {
 		Self(Vec::from([c]))
+	}
+}
+
+impl From<Vec<u8>> for UnpackedResponseBody {
+	//		from																
+	/// Converts a `Vec<u8>` to an [`UnpackedResponseBody`].
+	fn from(v: Vec<u8>) -> Self {
+		Self(v)
+	}
+}
+
+impl From<&Vec<u8>> for UnpackedResponseBody {
+	//		from																
+	/// Converts a `&Vec<u8>` to an [`UnpackedResponseBody`].
+	fn from(v: &Vec<u8>) -> Self {
+		Self(v.clone())
 	}
 }
 
