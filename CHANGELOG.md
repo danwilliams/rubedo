@@ -12,11 +12,27 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.3.2 (05 October 2023)
+
+### Added
+
+  - Added `new()`, `clear()`, `empty()`, `is_empty()`, `len()`, `push()`,
+    `push_bytes()`, `push_str()`, `as_bytes()`, `as_mut_bytes()`,
+    `into_bytes()`, and `to_bytes()` to `http::UnpackedResponseBody`
+
+  - Implemented `Add`, `AddAssign`, `AsRef`, `AsMut`, `Clone`, `Default`,
+    and `Write` for `http::UnpackedResponseBody`
+
+  - Implemented a range of `From` conversions for `http::UnpackedResponseBody`:
+    `&str`, `&mut str`, `String`, `&String`, `Box<str>`, `Cow<'a, str>`, `char`,
+    and `u8`
+
+
 ## 0.3.1 (04 October 2023)
 
 ### Added
 
-  - Implemented `Serialize` and `Deserialize` for `UnpackedResponse`
+  - Implemented `Serialize` and `Deserialize` for `http::UnpackedResponse`
 
 ### Changed
 
