@@ -491,6 +491,7 @@ impl Add<&[u8]> for UnpackedResponseBody {
 	type Output = Self;
 	
 	//		add																	
+	/// Adds a `&[u8]` to an [`UnpackedResponseBody`].
 	fn add(mut self, other: &[u8]) -> Self {
 		self.push_bytes(other);
 		self
@@ -501,6 +502,7 @@ impl<const N: usize> Add<&[u8; N]> for UnpackedResponseBody {
 	type Output = Self;
 	
 	//		add																	
+	/// Adds a `&[u8; N]` to an [`UnpackedResponseBody`].
 	fn add(mut self, other: &[u8; N]) -> Self {
 		self.push_bytes(other);
 		self
@@ -511,6 +513,7 @@ impl Add<&str> for UnpackedResponseBody {
 	type Output = Self;
 	
 	//		add																	
+	/// Adds a `&str` to an [`UnpackedResponseBody`].
 	fn add(mut self, other: &str) -> Self {
 		self.push_str(other);
 		self
@@ -519,6 +522,7 @@ impl Add<&str> for UnpackedResponseBody {
 
 impl AddAssign<&[u8]> for UnpackedResponseBody {
 	//		add_assign															
+	/// Adds a `&[u8]` to an [`UnpackedResponseBody`].
 	fn add_assign(&mut self, other: &[u8]) {
 		self.push_bytes(other);
 	}
@@ -526,6 +530,7 @@ impl AddAssign<&[u8]> for UnpackedResponseBody {
 
 impl<const N: usize> AddAssign<&[u8; N]> for UnpackedResponseBody {
 	//		add_assign															
+	/// Adds a `&[u8; N]` to an [`UnpackedResponseBody`].
 	fn add_assign(&mut self, other: &[u8; N]) {
 		self.push_bytes(other);
 	}
@@ -533,18 +538,21 @@ impl<const N: usize> AddAssign<&[u8; N]> for UnpackedResponseBody {
 
 impl AddAssign<&str> for UnpackedResponseBody {
 	//		add_assign															
+	/// Adds a `&str` to an [`UnpackedResponseBody`].
 	fn add_assign(&mut self, other: &str) {
 		self.push_str(other);
 	}
 }
 
 impl AsMut<[u8]> for UnpackedResponseBody {
+	//		as_mut																
 	fn as_mut(&mut self) -> &mut [u8] {
 		self.as_mut_bytes()
 	}
 }
 
 impl AsRef<[u8]> for UnpackedResponseBody {
+	//		as_ref																
 	fn as_ref(&self) -> &[u8] {
 		self.as_bytes()
 	}
@@ -581,41 +589,47 @@ impl Display for UnpackedResponseBody {
 }
 
 impl From<&str> for UnpackedResponseBody {
-	/// Converts a `&str` into an [`UnpackedResponseBody`].
+	//		from																
+	/// Converts a `&str` to an [`UnpackedResponseBody`].
 	fn from(s: &str) -> Self {
 		Self(s.to_owned().as_bytes().to_vec())
 	}
 }
 
 impl From<&mut str> for UnpackedResponseBody {
-	/// Converts a `&mut str` into an [`UnpackedResponseBody`].
+	//		from																
+	/// Converts a `&mut str` to an [`UnpackedResponseBody`].
 	fn from(s: &mut str) -> Self {
 		Self(s.to_owned().as_bytes().to_vec())
 	}
 }
 
 impl From<String> for UnpackedResponseBody {
-	/// Converts a `String` into an [`UnpackedResponseBody`].
+	//		from																
+	/// Converts a [`String`] to an [`UnpackedResponseBody`].
 	fn from(s: String) -> Self {
 		Self(s.as_bytes().to_vec())
 	}
 }
 
 impl From<&String> for UnpackedResponseBody {
-	/// Converts a `&String` into an [`UnpackedResponseBody`].
+	//		from																
+	/// Converts a `&String` to an [`UnpackedResponseBody`].
 	fn from(s: &String) -> Self {
 		Self(s.clone().as_bytes().to_vec())
 	}
 }
 
 impl From<Box<str>> for UnpackedResponseBody {
-	/// Converts a boxed `str` slice into an [`UnpackedResponseBody`].
+	//		from																
+	/// Converts a boxed [`str`] slice to an [`UnpackedResponseBody`].
 	fn from(s: Box<str>) -> Self {
 		Self(s.into_string().as_bytes().to_vec())
 	}
 }
 
 impl<'a> From<Cow<'a, str>> for UnpackedResponseBody {
+	//		from																
 	/// Converts a clone-on-write string to an [`UnpackedResponseBody`].
 	fn from(s: Cow<'a, str>) -> Self {
 		Self(s.into_owned().as_bytes().to_vec())
@@ -623,7 +637,8 @@ impl<'a> From<Cow<'a, str>> for UnpackedResponseBody {
 }
 
 impl From<char> for UnpackedResponseBody {
-	/// Converts a `char` to an [`UnpackedResponseBody`].
+	//		from																
+	/// Converts a [`char`] to an [`UnpackedResponseBody`].
 	/// 
 	/// Note that it does this in the way that is most compatible with
 	/// [`String`] conversion. The [`char`] type in Rust represents a Unicode
@@ -657,7 +672,8 @@ impl From<char> for UnpackedResponseBody {
 }
 
 impl From<u8> for UnpackedResponseBody {
-	/// Converts a `u8` to an [`UnpackedResponseBody`].
+	//		from																
+	/// Converts a [`u8`] to an [`UnpackedResponseBody`].
 	fn from(c: u8) -> Self {
 		Self(Vec::from([c]))
 	}
