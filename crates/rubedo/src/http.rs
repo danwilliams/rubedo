@@ -28,7 +28,6 @@ use hyper::{
 	header::HeaderValue,
 };
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use serde_with::{DisplayFromStr, serde_as};
 use std::{
 	borrow::Cow,
 	cmp::Ordering,
@@ -97,7 +96,6 @@ impl Error for ResponseError {}
 /// * [`ResponseExt::unpack()`]
 /// * [`UnpackedResponseHeader`]
 /// 
-#[serde_as]
 #[derive(Debug, Deserialize, Serialize)]
 pub struct UnpackedResponse {
 	//		Public properties													
@@ -126,7 +124,6 @@ pub struct UnpackedResponse {
 	/// step is left as optional for the caller, if required (and happens when
 	/// running the `UnpackedResponse` struct through the [`Debug`] or
 	/// [`Display`] formatters).
-	#[serde_as(as = "DisplayFromStr")]
 	pub body:    UnpackedResponseBody,
 }
 
@@ -193,16 +190,15 @@ impl PartialEq for UnpackedResponseHeader {
 /// struct rather than a regular struct.
 ///
 /// Note that serialisation/deserialisation of this struct directly will produce
-/// and expect a vector of bytes, but when part of `UnpackedResponse` it will be
-/// converted to and from a `String`. This is because the serialisation has been
-/// applied to the `UnpackedResponse` struct as a whole. This behaviour may be
-/// changed later.
+/// and expect a `String`, not a vector of bytes. This is because this is the
+/// most useful and fitting behaviour for the intended purpose, as with the
+/// implementations of `Display` and [`FromStr`]. As noted above, this is lossy.
 /// 
 /// # See Also
 /// 
 /// * [`UnpackedResponse`]
 /// 
-#[derive(Default, Deserialize, Serialize)]
+#[derive(Default)]
 pub struct UnpackedResponseBody(Vec<u8>);
 
 impl UnpackedResponseBody {
@@ -967,6 +963,28 @@ impl PartialEq for UnpackedResponseBody {
 	//		eq																	
 	fn eq(&self, other: &Self) -> bool {
 		self.0 == other.0
+	}
+}
+
+impl Serialize for UnpackedResponseBody {
+	//		serialize															
+	fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+	where
+		S: Serializer,
+	{
+		let string = String::from_utf8_lossy(&self.0);
+		serializer.serialize_str(&string)
+	}
+}
+
+impl <'de> Deserialize<'de> for UnpackedResponseBody {
+	//		deserialize															
+	fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+	where
+		D: Deserializer<'de>,
+	{
+		let string = String::deserialize(deserializer)?;
+		Ok(Self(string.as_bytes().to_vec()))
 	}
 }
 

@@ -962,7 +962,7 @@ mod unpacked_response_body__traits {
 	#[test]
 	fn serialize() {
 		let body = UnpackedResponseBody(b"This is a test".to_vec());
-		let json = json!(b"This is a test".to_vec());
+		let json = json!("This is a test");
 		assert_json_eq!(json!(body), json);
 	}
 	
@@ -970,7 +970,7 @@ mod unpacked_response_body__traits {
 	#[test]
 	fn deserialize() {
 		let body = UnpackedResponseBody(b"This is a test".to_vec());
-		let json = json!(b"This is a test".to_vec()).to_string();
+		let json = r#""This is a test""#;
 		assert_ok_eq!(serde_json::from_str::<UnpackedResponseBody>(&json), body);
 	}
 	
