@@ -12,6 +12,27 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.3.3 (06 October 2023)
+
+### Added
+
+  - Added `push_char()` to `http::UnpackedResponseBody`
+
+  - Implemented additional `Add` and `AddAssign` functionality for
+    `http::UnpackedResponseBody`: `char`, `&char`, `String`, `&String`,
+    `Box<str>`, `Cow<'a, str>`, `u8`, `Vec<u8>`, `&Vec<u8>`,
+    `UnpackedResponseBody`, `&UnpackedResponseBody`
+
+  - Implemented additional `From` conversions for `http::UnpackedResponseBody`:
+    `&[u8]`, `&[u8; N]`, `&char`, `Vec<u8>`, `&Vec<u8>`
+
+### Changed
+
+  - Improved performance in `chrono::DurationExt.humanize()`
+
+  - Improved performance in `http::UnpackedResponseBody::from<&String>()`
+
+
 ## 0.3.2 (05 October 2023)
 
 ### Added
@@ -20,8 +41,11 @@ The format is based on [Keep a Changelog][], and this project adheres to
     `push_bytes()`, `push_str()`, `as_bytes()`, `as_mut_bytes()`,
     `into_bytes()`, and `to_bytes()` to `http::UnpackedResponseBody`
 
-  - Implemented `Add`, `AddAssign`, `AsRef`, `AsMut`, `Clone`, `Default`,
-    and `Write` for `http::UnpackedResponseBody`
+  - Implemented `Add` and `AddAssign` functionality for
+    `http::UnpackedResponseBody`: `&[u8]`, `&[u8; N]`, and `&str`
+
+  - Implemented `AsRef`, `AsMut`, `Clone`, `Default`, and `Write` for
+    `http::UnpackedResponseBody`
 
   - Implemented a range of `From` conversions for `http::UnpackedResponseBody`:
     `&str`, `&mut str`, `String`, `&String`, `Box<str>`, `Cow<'a, str>`, `char`,
