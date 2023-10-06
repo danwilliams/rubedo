@@ -424,7 +424,7 @@ mod unpacked_response_body__traits {
 		//assert_eq!(body, UnpackedResponseBody(b"This is".to_vec()));
 	}
 	#[test]
-	fn add__char_one() {
+	fn add__char_one_byte() {
 		let body = UnpackedResponseBody(b"This is ".to_vec());
 		assert_eq!(body + 'A', UnpackedResponseBody(s!("This is A").into_bytes()));
 		//	We cannot compare to the original response body after using the +
@@ -433,7 +433,7 @@ mod unpacked_response_body__traits {
 		//assert_eq!(body, UnpackedResponseBody(s!("This is ").into_bytes()));
 	}
 	#[test]
-	fn add__char_two() {
+	fn add__char_two_byte() {
 		let body = UnpackedResponseBody(b"This is ".to_vec());
 		assert_eq!(body + 'ñ', UnpackedResponseBody(s!("This is ñ").into_bytes()));
 		//	We cannot compare to the original response body after using the +
@@ -442,7 +442,7 @@ mod unpacked_response_body__traits {
 		//assert_eq!(body, UnpackedResponseBody(s!("This is ").into_bytes()));
 	}
 	#[test]
-	fn add__char_three() {
+	fn add__char_three_byte() {
 		let body = UnpackedResponseBody(b"This is ".to_vec());
 		assert_eq!(body + 'Ḁ', UnpackedResponseBody(s!("This is Ḁ").into_bytes()));
 		//	We cannot compare to the original response body after using the +
@@ -451,7 +451,7 @@ mod unpacked_response_body__traits {
 		//assert_eq!(body, UnpackedResponseBody(s!("This is ").into_bytes()));
 	}
 	#[test]
-	fn add__char_four() {
+	fn add__char_four_byte() {
 		let body = UnpackedResponseBody(b"This is ".to_vec());
 		assert_eq!(body + '𐍈', UnpackedResponseBody(s!("This is 𐍈").into_bytes()));
 		//	We cannot compare to the original response body after using the +
@@ -599,25 +599,25 @@ mod unpacked_response_body__traits {
 		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
 	}
 	#[test]
-	fn add_assign__char_one() {
+	fn add_assign__char_one_byte() {
 		let mut body  = UnpackedResponseBody(b"This is ".to_vec());
 		body         += 'A';
 		assert_eq!(body, UnpackedResponseBody(s!("This is A").into_bytes()));
 	}
 	#[test]
-	fn add_assign__char_two() {
+	fn add_assign__char_two_byte() {
 		let mut body  = UnpackedResponseBody(b"This is ".to_vec());
 		body         += 'ñ';
 		assert_eq!(body, UnpackedResponseBody(s!("This is ñ").into_bytes()));
 	}
 	#[test]
-	fn add_assign__char_three() {
+	fn add_assign__char_three_byte() {
 		let mut body  = UnpackedResponseBody(b"This is ".to_vec());
 		body         += 'Ḁ';
 		assert_eq!(body, UnpackedResponseBody(s!("This is Ḁ").into_bytes()));
 	}
 	#[test]
-	fn add_assign__char_four() {
+	fn add_assign__char_four_byte() {
 		let mut body  = UnpackedResponseBody(b"This is ".to_vec());
 		body         += '𐍈';
 		assert_eq!(body, UnpackedResponseBody(s!("This is 𐍈").into_bytes()));
@@ -781,36 +781,54 @@ mod unpacked_response_body__traits {
 	//		from																
 	#[test]
 	fn from__byte_array() {
-		let body = UnpackedResponseBody::from(b"This is a test");
-		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+		let body       = UnpackedResponseBody::from(b"This is a test");
+		assert_eq!(body,       UnpackedResponseBody(b"This is a test".to_vec()));
+		let byte_array = b"This is another test";
+		let body       = UnpackedResponseBody::from(byte_array);
+		assert_eq!(body,       UnpackedResponseBody(b"This is another test".to_vec()));
+		assert_eq!(byte_array, b"This is another test");
 	}
 	#[test]
 	fn from__byte_slice() {
-		let body = UnpackedResponseBody::from(&b"This is a test"[..]);
-		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+		let body       = UnpackedResponseBody::from(&b"This is a test"[..]);
+		assert_eq!(body,       UnpackedResponseBody(b"This is a test".to_vec()));
+		let byte_slice = &b"This is another test"[..];
+		let body       = UnpackedResponseBody::from(byte_slice);
+		assert_eq!(body,       UnpackedResponseBody(b"This is another test".to_vec()));
+		assert_eq!(byte_slice, b"This is another test");
+	}
+	#[test]
+	fn from__char() {
+		let body = UnpackedResponseBody::from('A');
+		assert_eq!(body, UnpackedResponseBody(b"A".to_vec()));
+		let char = 'B';
+		let body = UnpackedResponseBody::from(char);
+		assert_eq!(body, UnpackedResponseBody(b"B".to_vec()));
+		assert_eq!(char, 'B');
 	}
 	#[test]
 	fn from__char_ref() {
 		let char = 'A';
 		let body = UnpackedResponseBody::from(&char);
 		assert_eq!(body, UnpackedResponseBody(b"A".to_vec()));
+		assert_eq!(char, 'A');
 	}
 	#[test]
-	fn from__char_one() {
+	fn from__char_one_byte() {
 		let body = UnpackedResponseBody::from('A');
 		assert_eq!(body, UnpackedResponseBody(vec![65]));
 		assert_eq!(body, UnpackedResponseBody::from(s!("A")));
 		assert_eq!(body, UnpackedResponseBody(s!("A").into_bytes()));
 	}
 	#[test]
-	fn from__char_two() {
+	fn from__char_two_byte() {
 		let body = UnpackedResponseBody::from('ñ');
 		assert_eq!(body, UnpackedResponseBody(vec![195, 177]));
 		assert_eq!(body, UnpackedResponseBody::from(s!("ñ")));
 		assert_eq!(body, UnpackedResponseBody(s!("ñ").into_bytes()));
 	}
 	#[test]
-	fn from__char_three() {
+	fn from__char_three_byte() {
 		let three_byte_single_width = UnpackedResponseBody::from('Ḁ');
 		assert_eq!(three_byte_single_width, UnpackedResponseBody(vec![225, 184, 128]));
 		assert_eq!(three_byte_single_width, UnpackedResponseBody::from(s!("Ḁ")));
@@ -821,7 +839,7 @@ mod unpacked_response_body__traits {
 		assert_eq!(three_byte_double_width, UnpackedResponseBody(s!("你").into_bytes()));
 	}
 	#[test]
-	fn from__char_four() {
+	fn from__char_four_byte() {
 		let body = UnpackedResponseBody::from('𐍈');
 		assert_eq!(body, UnpackedResponseBody(vec![240, 144, 141, 136]));
 		assert_eq!(body, UnpackedResponseBody::from(s!("𐍈")));
@@ -837,43 +855,62 @@ mod unpacked_response_body__traits {
 		let str  = "This is a test";
 		let body = UnpackedResponseBody::from(str);
 		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+		assert_eq!(str,  "This is a test");
 	}
 	#[test]
-	fn from__mut_str() {
+	fn from__mut_str_ref() {
 		let mut string = s!("This is a test");
 		let mut_str    = string.as_mut_str();
 		let body       = UnpackedResponseBody::from(mut_str);
-		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+		assert_eq!(body,   UnpackedResponseBody(b"This is a test".to_vec()));
+		assert_eq!(string, "This is a test");
 	}
 	#[test]
 	fn from__string() {
 		let string = s!("This is a test");
 		let body   = UnpackedResponseBody::from(string);
 		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+		//	We cannot compare to the original string after calling from(),
+		//	because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(string, "This is a test");
 	}
 	#[test]
 	fn from__string_ref() {
 		let string = s!("This is a test");
 		let body   = UnpackedResponseBody::from(&string);
-		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+		assert_eq!(body,   UnpackedResponseBody(b"This is a test".to_vec()));
+		assert_eq!(string, "This is a test");
 	}
 	#[test]
 	fn from__box_str() {
 		let box_str = s!("This is a test").into_boxed_str();
 		let body    = UnpackedResponseBody::from(box_str);
 		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+		//	We cannot compare to the original box_str after calling from(),
+		//	because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(box_str, s!("This is a test").into_boxed_str());
 	}
 	#[test]
 	fn from__cow_borrowed() {
 		let cow: Cow<'_, str> = Cow::Borrowed("This is a test");
 		let body              = UnpackedResponseBody::from(cow);
 		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+		//	We cannot compare to the original cow after calling from(),
+		//	because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(cow, "This is a test");
 	}
 	#[test]
 	fn from__cow_owned() {
 		let cow: Cow<'_, str> = Cow::Owned(s!("This is a test"));
 		let body              = UnpackedResponseBody::from(cow);
 		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+		//	We cannot compare to the original cow after calling from(),
+		//	because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(cow, "This is a test");
 	}
 	#[test]
 	fn from__u8() {
@@ -885,12 +922,21 @@ mod unpacked_response_body__traits {
 	fn from__vec_u8() {
 		let body = UnpackedResponseBody::from(b"This is a test".to_vec());
 		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+		let vec  = b"This is another test".to_vec();
+		let body = UnpackedResponseBody::from(vec);
+		assert_eq!(body, UnpackedResponseBody(b"This is another test".to_vec()));
+		//	We cannot compare to the original vec after calling from(),
+		//	because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(vec,  b"This is another test".to_vec());
+		
 	}
 	#[test]
 	fn from__vec_u8_ref() {
 		let vec  = b"This is a test".to_vec();
 		let body = UnpackedResponseBody::from(&vec);
 		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
+		assert_eq!(vec,  b"This is a test".to_vec());
 	}
 	
 	//		from_str															
