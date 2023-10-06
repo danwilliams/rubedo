@@ -910,7 +910,7 @@ impl From<&String> for UnpackedResponseBody {
 	//		from																
 	/// Converts a `&String` to an [`UnpackedResponseBody`].
 	fn from(s: &String) -> Self {
-		Self(s.clone().as_bytes().to_vec())
+		Self(s.as_str().as_bytes().to_vec())
 	}
 }
 
