@@ -200,7 +200,15 @@ impl PartialEq for UnpackedResponseHeader {
 /// * [`UnpackedResponse`]
 /// 
 #[derive(Default)]
-pub struct UnpackedResponseBody(Vec<u8>);
+pub struct UnpackedResponseBody {
+	/// The response body as a vector of bytes. The data originates from the
+	/// response body as a [`Bytes`] container, but gets stored here as a vector
+	/// of bytes for convenience. This may not be valid UTF8, so is not
+	/// converted to a [`String`]. That step is left as optional for the caller,
+	/// if required (and happens when running through the [`Debug`] or
+	/// [`Display`] formatters).
+	body: Vec<u8>,
+}
 
 impl UnpackedResponseBody {
 	//		new																	
@@ -211,7 +219,7 @@ impl UnpackedResponseBody {
 	/// * `vec` - The response body as a vector of bytes.
 	/// 
 	pub fn new(vec: Vec<u8>) -> Self {
-		Self(vec)
+		Self { body: vec }
 	}
 	
 	//		as_bytes															
@@ -244,7 +252,7 @@ impl UnpackedResponseBody {
 	/// * [`UnpackedResponseBody::to_bytes()`]
 	/// 
 	pub fn as_bytes(&self) -> &[u8] {
-		&self.0
+		&self.body
 	}
 	
 	//		as_mut_bytes														
@@ -287,7 +295,7 @@ impl UnpackedResponseBody {
 	/// * [`UnpackedResponseBody::to_bytes()`]
 	/// 
 	pub fn as_mut_bytes(&mut self) -> &mut Vec<u8> {
-		&mut self.0
+		&mut self.body
 	}
 	
 	//		into_bytes															
@@ -324,7 +332,7 @@ impl UnpackedResponseBody {
 	/// * [`UnpackedResponseBody::to_bytes()`]
 	/// 
 	pub fn into_bytes(self) -> Vec<u8> {
-		self.0
+		self.body
 	}
 	
 	//		to_bytes															
@@ -364,7 +372,7 @@ impl UnpackedResponseBody {
 	/// * [`UnpackedResponseBody::into_bytes()`]
 	/// 
 	pub fn to_bytes(&self) -> Vec<u8> {
-		self.0.clone()
+		self.body.clone()
 	}
 	
 	//		clear																
@@ -375,7 +383,7 @@ impl UnpackedResponseBody {
 	/// body, and so does not affect any allocation.
 	/// 
 	pub fn clear(&mut self) {
-		self.0.clear();
+		self.body.clear();
 	}
 	
 	//		empty																
@@ -386,7 +394,7 @@ impl UnpackedResponseBody {
 	/// without having to supply any parameters.
 	/// 
 	pub fn empty() -> Self {
-		Self(Vec::new())
+		Self { body: Vec::new() }
 	}
 	
 	//		is_empty															
@@ -396,7 +404,7 @@ impl UnpackedResponseBody {
 	/// equivalent to checking whether the length of the response body is zero.
 	/// 
 	pub fn is_empty(&self) -> bool {
-		self.0.is_empty()
+		self.body.is_empty()
 	}
 	
 	//		len																	
@@ -407,7 +415,7 @@ impl UnpackedResponseBody {
 	/// contains.
 	/// 
 	pub fn len(&self) -> usize {
-		self.0.len()
+		self.body.len()
 	}
 	
 	//		push																
@@ -440,7 +448,7 @@ impl UnpackedResponseBody {
 	/// * [`UnpackedResponseBody::push_str()`]
 	/// 
 	pub fn push(&mut self, byte: u8) {
-		self.0.push(byte)
+		self.body.push(byte)
 	}
 	
 	//		push_bytes															
@@ -462,7 +470,7 @@ impl UnpackedResponseBody {
 	/// * [`UnpackedResponseBody::push_str()`]
 	///
 	pub fn push_bytes(&mut self, bytes: &[u8]) {
-		self.0.extend_from_slice(bytes);
+		self.body.extend_from_slice(bytes);
 	}
 	
 	//		push_char															
@@ -485,7 +493,7 @@ impl UnpackedResponseBody {
 	pub fn push_char(&mut self, char: &char) {
 		let mut bytes = [0; 4];
 		let used      = char.encode_utf8(&mut bytes).len();
-		self.0.extend(&bytes[..used]);
+		self.body.extend(&bytes[..used]);
 	}
 	
 	//		push_str															
@@ -506,7 +514,7 @@ impl UnpackedResponseBody {
 	/// * [`UnpackedResponseBody::push_bytes()`]
 	/// 
 	pub fn push_str(&mut self, string: &str) {
-		self.0.extend_from_slice(string.as_bytes());
+		self.body.extend_from_slice(string.as_bytes());
 	}
 }
 
@@ -648,7 +656,7 @@ impl Add<UnpackedResponseBody> for UnpackedResponseBody {
 	//		add																	
 	/// Adds an `UnpackedResponseBody` to an [`UnpackedResponseBody`].
 	fn add(mut self, other: Self) -> Self {
-		self.push_bytes(&other.0);
+		self.push_bytes(&other.body);
 		self
 	}
 }
@@ -764,7 +772,7 @@ impl AddAssign<UnpackedResponseBody> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds an `UnpackedResponseBody` to an [`UnpackedResponseBody`].
 	fn add_assign(&mut self, other: Self) {
-		self.push_bytes(&other.0);
+		self.push_bytes(&other.body);
 	}
 }
 
@@ -793,21 +801,21 @@ impl AsRef<[u8]> for UnpackedResponseBody {
 impl Clone for UnpackedResponseBody {
 	//		clone																
 	fn clone(&self) -> Self {
-		Self(self.0.clone())
+		Self { body: self.body.clone() }
 	}
 	
 	//		clone_from															
 	fn clone_from(&mut self, source: &Self) {
-		self.0.clone_from(&source.0);
+		self.body.clone_from(&source.body);
 	}
 }
 
 impl Debug for UnpackedResponseBody {
 	//		fmt																	
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		let body = String::from_utf8_lossy(&self.0);
-		f.debug_tuple("UnpackedResponseBody")
-			.field(&body)
+		let body = String::from_utf8_lossy(&self.body);
+		f.debug_struct("UnpackedResponseBody")
+			.field("body", &body)
 			.finish()
 	}
 }
@@ -815,7 +823,7 @@ impl Debug for UnpackedResponseBody {
 impl Display for UnpackedResponseBody {
 	//		fmt																	
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		let body = String::from_utf8_lossy(&self.0);
+		let body = String::from_utf8_lossy(&self.body);
 		write!(f, "{}", body)
 	}
 }
@@ -824,7 +832,7 @@ impl From<&[u8]> for UnpackedResponseBody {
 	//		from																
 	/// Converts a `&[u8]` to an [`UnpackedResponseBody`].
 	fn from(b: &[u8]) -> Self {
-		UnpackedResponseBody(b.to_vec())
+		UnpackedResponseBody { body: b.to_vec() }
 	}
 }
 
@@ -832,7 +840,7 @@ impl<const N: usize> From<&[u8; N]> for UnpackedResponseBody {
 	//		from																
 	/// Converts a `&[u8; N]` to an [`UnpackedResponseBody`].
 	fn from(b: &[u8; N]) -> Self {
-		UnpackedResponseBody(b.to_vec())
+		UnpackedResponseBody { body: b.to_vec() }
 	}
 }
 
@@ -867,7 +875,7 @@ impl From<char> for UnpackedResponseBody {
 	fn from(c: char) -> Self {
 		let mut bytes = [0; 4];
 		let used      = c.encode_utf8(&mut bytes).len();
-		Self(bytes[..used].to_vec())
+		Self { body: bytes[..used].to_vec() }
 	}
 }
 
@@ -883,7 +891,7 @@ impl From<Json> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`serde_json::Value`] to an [`UnpackedResponseBody`].
 	fn from(j: Json) -> Self {
-		Self(j.to_string().into_bytes())
+		Self { body: j.to_string().into_bytes() }
 	}
 }
 
@@ -891,7 +899,7 @@ impl From<&Json> for UnpackedResponseBody {
 	//		from																
 	/// Converts a `&serde_json::Value` to an [`UnpackedResponseBody`].
 	fn from(j: &Json) -> Self {
-		Self(j.to_string().into_bytes())
+		Self { body: j.to_string().into_bytes() }
 	}
 }
 
@@ -899,7 +907,7 @@ impl From<&str> for UnpackedResponseBody {
 	//		from																
 	/// Converts a `&str` to an [`UnpackedResponseBody`].
 	fn from(s: &str) -> Self {
-		Self(s.to_owned().as_bytes().to_vec())
+		Self { body: s.to_owned().as_bytes().to_vec() }
 	}
 }
 
@@ -907,7 +915,7 @@ impl From<&mut str> for UnpackedResponseBody {
 	//		from																
 	/// Converts a `&mut str` to an [`UnpackedResponseBody`].
 	fn from(s: &mut str) -> Self {
-		Self(s.to_owned().as_bytes().to_vec())
+		Self { body: s.to_owned().as_bytes().to_vec() }
 	}
 }
 
@@ -915,7 +923,7 @@ impl From<String> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`String`] to an [`UnpackedResponseBody`].
 	fn from(s: String) -> Self {
-		Self(s.as_bytes().to_vec())
+		Self { body: s.as_bytes().to_vec() }
 	}
 }
 
@@ -923,7 +931,7 @@ impl From<&String> for UnpackedResponseBody {
 	//		from																
 	/// Converts a `&String` to an [`UnpackedResponseBody`].
 	fn from(s: &String) -> Self {
-		Self(s.as_str().as_bytes().to_vec())
+		Self { body: s.as_str().as_bytes().to_vec() }
 	}
 }
 
@@ -931,7 +939,7 @@ impl From<Box<str>> for UnpackedResponseBody {
 	//		from																
 	/// Converts a boxed [`str`] slice to an [`UnpackedResponseBody`].
 	fn from(s: Box<str>) -> Self {
-		Self(s.into_string().as_bytes().to_vec())
+		Self { body: s.into_string().as_bytes().to_vec() }
 	}
 }
 
@@ -939,7 +947,7 @@ impl<'a> From<Cow<'a, str>> for UnpackedResponseBody {
 	//		from																
 	/// Converts a clone-on-write string to an [`UnpackedResponseBody`].
 	fn from(s: Cow<'a, str>) -> Self {
-		Self(s.into_owned().as_bytes().to_vec())
+		Self { body: s.into_owned().as_bytes().to_vec() }
 	}
 }
 
@@ -947,7 +955,7 @@ impl From<u8> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`u8`] to an [`UnpackedResponseBody`].
 	fn from(c: u8) -> Self {
-		Self(Vec::from([c]))
+		Self { body: Vec::from([c]) }
 	}
 }
 
@@ -955,7 +963,7 @@ impl From<Vec<u8>> for UnpackedResponseBody {
 	//		from																
 	/// Converts a `Vec<u8>` to an [`UnpackedResponseBody`].
 	fn from(v: Vec<u8>) -> Self {
-		Self(v)
+		Self { body: v }
 	}
 }
 
@@ -963,7 +971,7 @@ impl From<&Vec<u8>> for UnpackedResponseBody {
 	//		from																
 	/// Converts a `&Vec<u8>` to an [`UnpackedResponseBody`].
 	fn from(v: &Vec<u8>) -> Self {
-		Self(v.clone())
+		Self { body: v.clone() }
 	}
 }
 
@@ -972,14 +980,14 @@ impl FromStr for UnpackedResponseBody {
 	
 	//		from_str															
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		Ok(Self(s.as_bytes().to_vec()))
+		Ok(Self { body: s.as_bytes().to_vec() })
 	}
 }
 
 impl PartialEq for UnpackedResponseBody {
 	//		eq																	
 	fn eq(&self, other: &Self) -> bool {
-		self.0 == other.0
+		self.body == other.body
 	}
 }
 
@@ -989,7 +997,7 @@ impl Serialize for UnpackedResponseBody {
 	where
 		S: Serializer,
 	{
-		let string = String::from_utf8_lossy(&self.0);
+		let string = String::from_utf8_lossy(&self.body);
 		serializer.serialize_str(&string)
 	}
 }
@@ -1001,7 +1009,7 @@ impl <'de> Deserialize<'de> for UnpackedResponseBody {
 		D: Deserializer<'de>,
 	{
 		let string = String::deserialize(deserializer)?;
-		Ok(Self(string.as_bytes().to_vec()))
+		Ok(Self { body: string.as_bytes().to_vec() })
 	}
 }
 
@@ -1155,7 +1163,7 @@ fn convert_response(
 	UnpackedResponse {
 		status,
 		headers: convert_headers(headers),
-		body:    UnpackedResponseBody(body.to_vec()),
+		body:    UnpackedResponseBody { body: body.to_vec() },
 	}
 }
 
