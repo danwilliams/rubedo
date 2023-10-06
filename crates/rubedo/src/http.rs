@@ -28,6 +28,7 @@ use hyper::{
 	header::HeaderValue,
 };
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde_json::Value as Json;
 use std::{
 	borrow::Cow,
 	cmp::Ordering,
@@ -875,6 +876,22 @@ impl From<&char> for UnpackedResponseBody {
 	/// Converts a `&char` to an [`UnpackedResponseBody`].
 	fn from(c: &char) -> Self {
 		Self::from(c.to_owned())
+	}
+}
+
+impl From<Json> for UnpackedResponseBody {
+	//		from																
+	/// Converts a [`serde_json::Value`] to an [`UnpackedResponseBody`].
+	fn from(j: Json) -> Self {
+		Self(j.to_string().into_bytes())
+	}
+}
+
+impl From<&Json> for UnpackedResponseBody {
+	//		from																
+	/// Converts a `&serde_json::Value` to an [`UnpackedResponseBody`].
+	fn from(j: &Json) -> Self {
+		Self(j.to_string().into_bytes())
 	}
 }
 

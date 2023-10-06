@@ -846,6 +846,45 @@ mod unpacked_response_body__traits {
 		assert_eq!(body, UnpackedResponseBody(s!("𐍈").into_bytes()));
 	}
 	#[test]
+	fn from__json() {
+		let body = UnpackedResponseBody::from(json!({
+			"foo": "bar",
+			"baz": 2,
+		}));
+		assert_json_eq!(json!(body), r#"{"foo":"bar","baz":2}"#);
+		
+		let json = json!({
+			"str":   "foo",
+			"int":   99,
+			"float": 1.234,
+			"bool":  true,
+		});
+		let body = UnpackedResponseBody::from(json);
+		assert_json_eq!(json!(body), r#"{"str":"foo","int":99,"float":1.234,"bool":true}"#);
+		//	We cannot compare to the original JSON after calling from(),
+		//	because it has been consumed.
+		//	Uncommenting the lines below would cause a compilation error:
+		// assert_json_eq!(json, json!({
+		// 	"str":   "foo",
+		// 	"int":   99,
+		// 	"float": 1.234,
+		// 	"bool":  true,
+		// }));
+	}
+	#[test]
+	fn from__json_ref() {
+		let json = json!({
+			"foo": "bar",
+			"baz": 2,
+		});
+		let body = UnpackedResponseBody::from(&json);
+		assert_json_eq!(json!(body), r#"{"foo":"bar","baz":2}"#);
+		assert_json_eq!(json, json!({
+			"foo": "bar",
+			"baz": 2,
+		}));
+	}
+	#[test]
 	fn from__str() {
 		let body = UnpackedResponseBody::from("This is a test");
 		assert_eq!(body, UnpackedResponseBody(b"This is a test".to_vec()));
