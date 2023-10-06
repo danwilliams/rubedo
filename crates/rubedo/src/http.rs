@@ -18,6 +18,7 @@ mod tests;
 //		Packages
 
 use crate::sugar::s;
+use base64;
 use core::convert::Infallible;
 use futures::executor;
 use http::{Response, StatusCode};
@@ -41,6 +42,25 @@ use std::{
 
 
 //		Enums
+
+//		ContentType																
+/// The content type of an HTTP response, for use by [`UnpackedResponseBody`].
+/// 
+/// The content type is used to determine how to represent and interpret the
+/// response body when performing serialisation and deserialisation, including
+/// for display.
+/// 
+/// The default content type is [`Text`](ContentType::Text).
+#[derive(Copy, Clone, Debug, Default, PartialEq)]
+pub enum ContentType {
+	/// The response body is text. It will be represented as an ordinary
+	/// [`String`] when serialised.
+	#[default]
+	Text,
+	/// The response body is binary. It will be represented as a [`String`]
+	/// in base64 format when serialised.
+	Binary,
+}
 
 //		ResponseError															
 #[derive(Debug)]
@@ -207,7 +227,12 @@ pub struct UnpackedResponseBody {
 	/// converted to a [`String`]. That step is left as optional for the caller,
 	/// if required (and happens when running through the [`Debug`] or
 	/// [`Display`] formatters).
-	body: Vec<u8>,
+	body:         Vec<u8>,
+	/// The content type of the response body. This is used to determine how to
+	/// represent and interpret the response body when performing serialisation
+	/// and deserialisation, including for display. The default content type is
+	/// [`Text`](ContentType::Text).
+	content_type: ContentType,
 }
 
 impl UnpackedResponseBody {
@@ -219,7 +244,7 @@ impl UnpackedResponseBody {
 	/// * `vec` - The response body as a vector of bytes.
 	/// 
 	pub fn new(vec: Vec<u8>) -> Self {
-		Self { body: vec }
+		Self { body: vec, ..Default::default() }
 	}
 	
 	//		as_bytes															
@@ -394,7 +419,7 @@ impl UnpackedResponseBody {
 	/// without having to supply any parameters.
 	/// 
 	pub fn empty() -> Self {
-		Self { body: Vec::new() }
+		Self { body: Vec::new(), ..Default::default() }
 	}
 	
 	//		is_empty															
@@ -801,7 +826,7 @@ impl AsRef<[u8]> for UnpackedResponseBody {
 impl Clone for UnpackedResponseBody {
 	//		clone																
 	fn clone(&self) -> Self {
-		Self { body: self.body.clone() }
+		Self { body: self.body.clone(), ..Default::default() }
 	}
 	
 	//		clone_from															
@@ -832,7 +857,7 @@ impl From<&[u8]> for UnpackedResponseBody {
 	//		from																
 	/// Converts a `&[u8]` to an [`UnpackedResponseBody`].
 	fn from(b: &[u8]) -> Self {
-		UnpackedResponseBody { body: b.to_vec() }
+		UnpackedResponseBody { body: b.to_vec(), ..Default::default() }
 	}
 }
 
@@ -840,7 +865,7 @@ impl<const N: usize> From<&[u8; N]> for UnpackedResponseBody {
 	//		from																
 	/// Converts a `&[u8; N]` to an [`UnpackedResponseBody`].
 	fn from(b: &[u8; N]) -> Self {
-		UnpackedResponseBody { body: b.to_vec() }
+		UnpackedResponseBody { body: b.to_vec(), ..Default::default() }
 	}
 }
 
@@ -875,7 +900,7 @@ impl From<char> for UnpackedResponseBody {
 	fn from(c: char) -> Self {
 		let mut bytes = [0; 4];
 		let used      = c.encode_utf8(&mut bytes).len();
-		Self { body: bytes[..used].to_vec() }
+		Self { body: bytes[..used].to_vec(), ..Default::default() }
 	}
 }
 
@@ -891,7 +916,7 @@ impl From<Json> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`serde_json::Value`] to an [`UnpackedResponseBody`].
 	fn from(j: Json) -> Self {
-		Self { body: j.to_string().into_bytes() }
+		Self { body: j.to_string().into_bytes(), ..Default::default() }
 	}
 }
 
@@ -899,7 +924,7 @@ impl From<&Json> for UnpackedResponseBody {
 	//		from																
 	/// Converts a `&serde_json::Value` to an [`UnpackedResponseBody`].
 	fn from(j: &Json) -> Self {
-		Self { body: j.to_string().into_bytes() }
+		Self { body: j.to_string().into_bytes(), ..Default::default() }
 	}
 }
 
@@ -907,7 +932,7 @@ impl From<&str> for UnpackedResponseBody {
 	//		from																
 	/// Converts a `&str` to an [`UnpackedResponseBody`].
 	fn from(s: &str) -> Self {
-		Self { body: s.to_owned().as_bytes().to_vec() }
+		Self { body: s.to_owned().as_bytes().to_vec(), ..Default::default() }
 	}
 }
 
@@ -915,7 +940,7 @@ impl From<&mut str> for UnpackedResponseBody {
 	//		from																
 	/// Converts a `&mut str` to an [`UnpackedResponseBody`].
 	fn from(s: &mut str) -> Self {
-		Self { body: s.to_owned().as_bytes().to_vec() }
+		Self { body: s.to_owned().as_bytes().to_vec(), ..Default::default() }
 	}
 }
 
@@ -923,7 +948,7 @@ impl From<String> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`String`] to an [`UnpackedResponseBody`].
 	fn from(s: String) -> Self {
-		Self { body: s.as_bytes().to_vec() }
+		Self { body: s.as_bytes().to_vec(), ..Default::default() }
 	}
 }
 
@@ -931,7 +956,7 @@ impl From<&String> for UnpackedResponseBody {
 	//		from																
 	/// Converts a `&String` to an [`UnpackedResponseBody`].
 	fn from(s: &String) -> Self {
-		Self { body: s.as_str().as_bytes().to_vec() }
+		Self { body: s.as_str().as_bytes().to_vec(), ..Default::default() }
 	}
 }
 
@@ -939,7 +964,7 @@ impl From<Box<str>> for UnpackedResponseBody {
 	//		from																
 	/// Converts a boxed [`str`] slice to an [`UnpackedResponseBody`].
 	fn from(s: Box<str>) -> Self {
-		Self { body: s.into_string().as_bytes().to_vec() }
+		Self { body: s.into_string().as_bytes().to_vec(), ..Default::default() }
 	}
 }
 
@@ -947,7 +972,7 @@ impl<'a> From<Cow<'a, str>> for UnpackedResponseBody {
 	//		from																
 	/// Converts a clone-on-write string to an [`UnpackedResponseBody`].
 	fn from(s: Cow<'a, str>) -> Self {
-		Self { body: s.into_owned().as_bytes().to_vec() }
+		Self { body: s.into_owned().as_bytes().to_vec(), ..Default::default() }
 	}
 }
 
@@ -955,7 +980,7 @@ impl From<u8> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`u8`] to an [`UnpackedResponseBody`].
 	fn from(c: u8) -> Self {
-		Self { body: Vec::from([c]) }
+		Self { body: Vec::from([c]), ..Default::default() }
 	}
 }
 
@@ -963,7 +988,7 @@ impl From<Vec<u8>> for UnpackedResponseBody {
 	//		from																
 	/// Converts a `Vec<u8>` to an [`UnpackedResponseBody`].
 	fn from(v: Vec<u8>) -> Self {
-		Self { body: v }
+		Self { body: v, ..Default::default() }
 	}
 }
 
@@ -971,7 +996,7 @@ impl From<&Vec<u8>> for UnpackedResponseBody {
 	//		from																
 	/// Converts a `&Vec<u8>` to an [`UnpackedResponseBody`].
 	fn from(v: &Vec<u8>) -> Self {
-		Self { body: v.clone() }
+		Self { body: v.clone(), ..Default::default() }
 	}
 }
 
@@ -980,7 +1005,7 @@ impl FromStr for UnpackedResponseBody {
 	
 	//		from_str															
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		Ok(Self { body: s.as_bytes().to_vec() })
+		Ok(Self { body: s.as_bytes().to_vec(), ..Default::default() })
 	}
 }
 
@@ -1009,7 +1034,7 @@ impl <'de> Deserialize<'de> for UnpackedResponseBody {
 		D: Deserializer<'de>,
 	{
 		let string = String::deserialize(deserializer)?;
-		Ok(Self { body: string.as_bytes().to_vec() })
+		Ok(Self { body: string.as_bytes().to_vec(), ..Default::default() })
 	}
 }
 
@@ -1163,7 +1188,7 @@ fn convert_response(
 	UnpackedResponse {
 		status,
 		headers: convert_headers(headers),
-		body:    UnpackedResponseBody { body: body.to_vec() },
+		body:    UnpackedResponseBody { body: body.to_vec(), ..Default::default() },
 	}
 }
 
