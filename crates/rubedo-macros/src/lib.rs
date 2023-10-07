@@ -32,7 +32,7 @@ use std::net::IpAddr;
 /// 
 /// Note that this macro will panic if it fails to parse a string literal as an
 /// IP address. This is by design, so that all variants of IP creation return an
-/// `IpAddr` instance, just like [`IpAddr::from()`]. This macro is intended to
+/// [`IpAddr`] instance, just like [`IpAddr::from()`]. This macro is intended to
 /// be used with hard-coded addresses. If you need to handle errors, use the
 /// standard [`IpAddr::from_str()`](IpAddr) method instead.
 /// 
@@ -47,7 +47,7 @@ use std::net::IpAddr;
 /// assert_eq!(ip!(1, 2, 3, 4), IpAddr::from([1, 2, 3, 4]));
 /// ```
 /// 
-/// # See Also
+/// # See also
 /// 
 /// * [`IpAddr`]
 /// 

@@ -34,11 +34,12 @@ pub trait DurationExt {
 	];
 	
 	//		humanize															
-	/// Returns a human-readable string representation of the duration.
+	/// Returns a human-readable string representation of a [`Duration`].
 	/// 
-	/// This will indicate the duration as an expression of the largest unit
+	/// This will indicate the [`Duration`] as an expression of the largest unit
 	/// available. For example, if the duration is 1 year, 2 months, 3 weeks,
 	/// 4 days, 5 hours, 6 minutes, and 7 seconds, it will return "1 year".
+	/// 
 	fn humanize(&self) -> String;
 }
 
@@ -64,6 +65,7 @@ pub trait NaiveDateExt {
 	/// 
 	/// Although this is a static method, it does not return an [`Option`] as it
 	/// cannot fail.
+	/// 
 	fn today() -> NaiveDate;
 	
 	//		days_in_month														
@@ -71,6 +73,12 @@ pub trait NaiveDateExt {
 	/// 
 	/// This method operates on `&self`. For the equivalent method that operates
 	/// without an instance, see [`days_in_month_opt()`](NaiveDateExt::days_in_month_opt()).
+	/// 
+	/// # See also
+	/// 
+	/// * [`days_in_month_opt()`](NaiveDateExt::days_in_month_opt())
+	/// * [`days_in_year()`](NaiveDateExt::days_in_year())
+	/// 
 	fn days_in_month(&self) -> u32;
 	
 	//		days_in_month_opt														
@@ -80,7 +88,13 @@ pub trait NaiveDateExt {
 	/// operates on `&self`, see [`days_in_month()`](NaiveDateExt::days_in_month()).
 	///
 	/// The outcome is wrapped in an [`Option`]. If the given year or month is
-	/// invalid, `None` is returned.
+	/// invalid, [`None`] is returned.
+	/// 
+	/// # See also
+	/// 
+	/// * [`days_in_month()`](NaiveDateExt::days_in_month())
+	/// * [`days_in_year_opt()`](NaiveDateExt::days_in_year_opt())
+	/// 
 	fn days_in_month_opt(year: i32, month: u32) -> Option<u32>;
 	
 	//		days_in_year														
@@ -88,6 +102,12 @@ pub trait NaiveDateExt {
 	/// 
 	/// This method operates on `&self`. For the equivalent method that operates
 	/// without an instance, see [`days_in_year_opt()`](NaiveDateExt::days_in_year_opt()).
+	/// 
+	/// # See also
+	/// 
+	/// * [`days_in_month()`](NaiveDateExt::days_in_month())
+	/// * [`days_in_year_opt()`](NaiveDateExt::days_in_year_opt())
+	/// 
 	fn days_in_year(&self) -> u32;
 	
 	//		days_in_year_opt														
@@ -97,7 +117,13 @@ pub trait NaiveDateExt {
 	/// operates on `&self`, see [`days_in_year()`](NaiveDateExt::days_in_year()).
 	///
 	/// The outcome is wrapped in an [`Option`]. If the given year is invalid,
-	/// `None` is returned.
+	/// [`None`] is returned.
+	/// 
+	/// # See also
+	/// 
+	/// * [`days_in_month_opt()`](NaiveDateExt::days_in_month_opt())
+	/// * [`days_in_year()`](NaiveDateExt::days_in_year())
+	/// 
 	fn days_in_year_opt(year: i32) -> Option<u32>;
 	
 	//		is_leap_year														
@@ -105,6 +131,11 @@ pub trait NaiveDateExt {
 	/// 
 	/// This method operates on `&self`. For the equivalent method that operates
 	/// without an instance, see [`is_leap_year_opt()`](NaiveDateExt::is_leap_year_opt()).
+	/// 
+	/// # See also
+	/// 
+	/// * [`is_leap_year_opt()`](NaiveDateExt::is_leap_year_opt())
+	/// 
 	fn is_leap_year(&self) -> bool;
 	
 	//		is_leap_year_opt														
@@ -114,7 +145,12 @@ pub trait NaiveDateExt {
 	/// operates on `&self`, see [`is_leap_year()`](NaiveDateExt::is_leap_year()).
 	/// 
 	/// The outcome is wrapped in an [`Option`]. If the given year is invalid,
-	/// `None` is returned.
+	/// [`None`] is returned.
+	/// 
+	/// # See also
+	/// 
+	/// * [`is_leap_year()`](NaiveDateExt::is_leap_year())
+	/// 
 	fn is_leap_year_opt(year: i32) -> Option<bool>;
 	
 	//		start_of_month														
@@ -122,6 +158,14 @@ pub trait NaiveDateExt {
 	/// 
 	/// This method operates on `&self`. For the equivalent method that operates
 	/// without an instance, see [`start_of_month_opt()`](NaiveDateExt::start_of_month_opt()).
+	/// 
+	/// # See also
+	/// 
+	/// * [`end_of_month()`](NaiveDateExt::end_of_month())
+	/// * [`end_of_year()`](NaiveDateExt::end_of_year())
+	/// * [`start_of_month_opt()`](NaiveDateExt::start_of_month_opt())
+	/// * [`start_of_year()`](NaiveDateExt::start_of_year())
+	/// 
 	fn start_of_month(&self) -> NaiveDate;
 	
 	//		start_of_month_opt														
@@ -131,7 +175,15 @@ pub trait NaiveDateExt {
 	/// operates on `&self`, see [`start_of_month()`](NaiveDateExt::start_of_month()).
 	///
 	/// The outcome is wrapped in an [`Option`]. If the given year or month is
-	/// invalid, `None` is returned.
+	/// invalid, [`None`] is returned.
+	/// 
+	/// # See also
+	/// 
+	/// * [`end_of_month_opt()`](NaiveDateExt::end_of_month_opt())
+	/// * [`end_of_year_opt()`](NaiveDateExt::end_of_year_opt())
+	/// * [`start_of_month()`](NaiveDateExt::start_of_month())
+	/// * [`start_of_year_opt()`](NaiveDateExt::start_of_year_opt())
+	/// 
 	fn start_of_month_opt(year: i32, month: u32) -> Option<NaiveDate>;
 	
 	//		end_of_month														
@@ -139,6 +191,14 @@ pub trait NaiveDateExt {
 	/// 
 	/// This method operates on `&self`. For the equivalent method that operates
 	/// without an instance, see [`end_of_month_opt()`](NaiveDateExt::end_of_month_opt()).
+	/// 
+	/// # See also
+	/// 
+	/// * [`end_of_month_opt()`](NaiveDateExt::end_of_month_opt())
+	/// * [`end_of_year()`](NaiveDateExt::end_of_year())
+	/// * [`start_of_month()`](NaiveDateExt::start_of_month())
+	/// * [`start_of_year()`](NaiveDateExt::start_of_year())
+	/// 
 	fn end_of_month(&self) -> NaiveDate;
 	
 	//		end_of_month_opt														
@@ -148,7 +208,15 @@ pub trait NaiveDateExt {
 	/// operates on `&self`, see [`end_of_month()`](NaiveDateExt::end_of_month()).
 	///
 	/// The outcome is wrapped in an [`Option`]. If the given year or month is
-	/// invalid, `None` is returned.
+	/// invalid, [`None`] is returned.
+	/// 
+	/// # See also
+	/// 
+	/// * [`end_of_month()`](NaiveDateExt::end_of_month())
+	/// * [`end_of_year_opt()`](NaiveDateExt::end_of_year_opt())
+	/// * [`start_of_month_opt()`](NaiveDateExt::start_of_month_opt())
+	/// * [`start_of_year_opt()`](NaiveDateExt::start_of_year_opt())
+	/// 
 	fn end_of_month_opt(year: i32, month: u32) -> Option<NaiveDate>;
 	
 	//		start_of_year														
@@ -156,6 +224,14 @@ pub trait NaiveDateExt {
 	/// 
 	/// This method operates on `&self`. For the equivalent method that operates
 	/// without an instance, see [`start_of_year_opt()`](NaiveDateExt::start_of_year_opt()).
+	/// 
+	/// # See also
+	/// 
+	/// * [`end_of_month()`](NaiveDateExt::end_of_month())
+	/// * [`end_of_year()`](NaiveDateExt::end_of_year())
+	/// * [`start_of_month()`](NaiveDateExt::start_of_month())
+	/// * [`start_of_year_opt()`](NaiveDateExt::start_of_year_opt())
+	/// 
 	fn start_of_year(&self) -> NaiveDate;
 	
 	//		start_of_year_opt														
@@ -165,7 +241,15 @@ pub trait NaiveDateExt {
 	/// operates on `&self`, see [`start_of_year()`](NaiveDateExt::start_of_year()).
 	///
 	/// The outcome is wrapped in an [`Option`]. If the given year is invalid,
-	/// `None` is returned.
+	/// [`None`] is returned.
+	/// 
+	/// # See also
+	/// 
+	/// * [`end_of_month_opt()`](NaiveDateExt::end_of_month_opt())
+	/// * [`end_of_year_opt()`](NaiveDateExt::end_of_year_opt())
+	/// * [`start_of_month_opt()`](NaiveDateExt::start_of_month_opt())
+	/// * [`start_of_year()`](NaiveDateExt::start_of_year())
+	/// 
 	fn start_of_year_opt(year: i32) -> Option<NaiveDate>;
 	
 	//		end_of_year															
@@ -173,6 +257,14 @@ pub trait NaiveDateExt {
 	/// 
 	/// This method operates on `&self`. For the equivalent method that operates
 	/// without an instance, see [`end_of_year_opt()`](NaiveDateExt::end_of_year_opt()).
+	/// 
+	/// # See also
+	/// 
+	/// * [`end_of_month()`](NaiveDateExt::end_of_month())
+	/// * [`end_of_year_opt()`](NaiveDateExt::end_of_year_opt())
+	/// * [`start_of_month()`](NaiveDateExt::start_of_month())
+	/// * [`start_of_year()`](NaiveDateExt::start_of_year())
+	/// 
 	fn end_of_year(&self) -> NaiveDate;
 	
 	//		end_of_year_opt															
@@ -182,7 +274,15 @@ pub trait NaiveDateExt {
 	/// operates on `&self`, see [`end_of_year()`](NaiveDateExt::end_of_year()).
 	///
 	/// The outcome is wrapped in an [`Option`]. If the given year is invalid,
-	/// `None` is returned.
+	/// [`None`] is returned.
+	/// 
+	/// # See also
+	/// 
+	/// * [`end_of_month_opt()`](NaiveDateExt::end_of_month_opt())
+	/// * [`end_of_year()`](NaiveDateExt::end_of_year())
+	/// * [`start_of_month_opt()`](NaiveDateExt::start_of_month_opt())
+	/// * [`start_of_year_opt()`](NaiveDateExt::start_of_year_opt())
+	/// 
 	fn end_of_year_opt(year: i32) -> Option<NaiveDate>;
 }
 

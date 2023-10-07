@@ -31,16 +31,16 @@ pub trait PathExt {
 	/// Adds a string to the end of a path, and returns the result as a new
 	/// path. This is specifically different to both [`push()`](PathBuf::push())
 	/// and [`join()`](Path::join()), as it simply appends the string without
-	/// having any further effect on the path. By contrast, `push()` and
-	/// `join()` will append a new string as a new path component, which will
-	/// then be normalized, and will also replace the path entirely if the
-	/// string is an absolute path.
+	/// having any further effect on the path. By contrast, [`push()`](PathBuf::push())
+	/// and [`join()`](Path::join()) will append a new string as a new path
+	/// component, which will then be normalized, and will also replace the path
+	/// entirely if the string is an absolute path.
 	/// 
 	/// # Parameters
 	/// 
 	/// * `suffix` - The string to append to the path.
 	/// 
-	/// # See Also
+	/// # See also
 	/// 
 	/// * [`std::path::Path::join()`]
 	/// * [`std::path::PathBuf::push()`]
@@ -64,7 +64,7 @@ pub trait PathExt {
 	/// There is therefore no method `is_objective()`, as it does not currently
 	/// appear to have a useful purpose.
 	/// 
-	/// # See Also
+	/// # See also
 	/// 
 	/// * [`std::path::Path::is_absolute()`]
 	/// * [`std::path::Path::is_relative()`]
@@ -86,12 +86,12 @@ pub trait PathExt {
 	/// [`canonicalize()`](Path::canonicalize()), which does a number of
 	/// filesystem checks.
 	/// 
-	/// Key differences are that `canonicalize()` will return an error if the
-	/// path does not exist, and will resolve symlinks. This function will
-	/// remove `.` segments, and will remove the parent segment along with the
-	/// current segment for `..` segments.
+	/// Key differences are that [`canonicalize()`](Path::canonicalize()) will
+	/// return an error if the path does not exist, and will resolve symlinks.
+	/// This function will remove `.` segments, and will remove the parent
+	/// segment along with the current segment for `..` segments.
 	/// 
-	/// # See Also
+	/// # See also
 	/// 
 	/// * [`restrict()`](PathExt::restrict())
 	/// * [`std::fs::canonicalize()`]
@@ -142,10 +142,10 @@ pub trait PathExt {
 	/// 
 	/// # Parameters
 	/// 
-	/// * `base` - The base path to use. If this is `None` then the current
+	/// * `base` - The base path to use. If this is [`None`] then the current
 	///            working directory will be used.
 	/// 
-	/// # See Also
+	/// # See also
 	/// 
 	/// * [`normalize()`](PathExt::normalize())
 	/// 
@@ -168,7 +168,7 @@ pub trait PathExt {
 	///                  removed, otherwise only those at the beginning of the
 	///                  path will be removed.
 	/// 
-	/// # See Also
+	/// # See also
 	/// 
 	/// * [`std::path::Component`]
 	/// * [`std::path::Path::components()`]
@@ -191,7 +191,7 @@ pub trait PathExt {
 	/// valid or exists. It will also not attempt to resolve special directory
 	/// references such as `.` or `..`.
 	/// 
-	/// # See Also
+	/// # See also
 	/// 
 	/// * [`std::path::Path::components()`]
 	/// * [`std::path::Path::has_root()`]

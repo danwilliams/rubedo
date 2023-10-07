@@ -20,18 +20,18 @@ mod tests;
 //		Macros
 
 //		s!																		
-/// Converts a `str` string literal to an owned `String`.
+/// Converts a [`str`] string literal to an owned [`String`].
 /// 
 /// This macro provides syntactic sugar to convert static [`str`] instances to 
 /// [`String`]s - this saves having to do `"foo".to_owned()` or
 /// `String::from("foo")`.
 /// 
 /// It will also convert any other type that implements the [`ToString`] trait
-/// to a `String`. This is perhaps not as useful as the `str` conversion, but it
-/// does provide a consistent interface for converting to `String`s. When
-/// converting from other types it is likely best to use the standard conversion
-/// functions directly, to avoid confusion, and so the recommendation is to only
-/// use this macro as shorthand for converting `str` instances.
+/// to a [`String`]. This is perhaps not as useful as the [`str`] conversion,
+/// but it does provide a consistent interface for converting to [`String`]s.
+/// When converting from other types it is likely best to use the standard
+/// conversion functions directly, to avoid confusion, and so the recommendation
+/// is to only use this macro as shorthand for converting [`str`] instances.
 /// 
 /// The inspiration for this macro comes from the [`velcro`](https://crates.io/crates/velcro)
 /// crate, which provides a range of macros for creating collections, building
@@ -48,7 +48,7 @@ mod tests;
 /// assert_eq!(s!("foo"), String::from("foo"));
 /// ```
 /// 
-/// # See Also
+/// # See also
 /// 
 /// * [`str`]
 /// * [`String`]

@@ -1095,6 +1095,7 @@ mod unpacked_response_body__traits {
 	fn from__vec_u8() {
 		let body = UnpackedResponseBody::from(b"This is a test".to_vec());
 		assert_eq!(body, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
+		
 		let vec  = b"This is another test".to_vec();
 		let body = UnpackedResponseBody::from(vec);
 		assert_eq!(body, UnpackedResponseBody { body: b"This is another test".to_vec(), ..Default::default() });
