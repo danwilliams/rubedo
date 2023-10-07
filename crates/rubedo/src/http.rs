@@ -100,12 +100,15 @@ impl Error for ResponseError {}
 /// Note that the [`body`](UnpackedResponse.body) property, which is stored as a
 /// vector of bytes, will get converted to a [`String`] if it is run through the
 /// standard [`Debug`] or [`Display`] formatters. This is because human-readable
-/// output is the intuitively-expected outcome in this situation. The conversion
-/// uses [`from_utf8_lossy()`](String::from_utf8_lossy()), so no errors will
-/// occur, but if the body is not valid UTF8 then the resulting `String` will
-/// not be exactly the same. If an accurate representation of the body is
-/// required then it should be extracted and converted to a `Vec<u8>`, and then
-/// run through the `Debug` or `Display` formatters directly.
+/// output is the intuitively-expected outcome in this situation. The behaviour
+/// can be controlled with the [`ContentType`] enum, which is used to determine
+/// whether the data is binary or text. If [`Text`](ContentType::Text), then the
+/// conversion uses [`from_utf8_lossy()`](String::from_utf8_lossy()), so no
+/// errors will occur, but if the body is not valid UTF8 then the resulting
+/// `String` will not be exactly the same. If an accurate representation of the
+/// body is required then it should be set to [`Binary`](ContentType::Binary),
+/// or else it should be extracted and converted to a `Vec<u8>` and then run
+/// through the `Debug` or `Display` formatters directly.
 /// 
 /// # See Also
 /// 
@@ -197,12 +200,15 @@ impl PartialEq for UnpackedResponseHeader {
 /// 
 /// The conversion to a `String` when run through the `Debug` and `Display`
 /// formatters is because human-readable output is the intuitively-expected
-/// outcome in this situation. The conversion uses [`from_utf8_lossy()`](String::from_utf8_lossy()),
-/// so no errors will occur, but if the body is not valid UTF8 then the
-/// resulting `String` will not be exactly the same. If an accurate
-/// representation of the body is required then it should be extracted and
-/// converted to a `Vec<u8>`, and then run through the `Debug` or `Display`
-/// formatters directly.
+/// outcome in this situation. The behaviour can be controlled with the
+/// [`ContentType`] enum, which is used to determine whether the data is binary
+/// or text. If [`Text`](ContentType::Text), then the conversion uses
+/// [`from_utf8_lossy()`](String::from_utf8_lossy()), so no errors will occur,
+/// but if the body is not valid UTF8 then the resulting `String` will not be
+/// exactly the same. If an accurate representation of the body is required then
+/// it should be set to [`Binary`](ContentType::Binary), or else it should be
+/// extracted and converted to a `Vec<u8>` and then run through the `Debug` or
+/// `Display` formatters directly.
 ///
 /// This struct is very similar in nature to the standard Rust [`String`]
 /// struct, in that it is a wrapper around a vector of bytes, and so its design
@@ -213,7 +219,9 @@ impl PartialEq for UnpackedResponseHeader {
 /// Note that serialisation/deserialisation of this struct directly will produce
 /// and expect a `String`, not a vector of bytes. This is because this is the
 /// most useful and fitting behaviour for the intended purpose, as with the
-/// implementations of `Display` and [`FromStr`]. As noted above, this is lossy.
+/// implementations of `Display` and [`FromStr`]. As noted above, this is lossy
+/// if the `ContentType` is `Text` and the data is not valid UTF8, but not if
+/// set to `Binary`.
 /// 
 /// # See Also
 /// 
@@ -875,17 +883,40 @@ impl Clone for UnpackedResponseBody {
 impl Debug for UnpackedResponseBody {
 	//		fmt																	
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		let body = String::from_utf8_lossy(&self.body);
 		f.debug_struct("UnpackedResponseBody")
-			.field("body", &body)
+			.field("body",         &self.to_string())
+			.field("content_type", &self.content_type)
 			.finish()
 	}
 }
 
 impl Display for UnpackedResponseBody {
 	//		fmt																	
+	/// Formats the response body for display.
+	///
+	/// This method serialises the response body based on the content type. If
+	/// the content type is [`ContentType::Text`], then the response body is
+	/// serialised to an ordinary `String`. If the content type is
+	/// [`ContentType::Binary`], then the response body is serialised to a
+	/// base64-encoded `String`.
+	///
+	/// Note that as no validation checks are performed on the response body
+	/// contents, it is not guaranteed to be UTF8, and therefore if not
+	/// specified as binary it is possible that the serialised string will not
+	/// totally match the original response body contents. This is because the
+	/// conversion of the response body bytes to a UTF8 string will be lossy if
+	/// there are invalid characters.
+	/// 
+	/// # See Also
+	/// 
+	/// * [`UnpackedResponseBody::serialize()`]
+	/// * [`UnpackedResponseBody::to_base64()`]
+	/// 
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		let body = String::from_utf8_lossy(&self.body);
+		let body                =  match self.content_type {
+			ContentType::Text   => String::from_utf8_lossy(&self.body),
+			ContentType::Binary => Cow::Owned(self.to_base64()),
+		};
 		write!(f, "{}", body)
 	}
 }
@@ -1080,11 +1111,7 @@ impl Serialize for UnpackedResponseBody {
 	where
 		S: Serializer,
 	{
-		let string              =  match self.content_type {
-			ContentType::Text   => self.to_string(),
-			ContentType::Binary => self.to_base64(),
-		};
-		serializer.serialize_str(&string)
+		serializer.serialize_str(&self.to_string())
 	}
 }
 

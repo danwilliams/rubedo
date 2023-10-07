@@ -48,7 +48,7 @@ mod unpacked_response {
 			],
 			body:          UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() },
 		};
-		assert_eq!(format!("{:?}", response), r#"UnpackedResponse { status: 200, headers: [UnpackedResponseHeader { name: "foo", value: "bar" }], body: UnpackedResponseBody { body: "This is a test" } }"#);
+		assert_eq!(format!("{:?}", response), r#"UnpackedResponse { status: 200, headers: [UnpackedResponseHeader { name: "foo", value: "bar" }], body: UnpackedResponseBody { body: "This is a test", content_type: Text } }"#);
 	}
 	
 	//		partial_eq															
@@ -800,9 +800,20 @@ mod unpacked_response_body__traits {
 	
 	//		debug																
 	#[test]
-	fn debug() {
-		let body = UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() };
-		assert_eq!(format!("{:?}", body), r#"UnpackedResponseBody { body: "This is a test" }"#);
+	fn debug__binary() {
+		let body        = UnpackedResponseBody {
+			body:         b"This is a test".to_vec(),
+			content_type: ContentType::Binary,
+		};
+		assert_eq!(format!("{:?}", body), r#"UnpackedResponseBody { body: "VGhpcyBpcyBhIHRlc3Q=", content_type: Binary }"#);
+	}
+	#[test]
+	fn debug__text() {
+		let body        = UnpackedResponseBody {
+			body:         b"This is a test".to_vec(),
+			content_type: ContentType::Text,
+		};
+		assert_eq!(format!("{:?}", body), r#"UnpackedResponseBody { body: "This is a test", content_type: Text }"#);
 	}
 	
 	//		default																
@@ -814,8 +825,19 @@ mod unpacked_response_body__traits {
 	
 	//		display																
 	#[test]
-	fn display() {
-		let body = UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() };
+	fn display__binary() {
+		let body        = UnpackedResponseBody {
+			body:         b"This is a test".to_vec(),
+			content_type: ContentType::Binary,
+		};
+		assert_eq!(format!("{}", body), r#"VGhpcyBpcyBhIHRlc3Q="#);
+	}
+	#[test]
+	fn display__text() {
+		let body        = UnpackedResponseBody {
+			body:         b"This is a test".to_vec(),
+			content_type: ContentType::Text,
+		};
 		assert_eq!(format!("{}", body), r#"This is a test"#);
 	}
 	
