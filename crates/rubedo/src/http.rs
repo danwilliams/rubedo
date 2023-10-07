@@ -1365,15 +1365,15 @@ fn convert_response(
 //		serialize_status_code													
 /// Returns the status code as a number.
 ///
-/// This function is used by [`serde`] to serialize the status code as a number
+/// This function is used by [`serde`] to serialise the status code as a number
 /// rather than an enum. This is necessary because the [`UnpackedResponse`]
 /// struct is used for comparison, and the status code is not directly
 /// comparable to a number.
 ///
 /// # Parameters
 ///
-/// * `status_code` - The status code to serialize.
-/// * `serializer`  - The serializer to use.
+/// * `status_code` - The status code to serialise.
+/// * `serializer`  - The serialiser to use.
 ///
 /// # See Also
 ///
@@ -1391,14 +1391,14 @@ where
 //		deserialize_status_code													
 /// Returns the status code as an enum.
 ///
-/// This function is used by [`serde`] to deserialize the status code as an
+/// This function is used by [`serde`] to deserialise the status code as an
 /// enum rather than a number. This is necessary because the
 /// [`UnpackedResponse`] struct is used for comparison, and the status code is
 /// not directly comparable to a number.
 ///
 /// # Parameters
 ///
-/// * `deserializer` - The deserializer to use.
+/// * `deserializer` - The deserialiser to use.
 ///
 /// # See Also
 ///
