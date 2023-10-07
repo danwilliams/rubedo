@@ -249,6 +249,9 @@ mod unpacked_response_body__struct {
 	fn new() {
 		let body = UnpackedResponseBody::new(b"This is a test".to_vec());
 		assert_eq!(body, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
+		
+		let body = UnpackedResponseBody::new("This is a test");
+		assert_eq!(body, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
 	}
 	
 	//		content_type														

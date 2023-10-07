@@ -249,10 +249,11 @@ impl UnpackedResponseBody {
 	/// 
 	/// # Parameters
 	/// 
-	/// * `vec` - The response body as a vector of bytes.
+	/// * `data` - The response body as any type for which there is a [`From`]
+	///            implementation.
 	/// 
-	pub fn new(vec: Vec<u8>) -> Self {
-		Self { body: vec, ..Default::default() }
+	pub fn new<T: Into<Self>>(data: T) -> Self {
+		data.into()
 	}
 	
 	//		content_type														
