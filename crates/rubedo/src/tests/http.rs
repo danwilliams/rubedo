@@ -241,6 +241,8 @@ mod unpacked_response_header {
 #[cfg(test)]
 mod unpacked_response_body__struct {
 	use super::super::*;
+	use claims::assert_err;
+	use std::str::from_utf8;
 	
 	//		new																	
 	#[test]
@@ -325,6 +327,45 @@ mod unpacked_response_body__struct {
 	fn to_string() {
 		let body = UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() };
 		assert_eq!(body.to_string(), "This is a test");
+	}
+	
+	//		to_base64															
+	#[test]
+	fn to_base64() {
+		let mut body    = UnpackedResponseBody {
+			body:         b"This is a test".to_vec(),
+			content_type: ContentType::Binary,
+		};
+		assert_eq!(body.to_base64(), "VGhpcyBpcyBhIHRlc3Q=");
+		
+		body.clear();
+		assert_eq!(body.to_base64(), "");
+		
+		body.body       = vec![0x80];
+		assert_err!(from_utf8(&vec![0x80]));
+		assert_eq!(body.to_base64(), "gA==");
+	}
+	
+	//		from_base64															
+	#[test]
+	fn from_base64__valid() {
+		let body = UnpackedResponseBody::from_base64("VGhpcyBpcyBhIHRlc3Q=").unwrap();
+		assert_eq!(body.body,         b"This is a test");
+		assert_eq!(body.content_type, ContentType::Binary);
+		
+		let body = UnpackedResponseBody::from_base64("").unwrap();
+		assert!(body.body.is_empty());
+		assert_eq!(body.content_type, ContentType::Binary);
+		
+		let body = UnpackedResponseBody::from_base64("gA==").unwrap();
+		assert_eq!(body.body,         vec![0x80]);
+		assert_eq!(body.content_type, ContentType::Binary);
+		assert_err!(from_utf8(&vec![0x80]));
+	}
+	
+	#[test]
+	fn from_base64__invalid() {
+		assert_err!(UnpackedResponseBody::from_base64("invalid@@base64"));
 	}
 	
 	//		clear																

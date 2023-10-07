@@ -18,7 +18,7 @@ mod tests;
 //		Packages
 
 use crate::sugar::s;
-use base64;
+use base64::{DecodeError, engine::{Engine as _, general_purpose::STANDARD as BASE64}};
 use core::convert::Infallible;
 use futures::executor;
 use http::{Response, StatusCode};
@@ -398,6 +398,43 @@ impl UnpackedResponseBody {
 	/// 
 	pub fn to_bytes(&self) -> Vec<u8> {
 		self.body.clone()
+	}
+	
+	//		to_base64															
+	/// Returns the response body data converted to a base64-encoded [`String`].
+	/// 
+	/// This does not consume the response body, but clones it, as is necessary
+	/// to perform the conversion to base64. It converts straight from bytes to
+	/// base64, without converting to a `String` first, because the response
+	/// body is binary data.
+	/// 
+	/// # See Also
+	/// 
+	/// * [`UnpackedResponseBody::from_base64()`]
+	/// 
+	pub fn to_base64(&self) -> String {
+		BASE64.encode(&self.body)
+	}
+	
+	//		from_base64															
+	/// Converts a base64-encoded [`String`] to an [`UnpackedResponseBody`].
+	/// 
+	/// This method does not consume the input string, but clones it, as is
+	/// necessary to perform the conversion from [`base64`]. It converts
+	/// straight from base64 to bytes, without converting to a `String` first,
+	/// because the response body is binary data. This means that no UTF8
+	/// validation is performed.
+	/// 
+	/// Note that unlike the [`From`] type conversion implementations, this
+	/// returns a `Result`.
+	/// 
+	/// # See Also
+	/// 
+	/// * [`UnpackedResponseBody::to_base64()`]
+	/// 
+	pub fn from_base64(encoded: &str) -> Result<Self, DecodeError> {
+		let decoded = BASE64.decode(encoded)?;
+		Ok(Self { body: decoded, content_type: ContentType::Binary })
 	}
 	
 	//		clear																
