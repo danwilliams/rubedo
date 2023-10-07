@@ -451,6 +451,7 @@ mod unpacked_response_body__struct {
 	fn is_empty() {
 		let body = UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() };
 		assert_eq!(body.is_empty(), false);
+		
 		let body = UnpackedResponseBody { body: b"".to_vec(), ..Default::default() };
 		assert_eq!(body.is_empty(), true);
 	}
@@ -830,6 +831,7 @@ mod unpacked_response_body__traits {
 		let mut body = UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() };
 		let byte_vec = body.as_mut();
 		assert_eq!(*byte_vec, b"This is a test".to_vec());
+		
 		byte_vec[10] = 84;
 		assert_eq!(*byte_vec, b"This is a Test".to_vec());
 		assert_eq!(body,      UnpackedResponseBody { body: b"This is a Test".to_vec(), ..Default::default() });
@@ -841,6 +843,7 @@ mod unpacked_response_body__traits {
 		let mut body = UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() };
 		let clone    = body.clone();
 		assert_eq!(clone, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
+		
 		body.clear();
 		body.push_str("This is a different test");
 		assert_eq!(body,  UnpackedResponseBody { body: b"This is a different test".to_vec(), ..Default::default() });
@@ -855,6 +858,7 @@ mod unpacked_response_body__traits {
 		clone.clone_from(&body);
 		assert_eq!(body,  UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
 		assert_eq!(clone, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
+		
 		body.clear();
 		body.push_str("This is a different test");
 		assert_eq!(body,  UnpackedResponseBody { body: b"This is a different test".to_vec(), ..Default::default() });
@@ -909,6 +913,7 @@ mod unpacked_response_body__traits {
 	fn from__byte_array() {
 		let body       = UnpackedResponseBody::from(b"This is a test");
 		assert_eq!(body,       UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
+		
 		let byte_array = b"This is another test";
 		let body       = UnpackedResponseBody::from(byte_array);
 		assert_eq!(body,       UnpackedResponseBody { body: b"This is another test".to_vec(), ..Default::default() });
@@ -918,6 +923,7 @@ mod unpacked_response_body__traits {
 	fn from__byte_slice() {
 		let body       = UnpackedResponseBody::from(&b"This is a test"[..]);
 		assert_eq!(body,       UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
+		
 		let byte_slice = &b"This is another test"[..];
 		let body       = UnpackedResponseBody::from(byte_slice);
 		assert_eq!(body,       UnpackedResponseBody { body: b"This is another test".to_vec(), ..Default::default() });
@@ -927,6 +933,7 @@ mod unpacked_response_body__traits {
 	fn from__char() {
 		let body = UnpackedResponseBody::from('A');
 		assert_eq!(body, UnpackedResponseBody { body: b"A".to_vec(), ..Default::default() });
+		
 		let char = 'B';
 		let body = UnpackedResponseBody::from(char);
 		assert_eq!(body, UnpackedResponseBody { body: b"B".to_vec(), ..Default::default() });
@@ -959,6 +966,7 @@ mod unpacked_response_body__traits {
 		assert_eq!(three_byte_single_width, UnpackedResponseBody { body: vec![225, 184, 128], ..Default::default() });
 		assert_eq!(three_byte_single_width, UnpackedResponseBody::from(s!("Ḁ")));
 		assert_eq!(three_byte_single_width, UnpackedResponseBody { body: s!("Ḁ").into_bytes(), ..Default::default() });
+		
 		let three_byte_double_width = UnpackedResponseBody::from('你');
 		assert_eq!(three_byte_double_width, UnpackedResponseBody { body: vec![228, 189, 160], ..Default::default() });
 		assert_eq!(three_byte_double_width, UnpackedResponseBody::from(s!("你")));
