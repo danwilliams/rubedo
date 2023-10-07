@@ -12,6 +12,34 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.3.4 (07 October 2023)
+
+### Added
+
+  - Implemented `From<Json>` for `http::UnpackedResponseBody`
+
+  - Implemented custom `Serialize` and `Deserialize` implementations for
+    `http::UnpackedResponseBody`
+
+  - Added `http::ContentType` enum to specify `http:UnpackedResponseBody`
+    content type
+
+  - Added `content_type()`, `set_content_type()`, `is_binary()`, `is_text()`,
+    `to_base64()`, and `from_base64()` to `http::UnpackedResponseBody`
+
+### Changed
+
+  - Updated `Debug`, `Display`, `Serialize`, and `Deserialize` implementations
+    for `http::UnpackedResponseBody` to be content-type aware.
+
+  - Updated `http::UnpackedResponseBody::new()` to accept any types that `From`
+    has been implemented for.
+
+  - Changed `http::UnpackedResponseBody` from tuple struct to standard struct
+
+  - Improved performance in `http::UnpackedResponseBody::from()`
+
+
 ## 0.3.3 (06 October 2023)
 
 ### Added
