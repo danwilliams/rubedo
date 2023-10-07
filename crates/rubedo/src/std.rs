@@ -170,7 +170,7 @@ pub trait PathExt {
 	/// 
 	/// # See Also
 	/// 
-	/// * [`std::path::Component`](std::path::Component)
+	/// * [`std::path::Component`]
 	/// * [`std::path::Path::components()`]
 	/// 
 	fn strip_parentdirs(&self, remove_all: bool) -> PathBuf;
@@ -197,8 +197,8 @@ pub trait PathExt {
 	/// * [`std::path::Path::has_root()`]
 	/// * [`std::path::Path::is_absolute()`]
 	/// * [`std::path::Path::strip_prefix()`]
-	/// * [`std::path::Prefix`](std::path::Prefix)
-	/// * [`std::path::PrefixComponent`](std::path::PrefixComponent)
+	/// * [`std::path::Prefix`]
+	/// * [`std::path::PrefixComponent`]
 	/// 
 	fn strip_root(&self) -> PathBuf;
 }
