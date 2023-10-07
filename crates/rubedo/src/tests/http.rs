@@ -251,6 +251,66 @@ mod unpacked_response_body__struct {
 		assert_eq!(body, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
 	}
 	
+	//		content_type														
+	#[test]
+	fn content_type() {
+		let body        = UnpackedResponseBody {
+			body:         b"This is a test".to_vec(),
+			content_type: ContentType::Text
+		};
+		assert_eq!(body.content_type(), ContentType::Text);
+		
+		let body        = UnpackedResponseBody {
+			body:         b"This is a test".to_vec(),
+			content_type: ContentType::Binary
+		};
+		assert_eq!(body.content_type(), ContentType::Binary);
+	}
+	
+	//		set_content_type													
+	#[test]
+	fn set_content_type() {
+		let mut body = UnpackedResponseBody { body: b"".to_vec(), ..Default::default() };
+		assert_eq!(body.content_type(), ContentType::Text);
+		
+		body.set_content_type(ContentType::Binary);
+		assert_eq!(body.content_type(), ContentType::Binary);
+		
+		body.set_content_type(ContentType::Text);
+		assert_eq!(body.content_type(), ContentType::Text);
+		
+		let mut clone = body.clone();
+		assert_eq!(clone.set_content_type(ContentType::Text), &body);
+		
+		assert_eq!(body.set_content_type(ContentType::Binary).content_type(), ContentType::Binary);
+	}
+	
+	//		is_binary															
+	#[test]
+	fn is_binary() {
+		let mut body = UnpackedResponseBody { body: b"".to_vec(), ..Default::default() };
+		assert_eq!(body.is_binary(), false);
+		
+		body.set_content_type(ContentType::Binary);
+		assert_eq!(body.is_binary(), true);
+		
+		body.set_content_type(ContentType::Text);
+		assert_eq!(body.is_binary(), false);
+	}
+	
+	//		is_text																
+	#[test]
+	fn is_text() {
+		let mut body = UnpackedResponseBody { body: b"".to_vec(), ..Default::default() };
+		assert_eq!(body.is_text(), true);
+		
+		body.set_content_type(ContentType::Binary);
+		assert_eq!(body.is_text(), false);
+		
+		body.set_content_type(ContentType::Text);
+		assert_eq!(body.is_text(), true);
+	}
+	
 	//		as_bytes															
 	#[test]
 	fn as_bytes() {

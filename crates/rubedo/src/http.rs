@@ -255,6 +255,62 @@ impl UnpackedResponseBody {
 		Self { body: vec, ..Default::default() }
 	}
 	
+	//		content_type														
+	/// Returns the content type of the response body.
+	/// 
+	/// # See Also
+	///
+	/// * [`ContentType`]
+	/// * [`UnpackedResponseBody::is_binary()`]
+	/// * [`UnpackedResponseBody::is_text()`]
+	/// * [`UnpackedResponseBody::set_content_type()`]
+	/// 
+	pub fn content_type(&self) -> ContentType {
+		self.content_type
+	}
+	
+	//		set_content_type													
+	/// Sets the content type of the response body.
+	/// 
+	/// This method is chainable, as it returns a mutable reference to the
+	/// response body instance.
+	/// 
+	/// # See Also
+	///
+	/// * [`ContentType`]
+	/// * [`UnpackedResponseBody::content_type()`]
+	/// 
+	pub fn set_content_type(&mut self, content_type: ContentType) -> &mut Self {
+		self.content_type = content_type;
+		self
+	}
+	
+	//		is_binary															
+	/// Returns whether the response body is binary.
+	/// 
+	/// # See Also
+	/// 
+	/// * [`ContentType`]
+	/// * [`UnpackedResponseBody::content_type()`]
+	/// * [`UnpackedResponseBody::is_text()`]
+	/// 
+	pub fn is_binary(&self) -> bool {
+		self.content_type == ContentType::Binary
+	}
+	
+	//		is_text																
+	/// Returns whether the response body is text.
+	///
+	/// # See Also
+	///
+	/// * [`ContentType`]
+	/// * [`UnpackedResponseBody::content_type()`]
+	/// * [`UnpackedResponseBody::is_binary()`]
+	///
+	pub fn is_text(&self) -> bool {
+		self.content_type == ContentType::Text
+	}
+	
 	//		as_bytes															
 	/// Returns a byte slice of the response body's contents.
 	/// 
