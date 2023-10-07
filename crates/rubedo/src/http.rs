@@ -1073,7 +1073,7 @@ impl From<String> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`String`] to an [`UnpackedResponseBody`].
 	fn from(s: String) -> Self {
-		Self { body: s.as_bytes().to_vec(), ..Default::default() }
+		Self { body: s.into_bytes(), ..Default::default() }
 	}
 }
 
@@ -1089,7 +1089,7 @@ impl From<Box<str>> for UnpackedResponseBody {
 	//		from																
 	/// Converts a boxed [`str`] slice to an [`UnpackedResponseBody`].
 	fn from(s: Box<str>) -> Self {
-		Self { body: s.into_string().as_bytes().to_vec(), ..Default::default() }
+		Self { body: s.into_string().into_bytes(), ..Default::default() }
 	}
 }
 
@@ -1097,7 +1097,7 @@ impl<'a> From<Cow<'a, str>> for UnpackedResponseBody {
 	//		from																
 	/// Converts a clone-on-write string to an [`UnpackedResponseBody`].
 	fn from(s: Cow<'a, str>) -> Self {
-		Self { body: s.into_owned().as_bytes().to_vec(), ..Default::default() }
+		Self { body: s.into_owned().into_bytes(), ..Default::default() }
 	}
 }
 
