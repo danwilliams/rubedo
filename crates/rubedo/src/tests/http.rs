@@ -1040,17 +1040,41 @@ mod unpacked_response_body__traits {
 	
 	//		serialize															
 	#[test]
-	fn serialize() {
-		let body = UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() };
-		let json = json!("This is a test");
+	fn serialize__binary() {
+		let body        = UnpackedResponseBody {
+			body:         b"This is a test".to_vec(),
+			content_type: ContentType::Binary,
+		};
+		let json        = json!("VGhpcyBpcyBhIHRlc3Q=");
+		assert_json_eq!(json!(body), json);
+	}
+	#[test]
+	fn serialize__text() {
+		let body        = UnpackedResponseBody {
+			body:         b"This is a test".to_vec(),
+			content_type: ContentType::Text,
+		};
+		let json        = json!("This is a test");
 		assert_json_eq!(json!(body), json);
 	}
 	
 	//		deserialize															
 	#[test]
-	fn deserialize() {
-		let body = UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() };
-		let json = r#""This is a test""#;
+	fn deserialize__binary() {
+		let json        = r#""VGhpcyBpcyBhIHRlc3Q=""#;
+		let body        = UnpackedResponseBody {
+			body:         b"This is a test".to_vec(),
+			content_type: ContentType::Text,
+		};
+		assert_ok_eq!(serde_json::from_str::<UnpackedResponseBody>(&json), body);
+	}
+	#[test]
+	fn deserialize__text() {
+		let json        = r#""This is a test""#;
+		let body        = UnpackedResponseBody {
+			body:         b"This is a test".to_vec(),
+			content_type: ContentType::Text,
+		};
 		assert_ok_eq!(serde_json::from_str::<UnpackedResponseBody>(&json), body);
 	}
 	

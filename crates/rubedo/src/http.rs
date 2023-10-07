@@ -1055,23 +1055,72 @@ impl PartialEq for UnpackedResponseBody {
 
 impl Serialize for UnpackedResponseBody {
 	//		serialize															
+	/// Serialises the response body to a [`String`].
+	/// 
+	/// This method serialises the response body based on the content type. If
+	/// the content type is [`ContentType::Text`], then the response body is
+	/// serialised to an ordinary `String`. If the content type is
+	/// [`ContentType::Binary`], then the response body is serialised to a
+	/// base64-encoded `String`.
+	/// 
+	/// Note that as no validation checks are performed on the response body
+	/// contents, it is not guaranteed to be UTF8, and therefore if not
+	/// specified as binary it is possible that the serialised string will not
+	/// totally match the original response body contents. This is because the
+	/// conversion of the response body bytes to a UTF8 string will be lossy if
+	/// there are invalid characters.
+	/// 
+	/// # See Also
+	/// 
+	/// * [`UnpackedResponseBody::deserialize()`]
+	/// * [`UnpackedResponseBody::<Display>fmt()`]
+	/// * [`UnpackedResponseBody::to_base64()`]
+	/// 
 	fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
 	where
 		S: Serializer,
 	{
-		let string = String::from_utf8_lossy(&self.body);
+		let string              =  match self.content_type {
+			ContentType::Text   => self.to_string(),
+			ContentType::Binary => self.to_base64(),
+		};
 		serializer.serialize_str(&string)
 	}
 }
 
 impl <'de> Deserialize<'de> for UnpackedResponseBody {
 	//		deserialize															
+	/// Deserialises the response body from a [`String`].
+	/// 
+	/// This method deserialises the response body based on the content type.
+	/// However, as this method is not an instance method and it is not possible
+	/// to specify the content type in advance, it has to try to detect it. It
+	/// does this by attempting to decode the string as base64. If this succeeds
+	/// then it will set the content type as [`ContentType::Binary`]. If this
+	/// fails then it will assume the content type is [`ContentType::Text`], and
+	/// deserialises the string in standard fashion.
+	/// 
+	/// Note that as the incoming data is from a `String`, and Rust strings are
+	/// are all valid UTF8, the resulting deserialised response body is
+	/// guaranteed to be UTF8 if the content type is determined to be
+	/// `ContentType::Text`. If base64 is detected then the deserialised bytes
+	/// are not guaranteed to be valid UTF8, as no validation checks of that
+	/// nature are performed against the response body.
+	///
+	/// # See Also
+	///
+	/// * [`UnpackedResponseBody::deserialize()`]
+	/// * [`UnpackedResponseBody::from_base64()`]
+	///
 	fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
 	where
 		D: Deserializer<'de>,
 	{
 		let string = String::deserialize(deserializer)?;
-		Ok(Self { body: string.as_bytes().to_vec(), ..Default::default() })
+		match BASE64.decode(&string) {
+			Ok(decoded) => Ok(Self { body: decoded,             content_type: ContentType::Binary }),
+			Err(_)      => Ok(Self { body: string.into_bytes(), content_type: ContentType::Text }),
+		}
 	}
 }
 
