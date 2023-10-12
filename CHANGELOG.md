@@ -12,6 +12,18 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.3.5 (12 October 2023)
+
+### Added
+
+  - Implemented `From<HyperBody>` and `From<UnsyncBoxBody<Bytes, E>>` for
+    `http::UnpackedResponseBody`
+
+### Changed
+
+  - Improved Rustdoc documentation
+
+
 ## 0.3.4 (07 October 2023)
 
 ### Added
