@@ -1070,6 +1070,20 @@ impl From<&Json> for UnpackedResponseBody {
 	}
 }
 
+impl From<HyperBody> for UnpackedResponseBody {
+	//		from																
+	/// Converts a [`UnsyncBoxBody<Bytes, E>`](UnsyncBoxBody) to an
+	/// [`UnpackedResponseBody`].
+	fn from(b: HyperBody) -> Self {
+		let bytes    =  executor::block_on(to_bytes(b));
+		let body     =  match bytes {
+			Ok(body) => body.to_vec(),
+			Err(_)   => b"Conversion error".to_vec(),
+		};
+		Self { body, ..Default::default() }
+	}
+}
+
 impl From<&str> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`&str`](str) to an [`UnpackedResponseBody`].
@@ -1117,6 +1131,23 @@ impl<'a> From<Cow<'a, str>> for UnpackedResponseBody {
 	/// [`UnpackedResponseBody`].
 	fn from(s: Cow<'a, str>) -> Self {
 		Self { body: s.into_owned().into_bytes(), ..Default::default() }
+	}
+}
+
+impl<E> From<UnsyncBoxBody<Bytes, E>> for UnpackedResponseBody
+where
+	E: Error + 'static,
+{
+	//		from																
+	/// Converts a [`UnsyncBoxBody<Bytes, E>`](UnsyncBoxBody) to an
+	/// [`UnpackedResponseBody`].
+	fn from(b: UnsyncBoxBody<Bytes, E>) -> Self {
+		let bytes    =  executor::block_on(to_bytes(b));
+		let body     =  match bytes {
+			Ok(body) => body.to_vec(),
+			Err(_)   => b"Conversion error".to_vec(),
+		};
+		Self { body, ..Default::default() }
 	}
 }
 

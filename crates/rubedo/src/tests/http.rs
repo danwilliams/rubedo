@@ -980,6 +980,19 @@ mod unpacked_response_body__traits {
 		assert_eq!(body, UnpackedResponseBody { body: s!("𐍈").into_bytes(), ..Default::default() });
 	}
 	#[test]
+	fn from__hyper_body() {
+		let body       = UnpackedResponseBody::from(HyperBody::from("This is a test"));
+		assert_eq!(body, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
+		
+		let hyper_body = HyperBody::from("This is another test");
+		let body       = UnpackedResponseBody::from(hyper_body);
+		assert_eq!(body, UnpackedResponseBody { body: b"This is another test".to_vec(), ..Default::default() });
+		//	We cannot compare to the original hyper body after calling from(),
+		//	because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(hyper_body, "This is another test");
+	}
+	#[test]
 	fn from__json() {
 		let body = UnpackedResponseBody::from(json!({
 			"foo": "bar",
@@ -1084,6 +1097,19 @@ mod unpacked_response_body__traits {
 		//	because it has been consumed.
 		//	Uncommenting the line below would cause a compilation error:
 		//assert_eq!(cow, "This is a test");
+	}
+	#[test]
+	fn from__unsync_box_body() {
+		let body       = UnpackedResponseBody::from(UnsyncBoxBody::new(s!("This is a test")));
+		assert_eq!(body, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
+		
+		let unsync_box = UnsyncBoxBody::new(s!("This is another test"));
+		let body       = UnpackedResponseBody::from(unsync_box);
+		assert_eq!(body, UnpackedResponseBody { body: b"This is another test".to_vec(), ..Default::default() });
+		//	We cannot compare to the original unsync box after calling from(),
+		//	because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(unsync_box, "This is another test");
 	}
 	#[test]
 	fn from__u8() {
