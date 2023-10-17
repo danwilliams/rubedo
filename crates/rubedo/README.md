@@ -22,6 +22,16 @@ your Rust code into gold... well, maybe... or at least make it easier to write.
 
 The `std` module provides extensions to the Rust standard library.
 
+#### Iterator
+
+The [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html) trait
+is extended with (technically, complemented by) the following methods:
+
+  - [`limit()`](https://docs.rs/rubedo/latest/rubedo/std/trait.PathExt.html#tymethod.append) -
+    Limits the number of items returned by an iterator, similar to
+    [`take()`](https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.take),
+    but accepts an `Option`.
+
 #### Path
 
 The [`Path`](https://doc.rust-lang.org/std/path/struct.Path.html) struct is

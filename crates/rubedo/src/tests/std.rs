@@ -2,6 +2,41 @@
 
 //		Tests
 
+//§		IteratorExt																
+#[cfg(test)]
+mod iterator_ext {
+	use super::super::*;
+	
+	//		limit																
+	#[test]
+	fn limit__empty() {
+		let vec:    Vec<usize> = Vec::new();
+		let result: Vec<_>     = vec.iter().limit(Some(10)).collect();
+		assert_eq!(result.len(), 0);
+	}
+	#[test]
+	fn limit__no_limit() {
+		let vec            = vec![1, 2, 3, 4, 5];
+		let result: Vec<_> = vec.iter().limit(None).cloned().collect();
+		assert_eq!(result.len(), vec.len());
+		assert_eq!(result,       vec);
+	}
+	#[test]
+	fn limit__within_limit() {
+		let vec            = vec![1, 2, 3, 4, 5];
+		let result: Vec<_> = vec.iter().limit(Some(10)).cloned().collect();
+		assert_eq!(result.len(), vec.len());
+		assert_eq!(result,       vec);
+	}
+	#[test]
+	fn limit__exceeds_limit() {
+		let vec            = vec![1, 2, 3, 4, 5];
+		let result: Vec<_> = vec.iter().limit(Some(3)).cloned().collect();
+		assert_eq!(result.len(), 3);
+		assert_eq!(result,       vec![1, 2, 3]);
+	}
+}
+	
 //§		PathExt																	
 #[cfg(test)]
 mod path_ext {

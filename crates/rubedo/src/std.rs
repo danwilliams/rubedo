@@ -20,7 +20,72 @@ use std::{
 
 
 
+//		Structs
+
+//		LimitIterator															
+/// This struct provides an iterator that limits the number of items returned.
+/// 
+/// This will be returned from the [`limit()`](IteratorExt::limit()) method, and
+/// will generally not be used directly.
+/// 
+/// # See also
+/// 
+/// * [`IteratorExt::limit()`]
+/// 
+pub struct LimitIterator<I> {
+	//		Private properties													
+	/// The iterator to limit.
+	iter:  I,
+	
+	/// The maximum number of items to return.
+	limit: Option<usize>,
+	
+	/// The number of items returned so far.
+	count: usize,
+}
+
+impl<I: Iterator> Iterator for LimitIterator<I> {
+	type Item = I::Item;
+	
+	//		next																
+	fn next(&mut self) -> Option<Self::Item> {
+		if let Some(limit) = self.limit {
+			if self.count >= limit {
+				return None;
+			}
+			self.count += 1;
+		}
+		self.iter.next()
+	}
+}
+
+
+
 //		Traits
+
+//§		IteratorExt																
+/// This trait provides additional functionality to [`Iterator`].
+pub trait IteratorExt: Iterator {
+	//		limit																
+	/// Limits the number of items returned by an iterator.
+	/// 
+	/// This is the same as [`Iterator::take()`], but accepts an [`Option`], so
+	/// that the limit does not have to be specified. It allows a match such as
+	/// `foo.iter().take(match limit { Some(n) => n, None => foo.len() })`
+	/// to be simplified to `foo.iter().limit(limit)`, and is especially useful
+	/// when `foo` is of unknown or infinite length.
+	/// 
+	/// # Parameters
+	/// 
+	/// * `limit` - The maximum number of items to return. If [`None`], no limit
+	///             will be applied.
+	/// 
+	fn limit(self, limit: Option<usize>) -> LimitIterator<Self> where Self: Sized {
+		LimitIterator { iter: self, limit, count: 0 }
+	}
+}
+
+impl<I: Iterator> IteratorExt for I {}
 
 //§		PathExt																	
 /// This trait provides additional functionality to [`Path`].
