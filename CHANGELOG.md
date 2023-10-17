@@ -12,6 +12,13 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.3.6 (17 October 2023)
+
+### Added
+
+  - Added `std::Iterator.limit()`
+
+
 ## 0.3.5 (12 October 2023)
 
 ### Added
@@ -139,29 +146,29 @@ The format is based on [Keep a Changelog][], and this project adheres to
 
 ### Added
 
-  - Added std module to enhance Rust std lib
-      - Added `Path.append()`
-      - Added `Path.is_subjective()`
-      - Added `Path.normalize()`
-      - Added `Path.restrict()`
-      - Added `Path.strip_parentdirs()`
-      - Added `Path.strip_root()`
+  - Added `std` module to enhance Rust std lib
+      - Added `std::Path.append()`
+      - Added `std::Path.is_subjective()`
+      - Added `std::Path.normalize()`
+      - Added `std::Path.restrict()`
+      - Added `std::Path.strip_parentdirs()`
+      - Added `std::Path.strip_root()`
   - Added `chrono` module to enhance [Chrono][] library
       - Added `chrono::Duration.humanize()`
-      - Added `chrono::NaiveDate.today()`
+      - Added `chrono::NaiveDate::today()`
+      - Added `chrono::NaiveDate::days_in_month_opt()`
+      - Added `chrono::NaiveDate::days_in_year_opt()`
+      - Added `chrono::NaiveDate::is_leap_year_opt()`
+      - Added `chrono::NaiveDate::start_of_month_opt()`
+      - Added `chrono::NaiveDate::end_of_month_opt()`
+      - Added `chrono::NaiveDate::start_of_year_opt()`
+      - Added `chrono::NaiveDate::end_of_year_opt()`
       - Added `chrono::NaiveDate.days_in_month()`
-      - Added `chrono::NaiveDate.days_in_month_opt()`
-      - Added `chrono::NaiveDate.days_in_year_opt()`
       - Added `chrono::NaiveDate.days_in_year_opt()`
       - Added `chrono::NaiveDate.is_leap_year()`
-      - Added `chrono::NaiveDate.is_leap_year_opt()`
       - Added `chrono::NaiveDate.start_of_month()`
-      - Added `chrono::NaiveDate.start_of_month_opt()`
-      - Added `chrono::NaiveDate.end_of_month_opt()`
       - Added `chrono::NaiveDate.end_of_month_opt()`
       - Added `chrono::NaiveDate.start_of_year()`
-      - Added `chrono::NaiveDate.start_of_year_opt()`
-      - Added `chrono::NaiveDate.end_of_year_opt()`
       - Added `chrono::NaiveDate.end_of_year_opt()`
   - Added macros for creation sugar
       - Added `ip!()` macro for IpAddr creation sugar
