@@ -11,6 +11,7 @@
 
 pub mod chrono;
 pub mod http;
+pub mod serde;
 pub mod std;
 pub mod sugar;
 
