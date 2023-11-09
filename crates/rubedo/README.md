@@ -139,6 +139,24 @@ struct is extended with the following methods:
     Unpacks the response and provides the headers and body in a more accessible
     form, to allow it to be checked, compared, and printed easily.
 
+### serde
+
+The `serde` module provides conversion utility functions for use with [Serde](https://crates.io/crates/serde).
+
+#### Functions
+
+  - [`into()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.into.html) -
+    Returns a serialised representation of a type.
+
+  - [`into_string()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.into_string.html) -
+    Returns a string representation of a type.
+
+  - [`try_from()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.try_from.html) -
+    Returns a type from a string or other serialised representation.
+
+  - [`try_from_string()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.try_from_string.html) -
+    Returns a type from a string representation.
+
 ### Macros
 
 Some macros are provided to provide syntactic sugar for common operations.
