@@ -23,6 +23,9 @@ use chrono::{prelude::*, Duration, NaiveDate, Utc};
 //§		DurationExt																
 /// This trait provides additional functionality to [`Duration`].
 pub trait DurationExt {
+	/// The units used by [`humanize()`](DurationExt::humanize()). These
+	/// determine the units that will be used to represent a duration, with the
+	/// largest possible unit being used.
 	const UNITS:   [(i64, &'static str); 7] = [
 		(31536000, "year"),    //  60 * 60 * 24 * 365
 		(2592000,  "month"),   //  60 * 60 * 24 * 30

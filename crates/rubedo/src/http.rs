@@ -500,6 +500,12 @@ impl UnpackedResponseBody {
 	/// Note that unlike the [`From`] type conversion implementations, this
 	/// returns a [`Result`].
 	/// 
+	/// # Errors
+	/// 
+	/// This method will return an error if the input string is not valid
+	/// base64. Such an error will be returned as a [`DecodeError`], which is
+	/// passed through from the [`base64`] crate.
+	/// 
 	/// # See also
 	/// 
 	/// * [`UnpackedResponseBody::to_base64()`]
@@ -1292,6 +1298,17 @@ pub trait ResponseExt {
 	/// without considering purpose and effect. For tests, ensuring a response
 	/// body matches, this is fine, as the data is known and constrained, and
 	/// memory/performance is less of a concern.
+	/// 
+	/// # Errors
+	/// 
+	/// This function will potentially return an error if the response body
+	/// cannot be converted to bytes. This should not happen under normal
+	/// circumstances, but it may be possible if the response body is streamed
+	/// and the stream cannot be read. Many implementations of this function are
+	/// in fact infallible.
+	/// 
+	/// At present [`ResponseError`] only contains one error variant, but it is
+	/// possible that more will be added.
 	/// 
 	/// # See also
 	/// 
