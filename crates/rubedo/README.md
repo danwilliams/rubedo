@@ -143,12 +143,12 @@ struct is extended with the following methods:
 
 Some macros are provided to provide syntactic sugar for common operations.
 
-  - [`ip!`](https://docs.rs/rubedo-macros/latest/rubedo_macros/macro.ip.html)
+  - [`ip!`](https://docs.rs/rubedo-macros/latest/rubedo_macros/macro.ip.html) -
     Builds an IP address from a range of input types. Note that this macro is
     provided by the [`rubedo-macros`](https://crates.io/crates/rubedo-macros)
     crate.
 
-  - [`s!`](https://docs.rs/rubedo/latest/rubedo/sugar/macro.s.html)
+  - [`s!`](https://docs.rs/rubedo/latest/rubedo/sugar/macro.s.html) -
     Converts a `str` string literal to an owned `String`, saving having to do
     `"foo".to_owned()` or `String::from("foo")`. It will also convert any other
     type that implements the [`ToString`] trait to a `String`.

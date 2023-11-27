@@ -16,7 +16,3 @@ readme = "README.md"
 strip = true     # Automatically strip symbols from the binary
 opt-level = 3    # Maximum optimisation (this is the cargo default)
 lto = "thin"     # Enable link-time optimisation (fast)
-
-[workspace.dependencies]
-rubedo = { path = "./crates/rubedo", version = "0.0.1" }
-rubedo-macros = { path = "./crates/rubedo-macros", version = "0.0.1" }

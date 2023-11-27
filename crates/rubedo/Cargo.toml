@@ -20,6 +20,7 @@ futures = "0.3.28"
 http = "0.2.9"
 http-body = "0.4.5"
 hyper = "0.14.27"
+rubedo-macros = { path = "../rubedo-macros", version = "0.3.6" }
 serde = { version = "1.0.188", features = ["derive"] }
 serde_json = { version = "1.0.107", features = ["preserve_order"] }
 

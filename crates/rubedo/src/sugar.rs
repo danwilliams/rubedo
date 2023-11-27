@@ -15,6 +15,8 @@ mod tests;
 
 //		Packages
 
+pub use rubedo_macros::ip;
+
 
 
 //		Macros

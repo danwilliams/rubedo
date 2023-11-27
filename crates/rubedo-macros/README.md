@@ -2,7 +2,7 @@
 
 This crate provides proc macros for the main [`rubedo`](../rubedo/README.md)
 crate. It is not intended to be used directly, but rather to be used with the
-Rubedo crate.
+Rubedo crate, which re-exports its functionality.
 
 It exists because it is not currently possible to have proc macros in the same
 crate as the code that uses them. This is because the compiler needs to compile
