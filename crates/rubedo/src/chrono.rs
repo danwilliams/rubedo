@@ -27,13 +27,13 @@ pub trait DurationExt {
 	/// determine the units that will be used to represent a duration, with the
 	/// largest possible unit being used.
 	const UNITS:   [(i64, &'static str); 7] = [
-		(31536000, "year"),    //  60 * 60 * 24 * 365
-		(2592000,  "month"),   //  60 * 60 * 24 * 30
-		(604800,   "week"),    //  60 * 60 * 24 * 7
-		(86400,    "day"),     //  60 * 60 * 24
-		(3600,     "hour"),    //  60 * 60
-		(60,       "minute"),  //  60
-		(1,        "second"),  //  1
+		(31_536_000, "year"),    //  60 * 60 * 24 * 365
+		( 2_592_000, "month"),   //  60 * 60 * 24 * 30
+		(   604_800, "week"),    //  60 * 60 * 24 * 7
+		(    86_400, "day"),     //  60 * 60 * 24
+		(     3_600, "hour"),    //  60 * 60
+		(        60, "minute"),  //  60
+		(         1, "second"),  //  1
 	];
 	
 	//		humanize															
@@ -50,8 +50,8 @@ impl DurationExt for Duration {
 	//		humanize															
 	fn humanize(&self) -> String {
 		let seconds = self.num_seconds();
-		for (unit, name) in Self::UNITS.iter() {
-			if seconds >= *unit {
+		for &(unit, name) in &Self::UNITS {
+			if seconds >= unit {
 				let count = seconds / unit;
 				return format!("{} {}{}", count, name, if count == 1 { "" } else { "s" });
 			}

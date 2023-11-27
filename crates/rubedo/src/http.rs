@@ -18,7 +18,13 @@ mod tests;
 //		Packages
 
 use base64::{DecodeError, engine::{Engine as _, general_purpose::STANDARD as BASE64}};
-use core::convert::Infallible;
+use core::{
+	cmp::Ordering,
+	convert::Infallible,
+	fmt::{Debug, Display, Write, self},
+	ops::{Add, AddAssign},
+	str::FromStr,
+};
 use futures::executor;
 use http::{Response, StatusCode};
 use http_body::combinators::UnsyncBoxBody;
@@ -31,11 +37,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_json::Value as Json;
 use std::{
 	borrow::Cow,
-	cmp::Ordering,
 	error::Error,
-	fmt::{Debug, Display, Write, self},
-	ops::{Add, AddAssign},
-	str::FromStr,
 };
 
 
@@ -56,7 +58,7 @@ use std::{
 /// 
 #[cfg_attr(    feature = "reasons",  allow(clippy::exhaustive_enums, reason = "Exhaustive"))]
 #[cfg_attr(not(feature = "reasons"), allow(clippy::exhaustive_enums))]
-#[derive(Copy, Clone, Debug, Default, PartialEq)]
+#[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
 pub enum ContentType {
 	/// The response body is text. It will be represented as an ordinary
 	/// [`String`] when serialised.
@@ -81,9 +83,9 @@ impl Display for ResponseError {
 	//		fmt																	
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		let description = match self {
-			Self::ConversionError(err) => format!("Error encountered while converting response body to bytes: {}", err),
+			Self::ConversionError(err) => format!("Error encountered while converting response body to bytes: {err}"),
 		};
-		write!(f, "{}", description)
+		write!(f, "{description}")
 	}
 }
 
@@ -288,7 +290,7 @@ impl UnpackedResponseBody {
 	/// * [`UnpackedResponseBody::set_content_type()`]
 	/// 
 	#[must_use]
-	pub fn content_type(&self) -> ContentType {
+	pub const fn content_type(&self) -> ContentType {
 		self.content_type
 	}
 	
@@ -1019,7 +1021,7 @@ impl Display for UnpackedResponseBody {
 			ContentType::Text   => String::from_utf8_lossy(&self.body),
 			ContentType::Binary => Cow::Owned(self.to_base64()),
 		};
-		write!(f, "{}", body)
+		write!(f, "{body}")
 	}
 }
 
@@ -1352,8 +1354,8 @@ where
 {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
-		let body = executor::block_on(to_bytes(self.body_mut()));
-		match body {
+		let result = executor::block_on(to_bytes(self.body_mut()));
+		match result {
 			Ok(body) => Ok(convert_response(self.status(), self.headers(), &body)),
 			Err(err) => Err(ResponseError::ConversionError(Box::new(err))),
 		}
@@ -1363,8 +1365,8 @@ where
 impl ResponseExt for Response<HyperBody> {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
-		let body = executor::block_on(to_bytes(self.body_mut()));
-		match body {
+		let result = executor::block_on(to_bytes(self.body_mut()));
+		match result {
 			Ok(body) => Ok(convert_response(self.status(), self.headers(), &body)),
 			Err(err) => Err(ResponseError::ConversionError(Box::new(err))),
 		}
@@ -1374,8 +1376,8 @@ impl ResponseExt for Response<HyperBody> {
 impl ResponseExt for Response<String> {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
-		let body = executor::block_on(to_bytes(self.body_mut()));
-		match body {
+		let result = executor::block_on(to_bytes(self.body_mut()));
+		match result {
 			Ok(body) => Ok(convert_response(self.status(), self.headers(), &body)),
 			Err(err) => Err(ResponseError::ConversionError(Box::new(err))),
 		}
@@ -1409,8 +1411,9 @@ fn convert_headers(headermap: &HeaderMap<HeaderValue>) -> Vec<UnpackedResponseHe
 	}
 	headers.sort_by(|a, b| {
 		match a.name.cmp(&b.name) {
-			Ordering::Equal => a.value.cmp(&b.value),
-			other           => other,
+			Ordering::Equal   => a.value.cmp(&b.value),
+			Ordering::Greater => Ordering::Greater,
+			Ordering::Less    => Ordering::Less,
 		}
 	});
 	headers

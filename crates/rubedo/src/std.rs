@@ -32,6 +32,7 @@ use std::{
 /// 
 /// * [`IteratorExt::limit()`]
 /// 
+#[derive(Clone, Debug)]
 pub struct LimitIterator<I> {
 	//		Private properties													
 	/// The iterator to limit.
