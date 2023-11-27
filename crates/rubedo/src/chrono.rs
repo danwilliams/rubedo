@@ -342,7 +342,7 @@ impl NaiveDateExt for NaiveDate {
 	
 	//		end_of_month_opt													
 	fn end_of_month_opt(year: i32, month: u32) -> Option<Self> {
-		Self::from_ymd_opt(year, month, 1)?;
+		_ = Self::from_ymd_opt(year, month, 1)?;
 		Self::from_ymd_opt(
 			if month == 12 { year + 1 } else { year      },
 			if month == 12 { month    } else { month + 1 },

@@ -294,7 +294,7 @@ impl PathExt for Path {
 		if self.as_os_str().is_empty() {
 			return cwd;
 		}
-		let mut segments: Vec<OsString> = vec!();
+		let mut segments: Vec<OsString> = vec![];
 		for (i, component) in self.components().enumerate() {
 			match component {
 				PathComponent::Prefix(_) |
@@ -314,7 +314,7 @@ impl PathExt for Path {
 						);
 					}
 					if component == PathComponent::ParentDir && segments.len() > 1 {
-						segments.pop();
+						drop(segments.pop());
 					}
 				},
 				PathComponent::Normal(_) => {
@@ -340,7 +340,7 @@ impl PathExt for Path {
 			basepath.join(self)
 		}.normalize();
 		if !path.starts_with(&basepath) {
-			path = basepath
+			path = basepath;
 		}
 		path
 	}
@@ -351,7 +351,7 @@ impl PathExt for Path {
 			return self.to_owned();
 		}
 		let mut at_start = true;
-		let mut segments: Vec<OsString> = vec!();
+		let mut segments: Vec<OsString> = vec![];
 		for component in self.components() {
 			match component {
 				PathComponent::Prefix(_) |
@@ -376,7 +376,7 @@ impl PathExt for Path {
 		if self.as_os_str().is_empty() || self.is_relative() {
 			return self.to_owned();
 		}
-		let mut segments: Vec<OsString> = vec!();
+		let mut segments: Vec<OsString> = vec![];
 		for component in self.components() {
 			match component {
 				PathComponent::Prefix(_) |

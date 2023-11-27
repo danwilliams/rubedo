@@ -33,7 +33,7 @@ use hyper::{
 	HeaderMap,
 	header::HeaderValue,
 };
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as DeError};
 use serde_json::Value as Json;
 use std::{
 	borrow::Cow,
@@ -123,8 +123,8 @@ impl Error for ResponseError {}
 /// 
 /// # See also
 /// 
-/// * [`axum::response`]
-/// * [`axum::response::Response`]
+/// * [`axum::response`](https://docs.rs/axum/latest/axum/response/index.html)
+/// * [`axum::response::Response`](https://docs.rs/axum/latest/axum/response/type.Response.html)
 /// * [`http::Response`]
 /// * [`hyper::Response`]
 /// * [`ResponseExt`]
@@ -614,7 +614,7 @@ impl UnpackedResponseBody {
 	/// * [`UnpackedResponseBody::push_str()`]
 	/// 
 	pub fn push(&mut self, byte: u8) {
-		self.body.push(byte)
+		self.body.push(byte);
 	}
 	
 	//		push_bytes															
@@ -1332,8 +1332,8 @@ pub trait ResponseExt {
 	/// 
 	/// # See also
 	/// 
-	/// * [`axum::response`]
-	/// * [`axum::response::Response`]
+	/// * [`axum::response`](https://docs.rs/axum/latest/axum/response/index.html)
+	/// * [`axum::response::Response`](https://docs.rs/axum/latest/axum/response/type.Response.html)
 	/// * [`http::Response`]
 	/// * [`hyper::Response`]
 	/// * [`UnpackedResponse`]
@@ -1434,9 +1434,9 @@ fn convert_headers(headermap: &HeaderMap<HeaderValue>) -> Vec<UnpackedResponseHe
 /// * `body`    - The response body.
 /// 
 /// # See also
-///
-/// * [`axum::response`]
-/// * [`axum::response::Response`]
+/// 
+/// * [`axum::response`](https://docs.rs/axum/latest/axum/response/index.html)
+/// * [`axum::response::Response`](https://docs.rs/axum/latest/axum/response/type.Response.html)
 /// * [`http::Response`]
 /// * [`hyper::Response`]
 /// * [`ResponseExt::unpack()`]
@@ -1504,7 +1504,7 @@ where
 	D: Deserializer<'de>,
 {
 	let status_code_value: u16 = Deserialize::deserialize(deserializer)?;
-	let status_code            = StatusCode::from_u16(status_code_value).map_err(serde::de::Error::custom)?;
+	let status_code            = StatusCode::from_u16(status_code_value).map_err(DeError::custom)?;
 	Ok(status_code)
 }
 
