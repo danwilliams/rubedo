@@ -8,20 +8,31 @@ mod response_error {
 	use super::super::*;
 	use claims::assert_err;
 	
+	#[derive(Debug)]
+	struct TestError;
+	
+	impl Display for TestError {
+		fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+			write!(f, "Test error")
+		}
+	}
+	
+	impl Error for TestError {}
+	
 	//		debug																
 	#[test]
 	fn debug() {
-		let err = Err::<ResponseError, _>(ResponseError::ConversionError);
+		let err = Err::<ResponseError, _>(ResponseError::ConversionError(Box::new(TestError)));
 		assert_err!(&err);
-		assert_eq!(format!("{:?}", err), "Err(ConversionError)");
+		assert_eq!(format!("{:?}", err), "Err(ConversionError(TestError))");
 	}
 	
 	//		display																
 	#[test]
 	fn display() {
-		let err = Err::<ResponseError, _>(ResponseError::ConversionError);
+		let err = Err::<ResponseError, _>(ResponseError::ConversionError(Box::new(TestError)));
 		assert_err!(&err);
-		assert_eq!(err.unwrap_err().to_string(), "Error encountered while converting response body to bytes");
+		assert_eq!(err.unwrap_err().to_string(), "Error encountered while converting response body to bytes: Test error");
 	}
 }
 
@@ -174,6 +185,7 @@ mod unpacked_response {
 #[cfg(test)]
 mod unpacked_response_header {
 	use super::super::*;
+	use crate::sugar::s;
 	use assert_json_diff::assert_json_eq;
 	use claims::assert_ok_eq;
 	use serde_json::json;
@@ -505,6 +517,7 @@ mod unpacked_response_body__struct {
 #[cfg(test)]
 mod unpacked_response_body__traits {
 	use super::super::*;
+	use crate::sugar::s;
 	use assert_json_diff::assert_json_eq;
 	use claims::{assert_ok, assert_ok_eq};
 	use serde_json::json;

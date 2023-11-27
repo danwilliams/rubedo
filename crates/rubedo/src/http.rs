@@ -17,7 +17,6 @@ mod tests;
 
 //		Packages
 
-use crate::sugar::s;
 use base64::{DecodeError, engine::{Engine as _, general_purpose::STANDARD as BASE64}};
 use core::convert::Infallible;
 use futures::executor;
@@ -64,16 +63,18 @@ pub enum ContentType {
 }
 
 //		ResponseError															
+/// The possible errors that can occur when working with an HTTP response.
 #[derive(Debug)]
 pub enum ResponseError {
-	ConversionError,
+	/// An error encountered while converting the response body to bytes.
+	ConversionError(Box<dyn Error>),
 }
 
 impl Display for ResponseError {
 	//		fmt																	
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		let description = match self {
-			ResponseError::ConversionError => s!("Error encountered while converting response body to bytes"),
+			Self::ConversionError(err) => format!("Error encountered while converting response body to bytes: {}", err),
 		};
 		write!(f, "{}", description)
 	}
@@ -1319,7 +1320,7 @@ where
 		let body = executor::block_on(to_bytes(self.body_mut()));
 		match body {
 			Ok(body) => Ok(convert_response(self.status(), self.headers(), body)),
-			Err(_)   => Err(ResponseError::ConversionError),
+			Err(err) => Err(ResponseError::ConversionError(Box::new(err))),
 		}
 	}
 }
@@ -1330,7 +1331,7 @@ impl ResponseExt for Response<HyperBody> {
 		let body = executor::block_on(to_bytes(self.body_mut()));
 		match body {
 			Ok(body) => Ok(convert_response(self.status(), self.headers(), body)),
-			Err(_)   => Err(ResponseError::ConversionError),
+			Err(err) => Err(ResponseError::ConversionError(Box::new(err))),
 		}
 	}
 }
@@ -1338,8 +1339,11 @@ impl ResponseExt for Response<HyperBody> {
 impl ResponseExt for Response<String> {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
-		let body = executor::block_on(to_bytes(self.body_mut())).unwrap();  //  Infallible
-		Ok(convert_response(self.status(), self.headers(), body))
+		let body = executor::block_on(to_bytes(self.body_mut()));
+		match body {
+			Ok(body) => Ok(convert_response(self.status(), self.headers(), body)),
+			Err(err) => Err(ResponseError::ConversionError(Box::new(err))),
+		}
 	}
 }
 
