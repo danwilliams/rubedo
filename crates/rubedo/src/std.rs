@@ -142,14 +142,16 @@ pub trait PathExt {
 	/// Computes the canonicalized, absolute path of a file or directory, but
 	/// without expanding symlinks or checking existence. A path that starts
 	/// with `.` or without an initial separator will be interpreted relative to
-	/// the current working directory. Empty paths and paths of `.` alone will
-	/// result in the current working directory being returned.
+	/// the current working directory (or the filesystem root if the current
+	/// working directory is not accessible). Empty paths and paths of `.` alone
+	/// will result in the current working directory being returned.
 	/// 
 	/// This function will normalize the path by removing any `.` and `..`
 	/// segments and returning the "real" path. It does this without touching
 	/// the filesystem, and so is an abstract but also simpler version of
 	/// [`canonicalize()`](Path::canonicalize()), which does a number of
-	/// filesystem checks.
+	/// filesystem checks. It does check for the current working directory, on
+	/// which to base relative paths, but does not perform any other checks.
 	/// 
 	/// Key differences are that [`canonicalize()`](Path::canonicalize()) will
 	/// return an error if the path does not exist, and will resolve symlinks.
@@ -290,7 +292,7 @@ impl PathExt for Path {
 	
 	//		normalize															
 	fn normalize(&self) -> PathBuf {
-		let cwd = env::current_dir().unwrap();
+		let cwd = env::current_dir().unwrap_or_else(|_| PathBuf::from("/"));
 		if self.as_os_str().is_empty() {
 			return cwd;
 		}
