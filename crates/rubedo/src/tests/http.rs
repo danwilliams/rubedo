@@ -1419,7 +1419,7 @@ mod functions {
 	fn convert_response__basic() {
 		let mut headers  = HeaderMap::new();
 		headers.insert("foo", HeaderValue::from_static("bar"));
-		let converted    = convert_response(StatusCode::OK, &headers, Bytes::from("This is a test"));
+		let converted    = convert_response(StatusCode::OK, &headers, &Bytes::from("This is a test"));
 		let crafted      = UnpackedResponse {
 			status:        StatusCode::OK,
 			headers:       vec![

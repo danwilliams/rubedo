@@ -1348,7 +1348,7 @@ pub trait ResponseExt {
 impl ResponseExt for Response<()> {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
-		Ok(convert_response(self.status(), self.headers(), Bytes::new()))
+		Ok(convert_response(self.status(), self.headers(), &Bytes::new()))
 	}
 }
 
@@ -1360,7 +1360,7 @@ where
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
 		let body = executor::block_on(to_bytes(self.body_mut()));
 		match body {
-			Ok(body) => Ok(convert_response(self.status(), self.headers(), body)),
+			Ok(body) => Ok(convert_response(self.status(), self.headers(), &body)),
 			Err(err) => Err(ResponseError::ConversionError(Box::new(err))),
 		}
 	}
@@ -1371,7 +1371,7 @@ impl ResponseExt for Response<HyperBody> {
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
 		let body = executor::block_on(to_bytes(self.body_mut()));
 		match body {
-			Ok(body) => Ok(convert_response(self.status(), self.headers(), body)),
+			Ok(body) => Ok(convert_response(self.status(), self.headers(), &body)),
 			Err(err) => Err(ResponseError::ConversionError(Box::new(err))),
 		}
 	}
@@ -1382,7 +1382,7 @@ impl ResponseExt for Response<String> {
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
 		let body = executor::block_on(to_bytes(self.body_mut()));
 		match body {
-			Ok(body) => Ok(convert_response(self.status(), self.headers(), body)),
+			Ok(body) => Ok(convert_response(self.status(), self.headers(), &body)),
 			Err(err) => Err(ResponseError::ConversionError(Box::new(err))),
 		}
 	}
@@ -1449,7 +1449,7 @@ fn convert_headers(headermap: &HeaderMap<HeaderValue>) -> Vec<UnpackedResponseHe
 fn convert_response(
 	status:  StatusCode,
 	headers: &HeaderMap<HeaderValue>,
-	body:    Bytes,
+	body:    &Bytes,
 ) -> UnpackedResponse {
 	UnpackedResponse {
 		status,
