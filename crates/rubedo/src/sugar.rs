@@ -27,8 +27,15 @@ mod tests;
 /// `String::from("foo")`.
 /// 
 /// It will also convert any other type that implements the [`ToString`] trait
-/// to a [`String`]. This is perhaps not as useful as the [`str`] conversion,
-/// but it does provide a consistent interface for converting to [`String`]s.
+/// to a [`String`] - providing that it is passed in as a variable or some kind
+/// of expression, and not as a literal. That's because, at present, there is no
+/// way for the macro to tell the difference between [`str`] literals and other
+/// literals such as numbers, and as a result it will call `to_owned()` on them
+/// and give a non-[`String`] result, which will not match expectations. For
+/// this reason, this ability is not as useful as the [`str`] behaviour, and it
+/// does not provide a consistent interface for converting to [`String`]s (and
+/// nor is it intended to).
+/// 
 /// When converting from other types it is likely best to use the standard
 /// conversion functions directly, to avoid confusion, and so the recommendation
 /// is to only use this macro as shorthand for converting [`str`] instances.
@@ -58,9 +65,15 @@ mod tests;
 /// 
 #[macro_export]
 macro_rules! s {
+	//	Convert a str string literal to a String
+	($s:literal) => {
+		$s.to_owned()
+	};
+	//	General expression
 	($s:expr) => {
 		$s.to_string()
 	};
+	//	Empty expression
 	() => {
 		String::new()
 	};

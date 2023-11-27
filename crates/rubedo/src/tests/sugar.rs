@@ -30,8 +30,12 @@ mod s {
 	}
 	#[test]
 	fn s__int() {
-		assert_eq!(s!(42), "42");
-		assert_eq!(s!(42), String::from("42"));
+		//	This tests that although the macro is intended for use with str slice
+		//	literals, it will also work with other types providing they have a
+		//	to_owned() function - the outcome will not be a String, which will not
+		//	match expectations, but it will still work. Really, the macro should not
+		//	be used in this way, as it is only designed for use with str literals.
+		assert_eq!(s!(42), 42);
 	}
 	#[test]
 	fn s__types() {
