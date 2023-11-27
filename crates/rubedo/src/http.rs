@@ -817,7 +817,7 @@ impl Add<&Vec<u8>> for UnpackedResponseBody {
 	}
 }
 
-impl Add<UnpackedResponseBody> for UnpackedResponseBody {
+impl Add<Self> for UnpackedResponseBody {
 	type Output = Self;
 	
 	//		add																	
@@ -828,7 +828,7 @@ impl Add<UnpackedResponseBody> for UnpackedResponseBody {
 	}
 }
 
-impl Add<&UnpackedResponseBody> for UnpackedResponseBody {
+impl Add<&Self> for UnpackedResponseBody {
 	type Output = Self;
 	
 	//		add																	
@@ -939,7 +939,7 @@ impl AddAssign<&Vec<u8>> for UnpackedResponseBody {
 	}
 }
 
-impl AddAssign<UnpackedResponseBody> for UnpackedResponseBody {
+impl AddAssign<Self> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds an [`UnpackedResponseBody`] to an [`UnpackedResponseBody`].
 	fn add_assign(&mut self, other: Self) {
@@ -947,7 +947,7 @@ impl AddAssign<UnpackedResponseBody> for UnpackedResponseBody {
 	}
 }
 
-impl AddAssign<&UnpackedResponseBody> for UnpackedResponseBody {
+impl AddAssign<&Self> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds an [`&UnpackedResponseBody`](UnpackedResponseBody) to an
 	/// [`UnpackedResponseBody`].
@@ -1028,7 +1028,7 @@ impl From<&[u8]> for UnpackedResponseBody {
 	/// Converts a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html)
 	/// to an [`UnpackedResponseBody`].
 	fn from(b: &[u8]) -> Self {
-		UnpackedResponseBody { body: b.to_vec(), ..Default::default() }
+		Self { body: b.to_vec(), ..Default::default() }
 	}
 }
 
@@ -1037,7 +1037,7 @@ impl<const N: usize> From<&[u8; N]> for UnpackedResponseBody {
 	/// Converts a [`&[u8; N]`](https://doc.rust-lang.org/std/primitive.slice.html)
 	/// to an [`UnpackedResponseBody`].
 	fn from(b: &[u8; N]) -> Self {
-		UnpackedResponseBody { body: b.to_vec(), ..Default::default() }
+		Self { body: b.to_vec(), ..Default::default() }
 	}
 }
 

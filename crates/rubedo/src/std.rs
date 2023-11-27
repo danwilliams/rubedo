@@ -272,7 +272,7 @@ pub trait PathExt {
 
 impl PathExt for Path {
 	//		append																
-	fn append<P: AsRef<Path>>(&self, suffix: P) -> PathBuf {
+	fn append<P: AsRef<Self>>(&self, suffix: P) -> PathBuf {
 		PathBuf::from([
 			self.as_os_str().to_os_string(),
 			OsString::from(suffix.as_ref()),
@@ -331,7 +331,7 @@ impl PathExt for Path {
 	}
 	
 	//		restrict															
-	fn restrict<P: AsRef<Path>>(&self, base: P) -> PathBuf {
+	fn restrict<P: AsRef<Self>>(&self, base: P) -> PathBuf {
 		let basepath = base.as_ref().normalize();
 		if self.as_os_str().is_empty() {
 			return basepath;
