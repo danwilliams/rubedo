@@ -50,6 +50,12 @@ use std::{
 /// for display.
 /// 
 /// The default content type is [`Text`](ContentType::Text).
+/// 
+/// This enum is exhaustive and will never have any additional variants added
+/// to it, as all possibilities are already covered.
+/// 
+#[cfg_attr(    feature = "reasons",  allow(clippy::exhaustive_enums, reason = "Exhaustive"))]
+#[cfg_attr(not(feature = "reasons"), allow(clippy::exhaustive_enums))]
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
 pub enum ContentType {
 	/// The response body is text. It will be represented as an ordinary
@@ -65,6 +71,7 @@ pub enum ContentType {
 //		ResponseError															
 /// The possible errors that can occur when working with an HTTP response.
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum ResponseError {
 	/// An error encountered while converting the response body to bytes.
 	ConversionError(Box<dyn Error>),
@@ -123,6 +130,7 @@ impl Error for ResponseError {}
 /// * [`UnpackedResponseHeader`]
 /// 
 #[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct UnpackedResponse {
 	//		Public properties													
 	/// The response status code. This is an enum, so is not directly comparable
@@ -169,10 +177,15 @@ impl PartialEq for UnpackedResponse {
 /// purpose of this struct is to formalise the data structure used by
 /// [`UnpackedResponse`] for storing headers.
 /// 
+/// No other properties are planned or logically considerable at present, and so
+/// this struct is seen as being exhaustive.
+/// 
 /// # See also
 /// 
 /// * [`UnpackedResponse`]
 /// 
+#[cfg_attr(    feature = "reasons",  allow(clippy::exhaustive_structs, reason = "Exhaustive"))]
+#[cfg_attr(not(feature = "reasons"), allow(clippy::exhaustive_structs))]
 #[derive(Debug, Deserialize, Serialize)]
 pub struct UnpackedResponseHeader {
 	//		Public properties													
@@ -233,6 +246,7 @@ impl PartialEq for UnpackedResponseHeader {
 /// * [`UnpackedResponse`]
 /// 
 #[derive(Default)]
+#[non_exhaustive]
 pub struct UnpackedResponseBody {
 	//		Private properties													
 	/// The response body as a vector of bytes. The data originates from the
