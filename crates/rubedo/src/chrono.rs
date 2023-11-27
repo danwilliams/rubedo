@@ -60,6 +60,11 @@ impl DurationExt for Duration {
 //§		NaiveDateExt															
 /// This trait provides additional functionality to [`NaiveDate`].
 pub trait NaiveDateExt {
+	/// The maximum year that can be represented by a [`NaiveDate`].
+	const MAX_YEAR: i32 = i32::MAX >> 13_i32;
+	/// The minimum year that can be represented by a [`NaiveDate`].
+	const MIN_YEAR: i32 = i32::MIN >> 13_i32;
+	
 	//		today																
 	/// Returns the current date.
 	/// 
