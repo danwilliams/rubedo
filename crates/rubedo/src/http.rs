@@ -287,6 +287,7 @@ impl UnpackedResponseBody {
 	/// * [`UnpackedResponseBody::is_text()`]
 	/// * [`UnpackedResponseBody::set_content_type()`]
 	/// 
+	#[must_use]
 	pub fn content_type(&self) -> ContentType {
 		self.content_type
 	}
@@ -316,19 +317,21 @@ impl UnpackedResponseBody {
 	/// * [`UnpackedResponseBody::content_type()`]
 	/// * [`UnpackedResponseBody::is_text()`]
 	/// 
+	#[must_use]
 	pub fn is_binary(&self) -> bool {
 		self.content_type == ContentType::Binary
 	}
 	
 	//		is_text																
 	/// Returns whether the response body is text.
-	///
+	/// 
 	/// # See also
-	///
+	/// 
 	/// * [`ContentType`]
 	/// * [`UnpackedResponseBody::content_type()`]
 	/// * [`UnpackedResponseBody::is_binary()`]
-	///
+	/// 
+	#[must_use]
 	pub fn is_text(&self) -> bool {
 		self.content_type == ContentType::Text
 	}
@@ -362,6 +365,7 @@ impl UnpackedResponseBody {
 	/// * [`UnpackedResponseBody::into_bytes()`]
 	/// * [`UnpackedResponseBody::to_bytes()`]
 	/// 
+	#[must_use]
 	pub fn as_bytes(&self) -> &[u8] {
 		&self.body
 	}
@@ -442,6 +446,7 @@ impl UnpackedResponseBody {
 	/// * [`UnpackedResponseBody::as_mut_bytes()`]
 	/// * [`UnpackedResponseBody::to_bytes()`]
 	/// 
+	#[must_use]
 	pub fn into_bytes(self) -> Vec<u8> {
 		self.body
 	}
@@ -482,6 +487,7 @@ impl UnpackedResponseBody {
 	/// * [`UnpackedResponseBody::as_mut_bytes()`]
 	/// * [`UnpackedResponseBody::into_bytes()`]
 	/// 
+	#[must_use]
 	pub fn to_bytes(&self) -> Vec<u8> {
 		self.body.clone()
 	}
@@ -498,6 +504,7 @@ impl UnpackedResponseBody {
 	/// 
 	/// * [`UnpackedResponseBody::from_base64()`]
 	/// 
+	#[must_use]
 	pub fn to_base64(&self) -> String {
 		BASE64.encode(&self.body)
 	}
@@ -547,6 +554,7 @@ impl UnpackedResponseBody {
 	/// creating a new response body with [`UnpackedResponseBody::new()`], but
 	/// without having to supply any parameters.
 	/// 
+	#[must_use]
 	pub fn empty() -> Self {
 		Self { body: Vec::new(), ..Default::default() }
 	}
@@ -557,6 +565,7 @@ impl UnpackedResponseBody {
 	/// This method returns whether the response body is empty. This is
 	/// equivalent to checking whether the length of the response body is zero.
 	/// 
+	#[must_use]
 	pub fn is_empty(&self) -> bool {
 		self.body.is_empty()
 	}
@@ -568,6 +577,7 @@ impl UnpackedResponseBody {
 	/// equivalent to the length of the vector of bytes that the response body
 	/// contains.
 	/// 
+	#[must_use]
 	pub fn len(&self) -> usize {
 		self.body.len()
 	}
