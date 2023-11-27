@@ -280,14 +280,11 @@ impl PathExt for Path {
 	}
 	
 	//		is_subjective														
-	#[allow(clippy::iter_nth_zero)]
 	fn is_subjective(&self) -> bool {
-			self.is_relative()
-		&&	self.components().count() > 0
-		&&	(
-				self.components().nth(0).unwrap() == PathComponent::CurDir
-			||	self.components().nth(0).unwrap() == PathComponent::ParentDir
-			)
+		self.is_relative() && {
+			let mut components = self.components();
+			matches!(components.next(), Some(PathComponent::CurDir | PathComponent::ParentDir))
+		}
 	}
 	
 	//		normalize															

@@ -1106,11 +1106,8 @@ impl From<HyperBody> for UnpackedResponseBody {
 	/// Converts a [`UnsyncBoxBody<Bytes, E>`](UnsyncBoxBody) to an
 	/// [`UnpackedResponseBody`].
 	fn from(b: HyperBody) -> Self {
-		let bytes    =  executor::block_on(to_bytes(b));
-		let body     =  match bytes {
-			Ok(body) => body.to_vec(),
-			Err(_)   => b"Conversion error".to_vec(),
-		};
+		let bytes = executor::block_on(to_bytes(b));
+		let body  = bytes.map_or_else(|_| b"Conversion error".to_vec(), |body| body.to_vec());
 		Self { body, ..Default::default() }
 	}
 }
@@ -1173,11 +1170,8 @@ where
 	/// Converts a [`UnsyncBoxBody<Bytes, E>`](UnsyncBoxBody) to an
 	/// [`UnpackedResponseBody`].
 	fn from(b: UnsyncBoxBody<Bytes, E>) -> Self {
-		let bytes    =  executor::block_on(to_bytes(b));
-		let body     =  match bytes {
-			Ok(body) => body.to_vec(),
-			Err(_)   => b"Conversion error".to_vec(),
-		};
+		let bytes = executor::block_on(to_bytes(b));
+		let body  = bytes.map_or_else(|_| b"Conversion error".to_vec(), |body| body.to_vec());
 		Self { body, ..Default::default() }
 	}
 }
