@@ -50,10 +50,14 @@ impl<I: Iterator> Iterator for LimitIterator<I> {
 	
 	//		next																
 	fn next(&mut self) -> Option<Self::Item> {
+		#[cfg_attr(    feature = "reasons",  allow(clippy::arithmetic_side_effects, reason = "Range is controlled"))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::arithmetic_side_effects))]
 		if let Some(limit) = self.limit {
 			if self.count >= limit {
 				return None;
 			}
+			//	In this location, the count is guaranteed to not exceed the limit, so
+			//	this will not overflow and a checked_add() is not required.
 			self.count += 1;
 		}
 		self.iter.next()
