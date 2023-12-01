@@ -1,4 +1,99 @@
 //! This module provides conversion utility functions for use with [Serde](https://crates.io/crates/serde).
+//! 
+//! This module attempts to consider the common use cases for (de)serialisation,
+//! and provide functions that are semantically appropriate for those use cases.
+//! The functions are intended to be used with the
+//! [`#[serde(serialize_with)]`](https://docs.serde.rs/serde/attr.serialize_with.html)
+//! and [`#[serde(deserialize_with)]`](https://docs.serde.rs/serde/attr.deserialize_with.html)
+//! attributes.
+//! 
+//! Of course, as this module is an *extension* of standard Serde functionality,
+//! it does not attempt to reproduce what Serde already does by default. For
+//! instance, if a struct has a field of type [`u32`], then Serde will already
+//! know how to serialise and deserialise that field. Equally, if a struct has a
+//! field that is an enum, then Serde is able to serialise and deserialise that
+//! field according to the available enum variants, and the chosen internal
+//! representation of the enum.
+//! 
+//! Where this module provides particular value is when an alternative
+//! serialised representation is required for certain struct members. For
+//! example, it is common to have an enum that naturally serialises to and from
+//! an integer, but also has a string representation. Or equally, it could be
+//! that the required serialised form is not the default. This module allows
+//! easy specification of alternative forms for serialisation and
+//! deserialisation, while working with the existing Serde derive macros.
+//! 
+//! As a general statement, the intention of this module is to provide this
+//! functionality for data types such as structs and enums, where the Serde
+//! derive macros would be used, and there is no obvious application for
+//! primitive types such as integers, floats, and booleans, or string types such
+//! as [`String`] and [`str`].
+//! 
+//! # Naming conventions
+//! 
+//! Generally in Rust, the naming of functions carries semantic meaning:
+//! 
+//!   - `to_` prefix: This implies a conversion that does not necessarily
+//!     consume the original value. It's often seen in methods that return a new
+//!     value based on the original, without consuming the original.
+//! 
+//!   - `into_` prefix: This indicates that the function consumes the original
+//!     value and transforms it into another. It's commonly used with Rust's
+//!     ownership system, signifying that the original value will no longer be
+//!     usable after the conversion.
+//! 
+//!   - `as_` prefix: This is typically used for cheap reference conversions
+//!     that don't involve any data processing. It suggests a view or
+//!     representation of the original value, not a conversion or
+//!     transformation.
+//! 
+//! # `From` and `Into`
+//! 
+//! The first case considered is general conversion using [`Into`] and [`From`].
+//! In a situation where a type implements [`Into<T>`](Into) and either
+//! [`From<T>`](From) or [`TryFrom<T>`](TryFrom), then it seems natural and
+//! appropriate to be able to use those implementations for serialisation and
+//! deserialisation. Indeed, Serde does allow this, and it is possible to use
+//! the [`#[serde(into)]`](https://serde.rs/container-attrs.html#into),
+//! and [`#[serde(from)]`](https://serde.rs/container-attrs.html#from), and
+//! and [`#[serde(try_from)]`](https://serde.rs/container-attrs.html#try_from)
+//! attributes to specify the desired primary types. However, these apply at the
+//! container level, and there are no equivalent attributes for specifying the
+//! same behaviour at the field level. Instead, the [`#[serde(with)]`](https://serde.rs/field-attrs.html#with)
+//! attribute can be used, but this requires the implementation of a custom
+//! serialiser and/or deserialiser. That's where this module comes in.
+//! 
+//! The [`into()`], [`from()`], and [`try_from()`] functions can be used to
+//! specify the desired behaviour at the field level, matching the behaviour of
+//! the Serde container-level attributes, without the need to implement custom
+//! serialisers and deserialisers. This allows for variations other than the
+//! default to be easily specified. Additionally, ease-of-use functions for
+//! [`String`] conversion are provided in the form of [`into_string()`],
+//! [`from_string()`], and [`try_from_string()`]. Note that these functions
+//! expect to work on a full [`String`], not a [`str`] slice, due to their
+//! context.
+//! 
+//! The end result is that it becomes trivial to specify alternate conversions
+//! for any type that implements the common conversion traits.
+//! 
+//! # `as_str()` representation
+//! 
+//! The second case considered is the [`as_str()`] function. This function is
+//! intended to be used with any type that implements the [`AsStr`] trait, which
+//! is a marker trait used to indicate that a type has an `as_str()` method.
+//! This function is primarily intended to be used with enums, where it is
+//! common to have variants that naturally serialise to and from integers, but
+//! also have a string representation. In such cases, the enums will typically
+//! be created with `static &str` values for such representation, in which case
+//! it is desirable to use and propagate those actual values by reference
+//! instead of making unnecessary copies. This is the purpose of the
+//! [`as_str()`] function.
+//! 
+//! In keeping with Rust naming conventions and idioms, the concept of
+//! representation is considered to be distinct from the concept of conversion,
+//! with this function providing an unmodified, uncopied "view" onto a value
+//! provided by the type for this purpose.
+//! 
 
 
 
@@ -101,6 +196,15 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as DeErr
 /// * `value`      - The value to serialise.
 /// * `serializer` - The serialiser to use.
 /// 
+/// # Errors
+/// 
+/// This function will return an error if the value cannot be serialised to a
+/// [`String`]. The error will be a [`Serializer::Error`], which is passed
+/// through from the [`serde`] crate.
+/// 
+/// Note that the actual conversion of `T` to `U` is infallible, but the
+/// serialisation process may experience an error.
+/// 
 /// # See also
 /// 
 /// * [`into_string()`]
@@ -150,6 +254,15 @@ where
 /// 
 /// * `value`      - The value to serialise.
 /// * `serializer` - The serialiser to use.
+/// 
+/// # Errors
+/// 
+/// This function will return an error if the value cannot be serialised to a
+/// [`String`]. The error will be a [`Serializer::Error`], which is passed
+/// through from the [`serde`] crate.
+/// 
+/// Note that the actual conversion of `T` to a [`String`] is infallible, but
+/// the serialisation process may experience an error.
 /// 
 /// # See also
 /// 
@@ -218,6 +331,15 @@ where
 /// 
 /// * `deserializer` - The deserialiser to use.
 /// 
+/// # Errors
+/// 
+/// This function will return an error if the deserialised value cannot be
+/// converted to the required type. The error will be a [`DeError`], which is
+/// passed through from the [`serde`] crate.
+/// 
+/// It will also return an error if the conversion from `U` to `T` fails. The
+/// nature of this error will be specific to the type being converted to.
+/// 
 /// # See also
 /// 
 /// * [`into()`]
@@ -254,6 +376,16 @@ where
 /// # Parameters
 /// 
 /// * `deserializer` - The deserialiser to use.
+/// 
+/// # Errors
+/// 
+/// This function will return an error if the deserialised value cannot be
+/// converted to the required type. The error will be a [`DeError`], which is
+/// passed through from the [`serde`] crate.
+/// 
+/// It will also return an error if the conversion from the [`String`] to `T`
+/// fails. The nature of this error will be specific to the type being converted
+/// to.
 /// 
 /// # See also
 /// 
