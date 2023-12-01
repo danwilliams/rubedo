@@ -207,6 +207,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as DeErr
 /// 
 /// # See also
 /// 
+/// * [`from()`]
 /// * [`into_string()`]
 /// * [`try_from()`]
 /// 
@@ -266,6 +267,7 @@ where
 /// 
 /// # See also
 /// 
+/// * [`from()`]
 /// * [`into()`]
 /// * [`try_from_string()`]
 /// 
@@ -275,6 +277,129 @@ where
 	S: Serializer,
 {
 	serializer.serialize_str(&value.into())
+}
+
+//		from																	
+/// Returns a type from a string or other serialised representation.
+/// 
+/// This can be used with any type that implements [`From<String>`](From), but
+/// it is perhaps most useful when applied to enums.
+/// 
+/// It is a fairly common pattern to have an enum that naturally serialises to
+/// and from an integer, but also has a string representation. Or equally, it
+/// could be that the required serialised form is not the default, which would
+/// be to use the variant name. This function allows the correct string
+/// representation to be used to obtain the appropriate enum value. However,
+/// because it relies upon [`From`], it can be used with any type that
+/// implements that trait and has a serialised representation.
+/// 
+/// This function is intended for use by [`serde`] to deserialise the enum or
+/// other type of interest, e.g. when using [`#[serde(deserialize_with)]`]:
+/// 
+/// ```ignore
+/// #[serde(deserialize_with = "from::<Foo, String, __D>")]
+/// ```
+/// 
+/// Note that the example above will specify [`String`] as the concrete type
+/// that the deserialiser will attempt to deserialise from. Any type that
+/// [`serde`] supports can be used here, but it must be specified explicitly.
+/// Because converting from a [`String`] is such a common use case, there is a
+/// convenience function, [`from_string()`], that can be used instead. This
+/// achieves the same result as the example above, but is more concise:
+/// 
+/// ```ignore
+/// #[serde(deserialize_with = "from_string")]
+/// ```
+/// 
+/// In the [`from()`] example, `Foo` is the type that is being deserialised,
+/// which will be the result of the conversion. It needs to be specified because
+/// the input type requires an annotation, as it cannot be inferred, and there
+/// is no way to specify the input type without also specifying the output type.
+/// This is another reason why [`from_string()`] is more concise, as it does not
+/// require the output type to be specified.
+/// 
+/// Conversion from a [`String`] does not share the same number of semantic
+/// possibilities as conversion to a [`String`]. There is a general premise that
+/// there is generally only one correct serialised string representation of a
+/// given value, and that other string representations are not representative of
+/// the serialised form. This is not the case for conversion to a [`String`],
+/// where there is no such assumption. For example, the [`Display`]
+/// implementation for an enum may return a string representation that is not
+/// the same as the serialised form, as it is intended for a different purpose.
+/// However, the function written to implement [`From`] can of course do
+/// whatever it likes, and can support any number of string representations.
+/// 
+/// # Parameters
+/// 
+/// * `deserializer` - The deserialiser to use.
+/// 
+/// # Errors
+/// 
+/// This function will return an error if the deserialised value cannot be
+/// converted to the required type. The error will be a [`DeError`], which is
+/// passed through from the [`serde`] crate.
+/// 
+/// Note that the actual conversion of `U` to `T` is infallible, but the
+/// deserialisation process may experience an error.
+/// 
+/// # See also
+/// 
+/// * [`into()`]
+/// * [`from_string()`]
+/// * [`try_from()`]
+/// 
+pub fn from<'de, T, U, D>(deserializer: D) -> Result<T, D::Error>
+where
+	T: From<U>,
+	U: Deserialize<'de>,
+	D: Deserializer<'de>,
+{
+	U::deserialize(deserializer).map(T::from)
+}
+
+//		from_string																
+/// Returns a type from a string representation.
+/// 
+/// This is a convenience function that can be used instead of [`from()`] when
+/// the input type is [`String`]:
+/// 
+/// ```ignore
+/// #[serde(deserialize_with = "from_string")]
+/// ```
+/// 
+/// It is equivalent to the following:
+/// 
+/// ```ignore
+/// #[serde(deserialize_with = "from::<T, String, __D>")]
+/// ```
+/// 
+/// For more information, see the documentation for [`from()`].
+/// 
+/// # Parameters
+/// 
+/// * `deserializer` - The deserialiser to use.
+/// 
+/// # Errors
+/// 
+/// This function will return an error if the deserialised value cannot be
+/// converted to the required type. The error will be a [`DeError`], which is
+/// passed through from the [`serde`] crate.
+///
+/// Note that the actual conversion of the [`String`] to `T` is infallible, but
+/// the deserialisation process may experience an error.
+/// 
+/// # See also
+/// 
+/// * [`from()`]
+/// * [`into_string()`]
+/// * [`try_from_string()`]
+/// 
+pub fn from_string<'de, T, D>(deserializer: D) -> Result<T, D::Error>
+where
+	T: From<String>,
+	D: Deserializer<'de>,
+{
+	String::deserialize(deserializer).map(T::from)
 }
 
 //		try_from																
@@ -342,6 +467,7 @@ where
 /// 
 /// # See also
 /// 
+/// * [`from()`]
 /// * [`into()`]
 /// * [`try_from_string()`]
 /// 
@@ -389,6 +515,7 @@ where
 /// 
 /// # See also
 /// 
+/// * [`from_string()`]
 /// * [`into_string()`]
 /// * [`try_from()`]
 /// 

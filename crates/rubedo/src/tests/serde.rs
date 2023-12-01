@@ -3,7 +3,7 @@
 //		Packages
 
 use super::*;
-use claims::assert_err;
+use claims::{assert_err, assert_ok};
 use serde::Serialize;
 use std::fmt::{Debug, self};
 
@@ -12,6 +12,9 @@ use std::fmt::{Debug, self};
 //		Enums
 
 //		Position																
+///	This enum is used to test the `into` and `try_from` functions. It represents
+/// the typical use case for enums, as deserialisation is not guaranteed to give
+/// a valid result.
 #[derive(Copy, Clone, Deserialize, PartialEq, Serialize)]
 #[repr(u8)]
 #[serde(into = "u8", try_from = "u8")]
@@ -103,6 +106,54 @@ impl TryFrom<u8> for Position {
 	}
 }
 
+//		PositionInfallible														
+///	This enum is used to test the `from` function. It represents an atypical use
+/// case for enums, as deserialisation is not guaranteed to give a valid result,
+/// but the `from` function is infallible. It only has the implementations that
+/// are necessary for the tests, and sets a default to use in case of no match.
+#[derive(Copy, Clone, Default, Deserialize, PartialEq)]
+#[repr(u8)]
+#[serde(into = "u8", try_from = "u8")]
+enum PositionInfallible {
+	#[default]
+	Zero = 0,
+	One  = 1,
+	Two  = 2,
+}
+
+impl Debug for PositionInfallible {
+	//		fmt																	
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		match *self {
+			Self::Zero => write!(f, "0: Zero"),
+			Self::One  => write!(f, "1: One"),
+			Self::Two  => write!(f, "2: Two"),
+		}
+	}
+}
+
+impl From<String> for PositionInfallible {
+	fn from(value: String) -> Self {
+		match value.as_str() {
+			"Zero" => Self::Zero,
+			"One"  => Self::One,
+			"Two"  => Self::Two,
+			_      => Self::default(),
+		}
+	}
+}
+
+impl From<u8> for PositionInfallible {
+	fn from(value: u8) -> Self {
+		match value {
+			0 => Self::Zero,
+			1 => Self::One,
+			2 => Self::Two,
+			_ => Self::default(),
+		}
+	}
+}
+
 
 
 //		Structs
@@ -132,6 +183,33 @@ struct PosIntoIntGeneric {
 struct PosIntoStringGeneric {
 	#[serde(serialize_with = "into::<Position, String, __S>")]
 	foo: Position,
+}
+
+//		PosFromInt																
+#[derive(Debug, Deserialize)]
+struct PosFromInt {
+	foo: PositionInfallible,
+}
+
+//		PosFromString															
+#[derive(Debug, Deserialize)]
+struct PosFromString {
+	#[serde(deserialize_with = "from_string")]
+	foo: PositionInfallible,
+}
+
+//		PosFromIntGeneric														
+#[derive(Debug, Deserialize)]
+struct PosFromIntGeneric {
+	#[serde(deserialize_with = "from::<PositionInfallible, u8, __D>")]
+	foo: PositionInfallible,
+}
+
+//		PosFromStringGeneric													
+#[derive(Debug, Deserialize)]
+struct PosFromStringGeneric {
+	#[serde(deserialize_with = "from::<PositionInfallible, String, __D>")]
+	foo: PositionInfallible,
 }
 
 //		PosTryFromInt															
@@ -196,6 +274,49 @@ fn into__str() {
 		foo: Position::Two,
 	};
 	assert_eq!(serde_json::to_string(&test).unwrap(), r#"{"foo":"Two"}"#);
+}
+
+//		from_string																
+#[test]
+fn from_string__int() {
+	//	This tests the default behaviour, i.e. without deserialize_with applied
+	let test: PosFromInt = serde_json::from_str(r#"{"foo":1}"#).unwrap();
+	assert_eq!(test.foo, PositionInfallible::One);
+}
+#[test]
+fn from_string__string() {
+	let test: PosFromString = serde_json::from_str(r#"{"foo":"Two"}"#).unwrap();
+	assert_eq!(test.foo, PositionInfallible::Two);
+}
+#[test]
+fn from_string__absent() {
+	let test: Result<PosFromString, _> = serde_json::from_str(r#"{"foo":"Three"}"#);
+	assert_ok!(&test);
+	assert_eq!(test.unwrap().foo, PositionInfallible::Zero);
+}
+
+//		from__string_generic													
+#[test]
+fn from__int_present() {
+	let test: PosFromIntGeneric = serde_json::from_str(r#"{"foo":2}"#).unwrap();
+	assert_eq!(test.foo, PositionInfallible::Two);
+}
+#[test]
+fn from__string_present() {
+	let test: PosFromStringGeneric = serde_json::from_str(r#"{"foo":"One"}"#).unwrap();
+	assert_eq!(test.foo, PositionInfallible::One);
+}
+#[test]
+fn from__int_absent() {
+	let test: Result<PosFromIntGeneric, _> = serde_json::from_str(r#"{"foo":3}"#);
+	assert_ok!(&test);
+	assert_eq!(test.unwrap().foo, PositionInfallible::Zero);
+}
+#[test]
+fn from__string_absent() {
+	let test: Result<PosFromStringGeneric, _> = serde_json::from_str(r#"{"foo":"Three"}"#);
+	assert_ok!(&test);
+	assert_eq!(test.unwrap().foo, PositionInfallible::Zero);
 }
 
 //		try_from_string															
