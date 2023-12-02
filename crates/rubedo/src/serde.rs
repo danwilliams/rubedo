@@ -76,11 +76,11 @@
 //! The end result is that it becomes trivial to specify alternate conversions
 //! for any type that implements the common conversion traits.
 //! 
-//! # `as_str()` representation
+//! # `AsStr`
 //! 
-//! The second case considered is the [`as_str()`] function. This function is
-//! intended to be used with any type that implements the [`AsStr`] trait, which
-//! is a marker trait used to indicate that a type has an `as_str()` method.
+//! The second case considered is representation using [`AsStr`]. The
+//! [`as_str()`] function is intended to be used with any type that implements
+//! the [`AsStr`] trait, which provides an [`as_str()`](AsStr::as_str()) method.
 //! This function is primarily intended to be used with enums, where it is
 //! common to have variants that naturally serialise to and from integers, but
 //! also have a string representation. In such cases, the enums will typically
@@ -112,7 +112,158 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as DeErr
 
 
 
+//		Traits
+
+//§		AsStr																	
+/// This trait provides an [`as_str()`](AsStr::as_str()) method.
+/// 
+/// This trait requires the presence of an [`as_str()`](AsStr::as_str()) method.
+/// It's not possible to apply this trait purely as a marker to the existing
+/// types such as [`String`] that already have an [`as_str()`](AsStr::as_str())
+/// method and have it recognised that they already have it, due to Rust's
+/// implementation determination allowing multiple methods of the same name,
+/// differentiated by trait. In other words, our trait could define a method
+/// with the same name and signature as another trait, but an implementation of
+/// the function would not be considered to satisfy both. Both traits would have
+/// to have their methods specifically implemented, even if identical, and then
+/// the conflict would be resolved at call-time by specifying which trait's
+/// method is being called.
+/// 
+/// However, it is possible to apply this trait and call the underlying method
+/// on the type, for such cases as this may be required. This trait should
+/// therefore be applied to any types of interest, for which the [`as_str()`]
+/// serialisation function provided by this module is intended to be specified.
+/// Suitable standard and common types such as [`String`] and [`str`] have
+/// already had this trait implemented, and those implementations will be
+/// brought into scope when this trait is used.
+/// 
+/// In reality, implementations onto standard types should not really be
+/// necessary, as Serde already knows how to handle such types, and there is no
+/// real advantage to be gained by using this trait in such cases. The intent
+/// and purpose of this trait is to provide a way to specify a string
+/// representation for types that do not already have one, such as enums. Still,
+/// the trait has been applied to some common types for consistency and
+/// completeness.
+/// 
+/// The only current drawback is that trait functions cannot currently be
+/// declared as `const`, and the scope of the [`as_str()`](AsStr::as_str())
+/// method is usually such that it could be declared as `const` otherwise.
+/// 
+pub trait AsStr {
+	//		as_str																
+	/// Provides a string slice representation of the type.
+	#[must_use]
+	fn as_str(&self) -> &str;
+}
+
+impl AsStr for String {
+	//		as_str																
+	fn as_str(&self) -> &str {
+		self.as_str()
+	}
+}
+
+impl AsStr for str {
+	//		as_str																
+	fn as_str(&self) -> &str {
+		self
+	}
+}
+
+
+
 //		Functions
+
+//		as_str																	
+/// Returns a string representation of a type from a string slice.
+/// 
+/// This can be used with any type that implements [`AsStr`], but it is perhaps
+/// most useful when applied to enums. There is no `AsStr` trait in core Rust at
+/// present, but as the focus of this function is representation as [`str`], it
+/// seems best and most intuitive to name it `as_str()`. It is distinct in
+/// purpose from the [`Display`] trait, which is intended for human-readable
+/// representations, and provides [`ToString`].
+/// 
+/// It is a fairly common pattern to have an enum that naturally serialises to
+/// and from an integer, but also has a string representation. Or equally, it
+/// could be that the required serialised form is not the default, which would
+/// be to use the variant name. This function allows the correct string
+/// representation to be obtained from the enum value.
+/// 
+/// It is different from the [`Display`] implementation in that it returns a
+/// serialised representation of the enum (or indeed other type), suitable for
+/// exchanging via serialised data, rather than a human-readable representation.
+/// 
+/// This function is intended for use by [`serde`] to serialise the enum or
+/// other type of interest, e.g. when using [`#[serde(serialize_with)]`]:
+/// 
+/// ```ignore
+/// #[serde(serialize_with = "as_str")]
+/// ```
+/// 
+/// So in summary:
+/// 
+///   - [`Display`] is for human-readable representations. This also implements
+///     [`ToString`], which provides the [`to_string()`](ToString::to_string())
+///     method. The semantic purpose is *conversion to* a string. This concept
+///     of conversion signifies that the resulting string is not "the thing",
+///     but a description of it, and reversing the process is not necessarily
+///     guaranteed to be possible, and also may not have a 1:1 relationship.
+/// 
+///   - [`Into<String>`](Into) is for attempting an infallible conversion that
+///     takes, transforms, and consumes the original value. It may be different
+///     in intent and purpose from the [`Display`] implementation, but the
+///     technical difference is simply that `to_` functions convert by cloning,
+///     and `into_` functions convert by consuming. The semantic purpose is
+///     *transformation into* a string. This concept in this current context
+///     signifies that the resulting string is *equivalent to* "the thing", just
+///     in a different form, which can be used to recreate the original and is
+///     for all intents and purposes equivalent to it, but involves a process of
+///     fundamental type conversion rather than a presentation of something
+///     already present.
+/// 
+///   - [`AsStr`] is different in intent and purpose from both [`Display`] and
+///     [`Into<String>`](Into). It is intended to be used with types that have a
+///     method that returns a [`str`] slice, usually built-in as a static part
+///     of themselves, and therefore providing another "view" of the type. The
+///     semantic purpose is *representation as* a string. This concept signifies
+///     that the resulting string *is* "the thing", just viewed in a different
+///     way, which can be used to recreate the original and did not involve any
+///     conversion in order to provide.
+/// 
+/// The [`AsStr`] implementation is therefore typically a "lightweight" method
+/// of getting type representation, and the [`Into<String>`](Into)
+/// implementation is a more "heavyweight" approach.
+/// 
+/// Note that there may be cause to implement both [`Into<String>`](Into) and
+/// `AsStr` for a type, such as an enum, but the latter may well simply call the
+/// former.
+/// 
+/// # Parameters
+/// 
+/// * `value`      - The value to serialise.
+/// * `serializer` - The serialiser to use.
+/// 
+/// # Errors
+/// 
+/// This function will return an error if the value cannot be serialised to a
+/// [`String`]. The error will be a [`Serializer::Error`], which is passed
+/// through from the [`serde`] crate.
+/// 
+/// Note that the actual provision of `T` as a [`str`] is infallible, but the
+/// serialisation process may experience an error.
+/// 
+/// # See also
+/// 
+/// * [`into_string()`]
+/// 
+pub fn as_str<T, S>(value: &T, serializer: S) -> Result<S::Ok, S::Error>
+where
+	T: AsStr,
+	S: Serializer,
+{
+	serializer.serialize_str(value.as_str())
+}
 
 //		into																	
 /// Returns a serialised representation of a type.
@@ -161,19 +312,25 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as DeErr
 /// require the input type to be specified.
 /// 
 /// So in summary:
-/// 
+///
 ///   - [`Display`] is for human-readable representations. This also implements
 ///     [`ToString`], which provides the [`to_string()`](ToString::to_string())
-///     method. The semantic purpose is conversion *to* a string. This concept
+///     method. The semantic purpose is *conversion to* a string. This concept
 ///     of conversion signifies that the resulting string is not "the thing",
-///     but a description of it.
-/// 
-///   - [`Into<String>`](Into) is for attempting an infallible conversion. It
-///     should be possible to convert *to* a [`String`] without failing. The
-///     semantic purpose is representation *as* a string, but achieved through
-///     conversion here. This concept signifies that the resulting string *is*
-///     "the thing", just in a different form, which can be used to recreate the
-///     original and is for all intents and purposes equivalent to it.
+///     but a description of it, and reversing the process is not necessarily
+///     guaranteed to be possible, and also may not have a 1:1 relationship.
+///
+///   - [`Into<String>`](Into) is for attempting an infallible conversion that
+///     takes, transforms, and consumes the original value. It may be different
+///     in intent and purpose from the [`Display`] implementation, but the
+///     technical difference is simply that `to_` functions convert by cloning,
+///     and `into_` functions convert by consuming. The semantic purpose is
+///     *transformation into* a string. This concept in this current context
+///     signifies that the resulting string is *equivalent to* "the thing", just
+///     in a different form, which can be used to recreate the original and is
+///     for all intents and purposes equivalent to it, but involves a process of
+///     fundamental type conversion rather than a presentation of something
+///     already present.
 /// 
 /// Conversion to a [`String`] has a number of semantic possibilities. However,
 /// there is a general premise that there is generally only one correct
@@ -251,6 +408,9 @@ where
 /// 
 /// For more information, see the documentation for [`into()`].
 /// 
+/// For a lightweight alternative to provide representation rather than
+/// conversion, see [`as_str()`].
+/// 
 /// # Parameters
 /// 
 /// * `value`      - The value to serialise.
@@ -267,6 +427,7 @@ where
 /// 
 /// # See also
 /// 
+/// * [`as_str()`]
 /// * [`from()`]
 /// * [`into()`]
 /// * [`try_from_string()`]

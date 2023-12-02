@@ -145,6 +145,9 @@ The `serde` module provides conversion utility functions for use with [Serde](ht
 
 #### Functions
 
+  - [`as_str()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.as_str.html) -
+    Returns a string representation of a type from a string slice.
+
   - [`into()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.into.html) -
     Returns a serialised representation of a type.
 

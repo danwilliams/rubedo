@@ -3,6 +3,7 @@
 //		Packages
 
 use super::*;
+use crate::sugar::s;
 use claims::{assert_err, assert_ok};
 use serde::Serialize;
 use std::fmt::{Debug, self};
@@ -24,6 +25,18 @@ enum Position {
 	Two  = 2,
 }
 
+impl AsStr for Position {
+	//		as_str																
+	#[must_use]
+	fn as_str(&self) -> &'static str {
+		match *self {
+			Self::Zero => "Zero",
+			Self::One  => "One",
+			Self::Two  => "Two",
+		}
+	}
+}
+
 impl Debug for Position {
 	//		fmt																	
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -38,11 +51,7 @@ impl Debug for Position {
 impl Display for Position {
 	//		fmt																	
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		match *self {
-			Self::Zero => write!(f, "Position Zero"),
-			Self::One  => write!(f, "Position One"),
-			Self::Two  => write!(f, "Position Two"),
-		}
+		write!(f, "Position {}", self.as_str())
 	}
 }
 
@@ -56,11 +65,7 @@ impl From<Position> for String {
 impl From<&Position> for String {
 	//		from																
 	fn from(position: &Position) -> Self {
-		match *position {
-			Position::Zero => "Zero",
-			Position::One  => "One",
-			Position::Two  => "Two",
-		}.to_owned()
+		position.as_str().to_owned()
 	}
 }
 
@@ -158,6 +163,26 @@ impl From<u8> for PositionInfallible {
 
 //		Structs
 
+//		StringStandard															
+#[derive(Serialize)]
+struct StringStandard {
+	foo: String,
+}
+
+//		StringAsStr																
+#[derive(Serialize)]
+struct StringAsStr {
+	#[serde(serialize_with = "as_str")]
+	foo: String,
+}
+
+//		PosAsStr																
+#[derive(Serialize)]
+struct PosAsStr {
+	#[serde(serialize_with = "as_str")]
+	foo: Position,
+}
+
 //		PosIntoInt																
 #[derive(Serialize)]
 struct PosIntoInt {
@@ -242,6 +267,29 @@ struct PosTryFromStringGeneric {
 
 
 //		Tests
+
+//		as_str																	
+#[test]
+fn as_str__string_standard() {
+	let test = StringStandard {
+		foo: s!("Test"),
+	};
+	assert_eq!(serde_json::to_string(&test).unwrap(), r#"{"foo":"Test"}"#);
+}
+#[test]
+fn as_str__string_as_str() {
+	let test = StringAsStr {
+		foo: s!("Test"),
+	};
+	assert_eq!(serde_json::to_string(&test).unwrap(), r#"{"foo":"Test"}"#);
+}
+#[test]
+fn as_str__pos_as_string() {
+	let test = PosAsStr {
+		foo: Position::Two,
+	};
+	assert_eq!(serde_json::to_string(&test).unwrap(), r#"{"foo":"Two"}"#);
+}
 
 //		into_string																
 #[test]
