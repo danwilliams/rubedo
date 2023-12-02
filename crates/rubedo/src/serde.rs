@@ -107,68 +107,9 @@ mod tests;
 
 //		Packages
 
+use crate::std::AsStr;
 use core::fmt::Display;
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as DeError};
-
-
-
-//		Traits
-
-//§		AsStr																	
-/// This trait provides an [`as_str()`](AsStr::as_str()) method.
-/// 
-/// This trait requires the presence of an [`as_str()`](AsStr::as_str()) method.
-/// It's not possible to apply this trait purely as a marker to the existing
-/// types such as [`String`] that already have an [`as_str()`](AsStr::as_str())
-/// method and have it recognised that they already have it, due to Rust's
-/// implementation determination allowing multiple methods of the same name,
-/// differentiated by trait. In other words, our trait could define a method
-/// with the same name and signature as another trait, but an implementation of
-/// the function would not be considered to satisfy both. Both traits would have
-/// to have their methods specifically implemented, even if identical, and then
-/// the conflict would be resolved at call-time by specifying which trait's
-/// method is being called.
-/// 
-/// However, it is possible to apply this trait and call the underlying method
-/// on the type, for such cases as this may be required. This trait should
-/// therefore be applied to any types of interest, for which the [`as_str()`]
-/// serialisation function provided by this module is intended to be specified.
-/// Suitable standard and common types such as [`String`] and [`str`] have
-/// already had this trait implemented, and those implementations will be
-/// brought into scope when this trait is used.
-/// 
-/// In reality, implementations onto standard types should not really be
-/// necessary, as Serde already knows how to handle such types, and there is no
-/// real advantage to be gained by using this trait in such cases. The intent
-/// and purpose of this trait is to provide a way to specify a string
-/// representation for types that do not already have one, such as enums. Still,
-/// the trait has been applied to some common types for consistency and
-/// completeness.
-/// 
-/// The only current drawback is that trait functions cannot currently be
-/// declared as `const`, and the scope of the [`as_str()`](AsStr::as_str())
-/// method is usually such that it could be declared as `const` otherwise.
-/// 
-pub trait AsStr {
-	//		as_str																
-	/// Provides a string slice representation of the type.
-	#[must_use]
-	fn as_str(&self) -> &str;
-}
-
-impl AsStr for String {
-	//		as_str																
-	fn as_str(&self) -> &str {
-		self.as_str()
-	}
-}
-
-impl AsStr for str {
-	//		as_str																
-	fn as_str(&self) -> &str {
-		self
-	}
-}
 
 
 

@@ -22,6 +22,15 @@ your Rust code into gold... well, maybe... or at least make it easier to write.
 
 The `std` module provides extensions to the Rust standard library.
 
+#### AsStr
+
+The [`AsStr`](https://docs.rs/rubedo/latest/rubedo/std/trait.AsStr.html) trait
+is essentially a marker trait, indicating the presence of an `as_str()` method,
+primarily for use with the `serde` module, most usefully with enums:
+
+  - [`as_str()`](https://docs.rs/rubedo/latest/rubedo/std/trait.AsStr.html#tymethod.as_str) -
+    Provides a string slice representation of the type.
+
 #### Iterator
 
 The [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html) trait

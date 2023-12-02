@@ -2,6 +2,25 @@
 
 //		Tests
 
+//§		AsStr																	
+#[cfg(test)]
+mod as_str {
+	use super::super::*;
+	use crate::sugar::s;
+	
+	//		as_str																
+	#[test]
+	fn as_str__string() {
+		let foo = s!("Test");
+		assert_eq!(foo.as_str(), "Test");
+	}
+	#[test]
+	fn as_str__str() {
+		let foo = "Test";
+		assert_eq!(foo.as_str(), "Test");
+	}
+}
+
 //§		IteratorExt																
 #[cfg(test)]
 mod iterator_ext {
