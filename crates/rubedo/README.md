@@ -154,6 +154,8 @@ The `serde` module provides conversion utility functions for use with [Serde](ht
 
 #### Functions
 
+##### Serialisation
+
   - [`as_str()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.as_str.html) -
     Returns a string representation of a type from a string slice.
 
@@ -166,12 +168,17 @@ The `serde` module provides conversion utility functions for use with [Serde](ht
   - [`to_string()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.to_string.html) -
     Returns a string copy of a type.
 
+##### Deserialisation
+
   - [`from()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.from.html) -
     Returns a type from a string or other serialised representation.
     
   - [`from_string()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.from_string.html) -
     Returns a type from a string representation.
 
+  - [`from_str()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.from_str.html) -
+    Returns a type from a string slice representation.
+    
   - [`try_from()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.try_from.html) -
     Returns a type from a string or other serialised representation.
 

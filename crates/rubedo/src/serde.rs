@@ -76,7 +76,7 @@
 //! The end result is that it becomes trivial to specify alternate conversions
 //! for any type that implements the common conversion traits.
 //! 
-//! # `Display` and `ToString`
+//! # `Display` and `ToString`, and `FromStr`
 //! 
 //! Implementing [`Display`] for a type adds a free implementation of
 //! [`ToString`] as well, which provides the [`to_string()`](ToString::to_string())
@@ -97,6 +97,16 @@
 //! implementation may exist and is the same as the serialised form, in which
 //! case it would be onerous to also implement another function just for the
 //! sake of it.
+//! 
+//! The other side of the [`ToString`] coin is [`FromStr`], which provides the
+//! [`from_str()`](FromStr::from_str()) method. This is intended to be used for
+//! parsing a [`String`] into a type, and is the counterpart to [`to_string()`].
+//! For this purpose, the [`from_str()`] function is provided, which is
+//! basically equivalent to [`from()`], but for [`String`] types. In this way,
+//! it serves the same essential purpose as [`from_string()`], but for types
+//! that implement [`FromStr`] instead of [`TryFrom<String>`](TryFrom). That is
+//! the only difference, and the choice of which to use is entirely down to the
+//! implementation of the type in question.
 //! 
 //! # `AsStr`
 //! 
@@ -130,7 +140,10 @@ mod tests;
 //		Packages
 
 use crate::std::AsStr;
-use core::fmt::Display;
+use core::{
+	fmt::Display,
+	str::FromStr,
+};
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as DeError};
 
 
@@ -244,6 +257,9 @@ where
 /// #[serde(serialize_with = "to_string")]
 /// ```
 /// 
+/// The equivalent opposite of this function is [`from_str()`], which is
+/// intended for use with [`FromStr`].
+/// 
 /// # Parameters
 /// 
 /// * `value`      - The value to serialise.
@@ -261,6 +277,7 @@ where
 /// # See also
 /// 
 /// * [`as_str()`]
+/// * [`from_str()`]
 /// * [`into_string()`]
 /// 
 pub fn to_string<T, S>(value: &T, serializer: S) -> Result<S::Ok, S::Error>
@@ -269,6 +286,53 @@ where
 	S: Serializer,
 {
 	serializer.serialize_str(&value.to_string())
+}
+
+//		from_str																
+/// Returns a type from a string slice representation.
+///
+/// This can be used with any type that implements [`FromStr`]. It is basically
+/// the opposite of [`to_string()`], and is intended to be used for parsing a
+/// [`String`] into a type, and is essentially equivalent to [`from_string()`],
+/// but for types that implement [`FromStr`] instead of [`TryFrom<String>`](TryFrom).
+/// 
+/// This function is intended for use by [`serde`] to deserialise the type of
+/// interest, e.g. when using [`#[serde(deserialize_with)]`]:
+///
+/// ```ignore
+/// #[serde(deserialize_with = "from_str")]
+/// ```
+///
+/// The equivalent opposite of this function is [`to_string()`], which is
+/// intended for use with [`ToString`].
+/// 
+/// # Parameters
+/// 
+/// * `deserializer` - The deserialiser to use.
+/// 
+/// # Errors
+/// 
+/// This function will return an error if the deserialised value cannot be
+/// converted to the required type. The error will be a [`DeError`], which is
+/// passed through from the [`serde`] crate.
+///
+/// Note that the actual conversion of the [`String`] to `T` is infallible, but
+/// the deserialisation process may experience an error.
+/// 
+/// # See also
+/// 
+/// * [`try_from()`]
+/// * [`from_str()`]
+/// * [`into_string()`]
+/// * [`try_from_string()`]
+/// 
+pub fn from_str<'de, T, D>(deserializer: D) -> Result<T, D::Error>
+where
+	T:      FromStr,
+	T::Err: Display,
+	D:      Deserializer<'de>,
+{
+	String::deserialize(deserializer).and_then(|s| T::from_str(&s).map_err(DeError::custom))
 }
 
 //		into																	
@@ -513,6 +577,7 @@ where
 /// # See also
 /// 
 /// * [`into()`]
+/// * [`from_str()`]
 /// * [`from_string()`]
 /// * [`try_from()`]
 /// 
@@ -559,6 +624,7 @@ where
 /// # See also
 /// 
 /// * [`from()`]
+/// * [`from_str()`]
 /// * [`into_string()`]
 /// * [`try_from_string()`]
 /// 
@@ -636,6 +702,7 @@ where
 /// # See also
 /// 
 /// * [`from()`]
+/// * [`from_str()`]
 /// * [`into()`]
 /// * [`try_from_string()`]
 /// 
@@ -683,6 +750,7 @@ where
 /// 
 /// # See also
 /// 
+/// * [`from_str()`]
 /// * [`from_string()`]
 /// * [`into_string()`]
 /// * [`try_from()`]

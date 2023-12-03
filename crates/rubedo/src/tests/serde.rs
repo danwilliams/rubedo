@@ -83,17 +83,26 @@ impl From<&Position> for u8 {
 	}
 }
 
+impl FromStr for Position {
+	type Err = String;
+	
+	//		from_str															
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		match s.as_str() {
+			"Zero" => Ok(Self::Zero),
+			"One"  => Ok(Self::One),
+			"Two"  => Ok(Self::Two),
+			_      => Err(format!("Invalid value for Position: {}", s)),
+		}
+	}
+}
+
 impl TryFrom<String> for Position {
 	type Error = String;
 	
 	//		try_from															
 	fn try_from(value: String) -> Result<Self, Self::Error> {
-		match value.as_str() {
-			"Zero" => Ok(Self::Zero),
-			"One"  => Ok(Self::One),
-			"Two"  => Ok(Self::Two),
-			_      => Err(format!("Invalid value for Position: {}", value)),
-		}
+		value.as_str().parse()
 	}
 }
 
@@ -215,6 +224,41 @@ struct BoolToString {
 #[derive(Serialize)]
 struct PosToString {
 	#[serde(serialize_with = "to_string")]
+	foo: Position,
+}
+
+//		StringFromStr															
+#[derive(Deserialize)]
+struct StringFromStr {
+	#[serde(deserialize_with = "from_str")]
+	foo: String,
+}
+
+//		IntFromStr																
+#[derive(Deserialize)]
+struct IntFromStr {
+	#[serde(deserialize_with = "from_str")]
+	foo: u32,
+}
+
+//		FloatFromStr															
+#[derive(Deserialize)]
+struct FloatFromStr {
+	#[serde(deserialize_with = "from_str")]
+	foo: f32,
+}
+
+//		BoolFromStr																
+#[derive(Deserialize)]
+struct BoolFromStr {
+	#[serde(deserialize_with = "from_str")]
+	foo: bool,
+}
+
+//		PosFromStr																
+#[derive(Deserialize)]
+struct PosFromStr {
+	#[serde(deserialize_with = "from_str")]
 	foo: Position,
 }
 
@@ -361,6 +405,33 @@ fn to_string__pos() {
 		foo: Position::Two,
 	};
 	assert_eq!(serde_json::to_string(&test).unwrap(), r#"{"foo":"Position Two"}"#);
+}
+
+//		from_str																
+#[test]
+fn from_str__string() {
+	let test: StringFromStr = serde_json::from_str(r#"{"foo":"Test"}"#).unwrap();
+	assert_eq!(test.foo, s!("Test"));
+}
+#[test]
+fn from_str__int() {
+	let test: IntFromStr = serde_json::from_str(r#"{"foo":"1234"}"#).unwrap();
+	assert_eq!(test.foo, 1234);
+}
+#[test]
+fn from_str__float() {
+	let test: FloatFromStr = serde_json::from_str(r#"{"foo":"12.34"}"#).unwrap();
+	assert_eq!(test.foo, 12.34);
+}
+#[test]
+fn from_str__bool() {
+	let test: BoolFromStr = serde_json::from_str(r#"{"foo":"true"}"#).unwrap();
+	assert_eq!(test.foo, true);
+}
+#[test]
+fn from_str__pos() {
+	let test: PosFromStr = serde_json::from_str(r#"{"foo":"Two"}"#).unwrap();
+	assert_eq!(test.foo, Position::Two);
 }
 
 //		into_string																
