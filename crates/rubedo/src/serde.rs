@@ -76,6 +76,28 @@
 //! The end result is that it becomes trivial to specify alternate conversions
 //! for any type that implements the common conversion traits.
 //! 
+//! # `Display` and `ToString`
+//! 
+//! Implementing [`Display`] for a type adds a free implementation of
+//! [`ToString`] as well, which provides the [`to_string()`](ToString::to_string())
+//! method. This is intended to be used for human-readable representations of a
+//! type, and provides a [`String`] copy of the converted type. This is not
+//! necessarily the same as the serialised representation, which is intended for
+//! machine-readable uses. However, for cases where the [`Display`]
+//! implementation is the same as the serialised representation, it is possible
+//! to use the [`to_string()`] function to provide the desired behaviour.
+//! 
+//! Notably, this is conceptually a subset of the [`Into<String>`](Into) use
+//! case, as [`Into<String>`](Into) is intended to be used for any type that can
+//! be converted to a [`String`], and [`ToString`] does that as well, albeit
+//! with a different semantic purpose, and via copy versus consumption. Although
+//! it is *advised* to use the [`into_string()`] or [`as_str()`] functions
+//! instead (as appropriate), the [`to_string()`] Serde helper function is
+//! provided for completeness and for such cases where a [`Display`]
+//! implementation may exist and is the same as the serialised form, in which
+//! case it would be onerous to also implement another function just for the
+//! sake of it.
+//! 
 //! # `AsStr`
 //! 
 //! The second case considered is representation using [`AsStr`]. The
@@ -197,6 +219,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as DeErr
 /// # See also
 /// 
 /// * [`into_string()`]
+/// * [`to_string()`]
 /// 
 pub fn as_str<T, S>(value: &T, serializer: S) -> Result<S::Ok, S::Error>
 where
@@ -204,6 +227,48 @@ where
 	S: Serializer,
 {
 	serializer.serialize_str(value.as_str())
+}
+
+//		to_string																
+/// Returns a string copy of a type.
+/// 
+/// This can be used with any type that implements [`ToString`], which is
+/// usually achieved by implementing [`Display`]. Although this is typically
+/// intended for human-readable representations, using it for serialisation can
+/// be useful in cases where this matches the serialised representation.
+/// 
+/// This function is intended for use by [`serde`] to serialise the type of
+/// interest, e.g. when using [`#[serde(serialize_with)]`]:
+/// 
+/// ```ignore
+/// #[serde(serialize_with = "to_string")]
+/// ```
+/// 
+/// # Parameters
+/// 
+/// * `value`      - The value to serialise.
+/// * `serializer` - The serialiser to use.
+/// 
+/// # Errors
+/// 
+/// This function will return an error if the value cannot be serialised to a
+/// [`String`]. The error will be a [`Serializer::Error`], which is passed
+/// through from the [`serde`] crate.
+/// 
+/// Note that the actual provision of `T` as a [`str`] is infallible, but the
+/// serialisation process may experience an error.
+/// 
+/// # See also
+/// 
+/// * [`as_str()`]
+/// * [`into_string()`]
+/// 
+pub fn to_string<T, S>(value: &T, serializer: S) -> Result<S::Ok, S::Error>
+where
+	T: ToString,
+	S: Serializer,
+{
+	serializer.serialize_str(&value.to_string())
 }
 
 //		into																	
@@ -371,6 +436,7 @@ where
 /// * [`as_str()`]
 /// * [`from()`]
 /// * [`into()`]
+/// * [`to_string()`]
 /// * [`try_from_string()`]
 /// 
 pub fn into_string<T, S>(value: T, serializer: S) -> Result<S::Ok, S::Error>

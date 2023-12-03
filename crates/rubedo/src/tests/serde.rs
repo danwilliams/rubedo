@@ -183,6 +183,41 @@ struct PosAsStr {
 	foo: Position,
 }
 
+//		StringToString															
+#[derive(Serialize)]
+struct StringToString {
+	#[serde(serialize_with = "to_string")]
+	foo: String,
+}
+
+//		IntToString																
+#[derive(Serialize)]
+struct IntToString {
+	#[serde(serialize_with = "to_string")]
+	foo: u32,
+}
+
+//		FloatToString															
+#[derive(Serialize)]
+struct FloatToString {
+	#[serde(serialize_with = "to_string")]
+	foo: f32,
+}
+
+//		BoolToString															
+#[derive(Serialize)]
+struct BoolToString {
+	#[serde(serialize_with = "to_string")]
+	foo: bool,
+}
+
+//		PosToString																
+#[derive(Serialize)]
+struct PosToString {
+	#[serde(serialize_with = "to_string")]
+	foo: Position,
+}
+
 //		PosIntoInt																
 #[derive(Serialize)]
 struct PosIntoInt {
@@ -289,6 +324,43 @@ fn as_str__pos_as_string() {
 		foo: Position::Two,
 	};
 	assert_eq!(serde_json::to_string(&test).unwrap(), r#"{"foo":"Two"}"#);
+}
+
+//		to_string																
+#[test]
+fn to_string__string() {
+	let test = StringToString {
+		foo: s!("Test"),
+	};
+	assert_eq!(serde_json::to_string(&test).unwrap(), r#"{"foo":"Test"}"#);
+}
+#[test]
+fn to_string__int() {
+	let test = IntToString {
+		foo: 1_234,
+	};
+	assert_eq!(serde_json::to_string(&test).unwrap(), r#"{"foo":"1234"}"#);
+}
+#[test]
+fn to_string__float() {
+	let test = FloatToString {
+		foo: 12.34,
+	};
+	assert_eq!(serde_json::to_string(&test).unwrap(), r#"{"foo":"12.34"}"#);
+}
+#[test]
+fn to_string__bool() {
+	let test = BoolToString {
+		foo: true,
+	};
+	assert_eq!(serde_json::to_string(&test).unwrap(), r#"{"foo":"true"}"#);
+}
+#[test]
+fn to_string__pos() {
+	let test = PosToString {
+		foo: Position::Two,
+	};
+	assert_eq!(serde_json::to_string(&test).unwrap(), r#"{"foo":"Position Two"}"#);
 }
 
 //		into_string																
