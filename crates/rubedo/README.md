@@ -22,6 +22,15 @@ your Rust code into gold... well, maybe... or at least make it easier to write.
 
 The `std` module provides extensions to the Rust standard library.
 
+#### AsStr
+
+The [`AsStr`](https://docs.rs/rubedo/latest/rubedo/std/trait.AsStr.html) trait
+is essentially a marker trait, indicating the presence of an `as_str()` method,
+primarily for use with the `serde` module, most usefully with enums:
+
+  - [`as_str()`](https://docs.rs/rubedo/latest/rubedo/std/trait.AsStr.html#tymethod.as_str) -
+    Provides a string slice representation of the type.
+
 #### Iterator
 
 The [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html) trait
@@ -138,6 +147,43 @@ struct is extended with the following methods:
   - [`unpack()`](https://docs.rs/rubedo/latest/rubedo/chrono/trait.ResponseExt.html#tymethod.unpack) -
     Unpacks the response and provides the headers and body in a more accessible
     form, to allow it to be checked, compared, and printed easily.
+
+### serde
+
+The `serde` module provides conversion utility functions for use with [Serde](https://crates.io/crates/serde).
+
+#### Functions
+
+##### Serialisation
+
+  - [`as_str()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.as_str.html) -
+    Returns a string representation of a type from a string slice.
+
+  - [`into()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.into.html) -
+    Returns a serialised representation of a type.
+
+  - [`into_string()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.into_string.html) -
+    Returns a string representation of a type.
+
+  - [`to_string()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.to_string.html) -
+    Returns a string copy of a type.
+
+##### Deserialisation
+
+  - [`from()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.from.html) -
+    Returns a type from a string or other serialised representation.
+    
+  - [`from_string()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.from_string.html) -
+    Returns a type from a string representation.
+
+  - [`from_str()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.from_str.html) -
+    Returns a type from a string slice representation.
+    
+  - [`try_from()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.try_from.html) -
+    Returns a type from a string or other serialised representation.
+
+  - [`try_from_string()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.try_from_string.html) -
+    Returns a type from a string representation.
 
 ### Macros
 
