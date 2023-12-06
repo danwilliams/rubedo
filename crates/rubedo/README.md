@@ -31,6 +31,20 @@ primarily for use with the `serde` module, most usefully with enums:
   - [`as_str()`](https://docs.rs/rubedo/latest/rubedo/std/trait.AsStr.html#tymethod.as_str) -
     Provides a string slice representation of the type.
 
+#### FromIntWithScale and ToIntWithScale
+
+The [`FromIntWithScale`](https://docs.rs/rubedo/latest/rubedo/std/trait.FromIntWithScale.html)
+and [`ToIntWithScale`](https://docs.rs/rubedo/latest/rubedo/std/trait.ToIntWithScale.html)
+traits are used to convert between integers and floating-point numbers using
+specified scales, i.e. different numbers of decimal places, primarily for use
+with the `serde` module, most usefully with currency values:
+
+  - [`from_int_with_scale()`](https://docs.rs/rubedo/latest/rubedo/std/trait.FromIntWithScale.html#tymethod.from_int_with_scale) -
+    Converts from an integer to a floating-point number with a specified scale.
+
+  - [`to_int_with_scale()`](https://docs.rs/rubedo/latest/rubedo/std/trait.ToIntWithScale.html#tymethod.to_int_with_scale) -
+    Converts from a floating-point number to an integer with a specified scale.
+
 #### Iterator
 
 The [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html) trait

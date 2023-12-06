@@ -12,6 +12,10 @@ mod tests;
 
 //		Packages
 
+use rust_decimal::{
+	Decimal,
+	prelude::ToPrimitive,
+};
 use std::{
 	env,
 	ffi::OsString,
@@ -130,10 +134,358 @@ impl AsStr for str {
 	}
 }
 
+//§		FromIntWithScale														
+/// Converts from an integer to a floating-point number with a specified scale.
+/// 
+/// This trait requires the presence of a [`from_int_with_scale()`](FromIntWithScale::from_int_with_scale())
+/// method, which converts from an integer to a floating-point number with a
+/// specified scale, i.e. a certain number of decimal places. For example, if
+/// the scale is `2`, then the integer `1234` would be converted to the
+/// floating-point number `12.34`. This is most useful when dealing with
+/// currencies.
+/// 
+/// The trait is implemented for the standard floating-point types, i.e. [`f32`]
+/// and [`f64`], and for the [`Decimal`] type from the [`rust_decimal`](https://crates.io/crates/rust_decimal)
+/// crate. For the corresponding integer types expressed as the generic `T`, it
+/// is implemented for the standard integer types [`i8`], [`i16`], [`i32`],
+/// [`i64`], [`i128`], [`u8`], [`u16`], [`u32`], [`u64`], and [`u128`].
+/// 
+/// Note that not all of these integer types can have their full range
+/// represented by all of the floating-point types, and so naive conversion may
+/// result in them being truncated or rounded. To avoid this happening
+/// invisibly, the conversion will return [`None`] if the input number cannot be
+/// accurately represented in the output type. Care should be taken to assess
+/// the likelihood of this occurring, and to ensure that the correct types are
+/// used. This cannot be guaranteed by the compiler, as the outcome depends
+/// partly on the type and partly on the scale factor, and so an assessment has
+/// to be made at runtime.
+/// 
+pub trait FromIntWithScale<T>: Sized {
+	//		from_int_with_scale													
+	/// Converts from an integer to a floating-point number with a specified
+	/// scale.
+	/// 
+	/// This function converts from an integer to a floating-point number with a
+	/// specified scale, i.e. a certain number of decimal places. For example,
+	/// if the scale is `2`, then the integer `1234` would be converted to the
+	/// floating-point number `12.34`. This is most useful when dealing with
+	/// currencies.
+	/// 
+	/// Note that not all integer types can have their full range represented by
+	/// all of the floating-point types, and so naive conversion may result in
+	/// them being truncated or rounded. To avoid this happening invisibly, the
+	/// conversion will return [`None`] if the input number cannot be accurately
+	/// represented in the output type. Care should be taken to assess the
+	/// likelihood of this occurring, and to ensure that the correct types are
+	/// used. This cannot be guaranteed by the compiler, as the outcome depends
+	/// partly on the type and partly on the scale factor, and so an assessment
+	/// has to be made at runtime.
+	/// 
+	/// # Parameters
+	/// 
+	/// * `value` - The integer value to convert.
+	/// * `scale` - The scale factor, i.e. the number of decimal places. Note
+	///             that this is essentially limited to a maximum of 19 DP of
+	///             movement for an [`f32`] or [`f64`] without overflowing, and
+	///             28 DP for a [`Decimal`].
+	/// 
+	/// # See also
+	/// 
+	/// * [`ToIntWithScale::to_int_with_scale()`]
+	/// 
+	fn from_int_with_scale(value: T, scale: u8) -> Option<Self>;
+}
+
+//		impl_from_int_with_scale_for_float										
+/// Implements the [`FromIntWithScale`] trait for floating-point types.
+macro_rules! impl_from_int_with_scale_for_float {
+	($t:ty, f32) => {
+		impl FromIntWithScale<$t> for f32 {
+			//		from_int_with_scale											
+			fn from_int_with_scale(value: $t, scale: u8) -> Option<Self> {
+				let factor = 10_u32.checked_pow(scale as u32)?;
+				let scaled = value as f32 / factor as f32;
+				//	We need to manually check if the value exceeds the range of integer
+				//	values supported by an f32, as that will result in a loss of precision.
+				#[cfg_attr(    feature = "reasons",  allow(trivial_numeric_casts,
+					reason = "Trivial casts here are due to the macro permutations"
+				))]
+				#[cfg_attr(not(feature = "reasons"), allow(trivial_numeric_casts))]
+				#[cfg_attr(    feature = "reasons",  allow(clippy::invalid_upcast_comparisons,
+					reason = "Superfluous upcast comparisons here are due to the macro permutations"
+				))]
+				#[cfg_attr(not(feature = "reasons"), allow(clippy::invalid_upcast_comparisons))]
+				if scaled.is_infinite() || (value as u128) > 0x0100_0000_u128 || (value as i128) < -0x0100_0000_i128 {
+					None
+				} else {
+					Some(scaled)
+				}
+			}
+		}
+	};
+	($t:ty, f64) => {
+		impl FromIntWithScale<$t> for f64 {
+			//		from_int_with_scale											
+			fn from_int_with_scale(value: $t, scale: u8) -> Option<Self> {
+				let factor = 10_u64.checked_pow(scale as u32)?;
+				let scaled = value as f64 / factor as f64;
+				//	We need to manually check if the value exceeds the range of integer
+				//	values supported by an f64, as that will result in a loss of precision.
+				#[cfg_attr(    feature = "reasons",  allow(trivial_numeric_casts,
+					reason = "Trivial casts here are due to the macro permutations"
+				))]
+				#[cfg_attr(not(feature = "reasons"), allow(trivial_numeric_casts))]
+				#[cfg_attr(    feature = "reasons",  allow(clippy::invalid_upcast_comparisons,
+					reason = "Superfluous upcast comparisons here are due to the macro permutations"
+				))]
+				#[cfg_attr(not(feature = "reasons"), allow(clippy::invalid_upcast_comparisons))]
+				if scaled.is_infinite() || (value as u128) > 0x0020_0000_0000_0000_u128 || (value as i128) < -0x0020_0000_0000_0000_i128 {
+					None
+				} else {
+					Some(scaled)
+				}
+			}
+		}
+	};
+}
+
+impl_from_int_with_scale_for_float!(i8,   f32);
+impl_from_int_with_scale_for_float!(i16,  f32);
+impl_from_int_with_scale_for_float!(i32,  f32);
+impl_from_int_with_scale_for_float!(i64,  f32);
+impl_from_int_with_scale_for_float!(i128, f32);
+impl_from_int_with_scale_for_float!(i8,   f64);
+impl_from_int_with_scale_for_float!(i16,  f64);
+impl_from_int_with_scale_for_float!(i32,  f64);
+impl_from_int_with_scale_for_float!(i64,  f64);
+impl_from_int_with_scale_for_float!(i128, f64);
+impl_from_int_with_scale_for_float!(u8,   f32);
+impl_from_int_with_scale_for_float!(u16,  f32);
+impl_from_int_with_scale_for_float!(u32,  f32);
+impl_from_int_with_scale_for_float!(u64,  f32);
+impl_from_int_with_scale_for_float!(u128, f32);
+impl_from_int_with_scale_for_float!(u8,   f64);
+impl_from_int_with_scale_for_float!(u16,  f64);
+impl_from_int_with_scale_for_float!(u32,  f64);
+impl_from_int_with_scale_for_float!(u64,  f64);
+impl_from_int_with_scale_for_float!(u128, f64);
+
+//		impl_from_int_with_scale_for_decimal									
+/// Implements the [`FromIntWithScale`] trait for the [`Decimal`] type.
+macro_rules! impl_from_int_with_scale_for_decimal {
+	(i128) => {
+		impl FromIntWithScale<i128> for Decimal {
+			//		from_int_with_scale											
+			fn from_int_with_scale(value: i128, scale: u8) -> Option<Self> {
+				//	We should be able to rely upon Decimal::try_from_i128_with_scale() to
+				//	perform the necessary checks, but it currently has issues with numbers
+				//	larger than the supported 96-bit range, so we need to check manually.
+				if value > Decimal::MAX.to_i128().unwrap() || value < Decimal::MIN.to_i128().unwrap() {
+					None
+				} else {
+					Decimal::try_from_i128_with_scale(value, scale as u32).ok()
+				}
+			}
+		}
+	};
+	(u128) => {
+		impl FromIntWithScale<u128> for Decimal {
+			//		from_int_with_scale											
+			fn from_int_with_scale(value: u128, scale: u8) -> Option<Self> {
+				//	We should be able to rely upon Decimal::try_from_i128_with_scale() to
+				//	perform the necessary checks, but it currently has issues with numbers
+				//	larger than the supported 96-bit range, so we need to check manually.
+				//	Regardless of this, we would have to check if the value is larger than
+				//	supported by an i128 in any case.
+				if value > Decimal::MAX.to_u128().unwrap() || (value as i128) < Decimal::MIN.to_i128().unwrap() {
+					None
+				} else {
+					Decimal::try_from_i128_with_scale(value as i128, scale as u32).ok()
+				}
+			}
+		}
+	};
+	($t:ty) => {
+		impl FromIntWithScale<$t> for Decimal {
+			//		from_int_with_scale											
+			fn from_int_with_scale(value: $t, scale: u8) -> Option<Self> {
+				//	Everything less than 128 bits will fit safely into the Decimal's range.
+				Decimal::try_from_i128_with_scale(value as i128, scale as u32).ok()
+			}
+		}
+	};
+}
+
+impl_from_int_with_scale_for_decimal!(i8);
+impl_from_int_with_scale_for_decimal!(i16);
+impl_from_int_with_scale_for_decimal!(i32);
+impl_from_int_with_scale_for_decimal!(i64);
+impl_from_int_with_scale_for_decimal!(i128);
+impl_from_int_with_scale_for_decimal!(u8);
+impl_from_int_with_scale_for_decimal!(u16);
+impl_from_int_with_scale_for_decimal!(u32);
+impl_from_int_with_scale_for_decimal!(u64);
+impl_from_int_with_scale_for_decimal!(u128);
+
+//§		ToIntWithScale															
+/// Converts from a floating-point number to an integer with a specified scale.
+/// 
+/// This trait requires the presence of a [`to_int_with_scale()`](ToIntWithScale::to_int_with_scale())
+/// method, which converts from a floating-point number to an integer with a
+/// specified scale, i.e. a certain number of decimal places. For example, if
+/// the scale is `2`, then the floating-point number `12.34` would be converted
+/// to the integer `1234`. This is most useful when dealing with currencies.
+/// 
+/// The trait is implemented for the standard floating-point types, i.e. [`f32`]
+/// and [`f64`], and for the [`Decimal`] type from the [`rust_decimal`](https://crates.io/crates/rust_decimal)
+/// crate. For the corresponding integer types expressed as the generic `T`, it
+/// is implemented for the standard integer types [`i8`], [`i16`], [`i32`],
+/// [`i64`], [`i128`], [`u8`], [`u16`], [`u32`], [`u64`], and [`u128`].
+/// 
+/// Note that not all of these floating-point types can have their full range
+/// represented by all of the integer types, and so naive conversion may result
+/// in them being truncated or rounded. To avoid this happening invisibly, the
+/// conversion will return [`None`] if the input number cannot be accurately
+/// represented in the output type. Care should be taken to assess the
+/// likelihood of this occurring, and to ensure that the correct types are used.
+/// This cannot be guaranteed by the compiler, as the outcome depends partly on
+/// the type and partly on the scale factor, and so an assessment has to be made
+/// at runtime.
+/// 
+pub trait ToIntWithScale<T>: Sized {
+	//		to_int_with_scale													
+	/// Converts from a floating-point number to an integer with a specified
+	/// scale.
+	/// 
+	/// This function converts from a floating-point number to an integer with a
+	/// specified scale, i.e. a certain number of decimal places. For example,
+	/// if the scale is `2`, then the integer `1234` would be converted to the
+	/// floating-point number `12.34`. This is most useful when dealing with
+	/// currencies.
+	/// 
+	/// Note that not all floating-point types can have their full range
+	/// represented by all of the integer types, and so naive conversion may
+	/// result in them being truncated or rounded. To avoid this happening
+	/// invisibly, the conversion will return [`None`] if the input number
+	/// cannot be accurately represented in the output type. Care should be
+	/// taken to assess the likelihood of this occurring, and to ensure that the
+	/// correct types are used. This cannot be guaranteed by the compiler, as
+	/// the outcome depends partly on the type and partly on the scale factor,
+	/// and so an assessment has to be made at runtime.
+	/// 
+	/// # Parameters
+	///
+	/// * `scale` - The scale factor, i.e. the number of decimal places. Note
+	///             that this is essentially limited to a maximum of 19 DP of
+	///             movement without overflowing.
+	/// 
+	/// # See also
+	/// 
+	/// * [`FromIntWithScale::from_int_with_scale()`]
+	/// 
+	fn to_int_with_scale(&self, scale: u8) -> Option<T>;
+}
+
+//		impl_to_int_with_scale_for_float										
+/// Implements the [`ToIntWithScale`] trait for floating-point types.
+macro_rules! impl_to_int_with_scale_for_float {
+	($t:ty, $f:ty) => {
+		impl ToIntWithScale<$t> for $f {
+			//		to_int_with_scale											
+			fn to_int_with_scale(&self, scale: u8) -> Option<$t> {
+				let factor = 10_u64.checked_pow(scale as u32)?;
+				let scaled = (self * factor as $f).round();
+				if scaled.is_infinite() || scaled > <$t>::MAX as $f || scaled < <$t>::MIN as $f {
+					None
+				} else {
+					Some(scaled as $t)
+				}
+			}
+		}
+	};
+}
+
+impl_to_int_with_scale_for_float!(i8,   f32);
+impl_to_int_with_scale_for_float!(i16,  f32);
+impl_to_int_with_scale_for_float!(i32,  f32);
+impl_to_int_with_scale_for_float!(i64,  f32);
+impl_to_int_with_scale_for_float!(i128, f32);
+impl_to_int_with_scale_for_float!(i8,   f64);
+impl_to_int_with_scale_for_float!(i16,  f64);
+impl_to_int_with_scale_for_float!(i32,  f64);
+impl_to_int_with_scale_for_float!(i64,  f64);
+impl_to_int_with_scale_for_float!(i128, f64);
+impl_to_int_with_scale_for_float!(u8,   f32);
+impl_to_int_with_scale_for_float!(u16,  f32);
+impl_to_int_with_scale_for_float!(u32,  f32);
+impl_to_int_with_scale_for_float!(u64,  f32);
+impl_to_int_with_scale_for_float!(u128, f32);
+impl_to_int_with_scale_for_float!(u8,   f64);
+impl_to_int_with_scale_for_float!(u16,  f64);
+impl_to_int_with_scale_for_float!(u32,  f64);
+impl_to_int_with_scale_for_float!(u64,  f64);
+impl_to_int_with_scale_for_float!(u128, f64);
+
+//		impl_to_int_with_scale_for_decimal										
+/// Implements the [`ToIntWithScale`] trait for the [`Decimal`] type.
+macro_rules! impl_to_int_with_scale_for_decimal {
+	(i128) => {
+		impl ToIntWithScale<i128> for Decimal {
+			fn to_int_with_scale(&self, scale: u8) -> Option<i128> {
+				//	The integer range of the Decimal type is less than that of an i128, but
+				//	we cannot convert first and then scale, because the floating-point
+				//	component will be truncated and lost. We therefore need to scale first,
+				//	but this restricts the range of the final outcome to that of the Decimal
+				//	type, which is 96 bits.
+				let factor = 10_u64.checked_pow(scale as u32)?;
+				(self.checked_mul(Decimal::from(factor))?.round()).to_i128()
+			}
+		}
+	};
+	(u128) => {
+		impl ToIntWithScale<u128> for Decimal {
+			fn to_int_with_scale(&self, scale: u8) -> Option<u128> {
+				//	The integer range of the Decimal type is less than that of an i128, but
+				//	we cannot convert first and then scale, because the floating-point
+				//	component will be truncated and lost. We therefore need to scale first,
+				//	but this restricts the range of the final outcome to that of the Decimal
+				//	type, which is 96 bits.
+				let factor = 10_u64.checked_pow(scale as u32)?;
+				(self.checked_mul(Decimal::from(factor))?.round()).to_u128()
+			}
+		}
+	};
+	($t:ty) => {
+		impl ToIntWithScale<$t> for Decimal {
+			fn to_int_with_scale(&self, scale: u8) -> Option<$t> {
+				let factor = 10_u64.checked_pow(scale as u32)?;
+				let scaled = self.checked_mul(Decimal::from(factor))?.round();
+				//	Everything less than 128 bits will fit safely into the Decimal's range.
+				if scaled > Decimal::from(<$t>::MAX) || scaled < Decimal::from(<$t>::MIN) {
+					None
+				} else {
+					scaled.to_i128().and_then(|value| value.try_into().ok())
+				}
+			}
+		}
+	};
+}
+
+impl_to_int_with_scale_for_decimal!(i8);
+impl_to_int_with_scale_for_decimal!(i16);
+impl_to_int_with_scale_for_decimal!(i32);
+impl_to_int_with_scale_for_decimal!(i64);
+impl_to_int_with_scale_for_decimal!(i128);
+impl_to_int_with_scale_for_decimal!(u8);
+impl_to_int_with_scale_for_decimal!(u16);
+impl_to_int_with_scale_for_decimal!(u32);
+impl_to_int_with_scale_for_decimal!(u64);
+impl_to_int_with_scale_for_decimal!(u128);
+
 //§		IteratorExt																
 /// This trait provides additional functionality to [`Iterator`].
 pub trait IteratorExt: Iterator {
-	//		limit																
+	//		limit																
 	/// Limits the number of items returned by an iterator.
 	/// 
 	/// This is the same as [`Iterator::take()`], but accepts an [`Option`], so
