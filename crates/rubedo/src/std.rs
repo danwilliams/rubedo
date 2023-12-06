@@ -32,6 +32,7 @@ use std::{
 /// 
 /// * [`IteratorExt::limit()`]
 /// 
+#[derive(Clone, Debug)]
 pub struct LimitIterator<I> {
 	//		Private properties													
 	/// The iterator to limit.
@@ -49,10 +50,14 @@ impl<I: Iterator> Iterator for LimitIterator<I> {
 	
 	//		next																
 	fn next(&mut self) -> Option<Self::Item> {
+		#[cfg_attr(    feature = "reasons",  allow(clippy::arithmetic_side_effects, reason = "Range is controlled"))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::arithmetic_side_effects))]
 		if let Some(limit) = self.limit {
 			if self.count >= limit {
 				return None;
 			}
+			//	In this location, the count is guaranteed to not exceed the limit, so
+			//	this will not overflow and a checked_add() is not required.
 			self.count += 1;
 		}
 		self.iter.next()
@@ -204,14 +209,16 @@ pub trait PathExt {
 	/// Computes the canonicalized, absolute path of a file or directory, but
 	/// without expanding symlinks or checking existence. A path that starts
 	/// with `.` or without an initial separator will be interpreted relative to
-	/// the current working directory. Empty paths and paths of `.` alone will
-	/// result in the current working directory being returned.
+	/// the current working directory (or the filesystem root if the current
+	/// working directory is not accessible). Empty paths and paths of `.` alone
+	/// will result in the current working directory being returned.
 	/// 
 	/// This function will normalize the path by removing any `.` and `..`
 	/// segments and returning the "real" path. It does this without touching
 	/// the filesystem, and so is an abstract but also simpler version of
 	/// [`canonicalize()`](Path::canonicalize()), which does a number of
-	/// filesystem checks.
+	/// filesystem checks. It does check for the current working directory, on
+	/// which to base relative paths, but does not perform any other checks.
 	/// 
 	/// Key differences are that [`canonicalize()`](Path::canonicalize()) will
 	/// return an error if the path does not exist, and will resolve symlinks.
@@ -332,7 +339,7 @@ pub trait PathExt {
 
 impl PathExt for Path {
 	//		append																
-	fn append<P: AsRef<Path>>(&self, suffix: P) -> PathBuf {
+	fn append<P: AsRef<Self>>(&self, suffix: P) -> PathBuf {
 		PathBuf::from([
 			self.as_os_str().to_os_string(),
 			OsString::from(suffix.as_ref()),
@@ -340,23 +347,20 @@ impl PathExt for Path {
 	}
 	
 	//		is_subjective														
-	#[allow(clippy::iter_nth_zero)]
 	fn is_subjective(&self) -> bool {
-			self.is_relative()
-		&&	self.components().count() > 0
-		&&	(
-				self.components().nth(0).unwrap() == PathComponent::CurDir
-			||	self.components().nth(0).unwrap() == PathComponent::ParentDir
-			)
+		self.is_relative() && {
+			let mut components = self.components();
+			matches!(components.next(), Some(PathComponent::CurDir | PathComponent::ParentDir))
+		}
 	}
 	
 	//		normalize															
 	fn normalize(&self) -> PathBuf {
-		let cwd = env::current_dir().unwrap();
+		let cwd = env::current_dir().unwrap_or_else(|_| PathBuf::from("/"));
 		if self.as_os_str().is_empty() {
 			return cwd;
 		}
-		let mut segments: Vec<OsString> = vec!();
+		let mut segments: Vec<OsString> = vec![];
 		for (i, component) in self.components().enumerate() {
 			match component {
 				PathComponent::Prefix(_) |
@@ -376,7 +380,7 @@ impl PathExt for Path {
 						);
 					}
 					if component == PathComponent::ParentDir && segments.len() > 1 {
-						segments.pop();
+						drop(segments.pop());
 					}
 				},
 				PathComponent::Normal(_) => {
@@ -391,7 +395,7 @@ impl PathExt for Path {
 	}
 	
 	//		restrict															
-	fn restrict<P: AsRef<Path>>(&self, base: P) -> PathBuf {
+	fn restrict<P: AsRef<Self>>(&self, base: P) -> PathBuf {
 		let basepath = base.as_ref().normalize();
 		if self.as_os_str().is_empty() {
 			return basepath;
@@ -402,7 +406,7 @@ impl PathExt for Path {
 			basepath.join(self)
 		}.normalize();
 		if !path.starts_with(&basepath) {
-			path = basepath
+			path = basepath;
 		}
 		path
 	}
@@ -413,7 +417,7 @@ impl PathExt for Path {
 			return self.to_owned();
 		}
 		let mut at_start = true;
-		let mut segments: Vec<OsString> = vec!();
+		let mut segments: Vec<OsString> = vec![];
 		for component in self.components() {
 			match component {
 				PathComponent::Prefix(_) |
@@ -438,7 +442,7 @@ impl PathExt for Path {
 		if self.as_os_str().is_empty() || self.is_relative() {
 			return self.to_owned();
 		}
-		let mut segments: Vec<OsString> = vec!();
+		let mut segments: Vec<OsString> = vec![];
 		for component in self.components() {
 			match component {
 				PathComponent::Prefix(_) |

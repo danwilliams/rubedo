@@ -81,7 +81,6 @@ macro_rules! s {
 	};
 }
 
-#[allow(unused_imports)]
 pub use s;
 
 

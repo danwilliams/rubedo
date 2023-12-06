@@ -17,9 +17,14 @@ mod tests;
 
 //		Packages
 
-use crate::sugar::s;
 use base64::{DecodeError, engine::{Engine as _, general_purpose::STANDARD as BASE64}};
-use core::convert::Infallible;
+use core::{
+	cmp::Ordering,
+	convert::Infallible,
+	fmt::{Debug, Display, Write, self},
+	ops::{Add, AddAssign},
+	str::FromStr,
+};
 use futures::executor;
 use http::{Response, StatusCode};
 use http_body::combinators::UnsyncBoxBody;
@@ -28,15 +33,11 @@ use hyper::{
 	HeaderMap,
 	header::HeaderValue,
 };
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as DeError};
 use serde_json::Value as Json;
 use std::{
 	borrow::Cow,
-	cmp::Ordering,
 	error::Error,
-	fmt::{Debug, Display, Write, self},
-	ops::{Add, AddAssign},
-	str::FromStr,
 };
 
 
@@ -51,7 +52,13 @@ use std::{
 /// for display.
 /// 
 /// The default content type is [`Text`](ContentType::Text).
-#[derive(Copy, Clone, Debug, Default, PartialEq)]
+/// 
+/// This enum is exhaustive and will never have any additional variants added
+/// to it, as all possibilities are already covered.
+/// 
+#[cfg_attr(    feature = "reasons",  allow(clippy::exhaustive_enums, reason = "Exhaustive"))]
+#[cfg_attr(not(feature = "reasons"), allow(clippy::exhaustive_enums))]
+#[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
 pub enum ContentType {
 	/// The response body is text. It will be represented as an ordinary
 	/// [`String`] when serialised.
@@ -64,18 +71,23 @@ pub enum ContentType {
 }
 
 //		ResponseError															
+/// The possible errors that can occur when working with an HTTP response.
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum ResponseError {
-	ConversionError,
+	/// An error encountered while converting the response body to bytes.
+	ConversionError(Box<dyn Error>),
 }
 
 impl Display for ResponseError {
 	//		fmt																	
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		#[cfg_attr(    feature = "reasons",  allow(clippy::pattern_type_mismatch, reason = "Cannot dereference a Box"))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::pattern_type_mismatch))]
 		let description = match self {
-			ResponseError::ConversionError => s!("Error encountered while converting response body to bytes"),
+			Self::ConversionError(err) => format!("Error encountered while converting response body to bytes: {err}"),
 		};
-		write!(f, "{}", description)
+		write!(f, "{description}")
 	}
 }
 
@@ -113,8 +125,8 @@ impl Error for ResponseError {}
 /// 
 /// # See also
 /// 
-/// * [`axum::response`]
-/// * [`axum::response::Response`]
+/// * [`axum::response`](https://docs.rs/axum/latest/axum/response/index.html)
+/// * [`axum::response::Response`](https://docs.rs/axum/latest/axum/response/type.Response.html)
 /// * [`http::Response`]
 /// * [`hyper::Response`]
 /// * [`ResponseExt`]
@@ -122,6 +134,7 @@ impl Error for ResponseError {}
 /// * [`UnpackedResponseHeader`]
 /// 
 #[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct UnpackedResponse {
 	//		Public properties													
 	/// The response status code. This is an enum, so is not directly comparable
@@ -168,10 +181,15 @@ impl PartialEq for UnpackedResponse {
 /// purpose of this struct is to formalise the data structure used by
 /// [`UnpackedResponse`] for storing headers.
 /// 
+/// No other properties are planned or logically considerable at present, and so
+/// this struct is seen as being exhaustive.
+/// 
 /// # See also
 /// 
 /// * [`UnpackedResponse`]
 /// 
+#[cfg_attr(    feature = "reasons",  allow(clippy::exhaustive_structs, reason = "Exhaustive"))]
+#[cfg_attr(not(feature = "reasons"), allow(clippy::exhaustive_structs))]
 #[derive(Debug, Deserialize, Serialize)]
 pub struct UnpackedResponseHeader {
 	//		Public properties													
@@ -232,6 +250,7 @@ impl PartialEq for UnpackedResponseHeader {
 /// * [`UnpackedResponse`]
 /// 
 #[derive(Default)]
+#[non_exhaustive]
 pub struct UnpackedResponseBody {
 	//		Private properties													
 	/// The response body as a vector of bytes. The data originates from the
@@ -272,7 +291,8 @@ impl UnpackedResponseBody {
 	/// * [`UnpackedResponseBody::is_text()`]
 	/// * [`UnpackedResponseBody::set_content_type()`]
 	/// 
-	pub fn content_type(&self) -> ContentType {
+	#[must_use]
+	pub const fn content_type(&self) -> ContentType {
 		self.content_type
 	}
 	
@@ -301,19 +321,21 @@ impl UnpackedResponseBody {
 	/// * [`UnpackedResponseBody::content_type()`]
 	/// * [`UnpackedResponseBody::is_text()`]
 	/// 
+	#[must_use]
 	pub fn is_binary(&self) -> bool {
 		self.content_type == ContentType::Binary
 	}
 	
 	//		is_text																
 	/// Returns whether the response body is text.
-	///
+	/// 
 	/// # See also
-	///
+	/// 
 	/// * [`ContentType`]
 	/// * [`UnpackedResponseBody::content_type()`]
 	/// * [`UnpackedResponseBody::is_binary()`]
-	///
+	/// 
+	#[must_use]
 	pub fn is_text(&self) -> bool {
 		self.content_type == ContentType::Text
 	}
@@ -347,6 +369,7 @@ impl UnpackedResponseBody {
 	/// * [`UnpackedResponseBody::into_bytes()`]
 	/// * [`UnpackedResponseBody::to_bytes()`]
 	/// 
+	#[must_use]
 	pub fn as_bytes(&self) -> &[u8] {
 		&self.body
 	}
@@ -427,6 +450,7 @@ impl UnpackedResponseBody {
 	/// * [`UnpackedResponseBody::as_mut_bytes()`]
 	/// * [`UnpackedResponseBody::to_bytes()`]
 	/// 
+	#[must_use]
 	pub fn into_bytes(self) -> Vec<u8> {
 		self.body
 	}
@@ -467,6 +491,7 @@ impl UnpackedResponseBody {
 	/// * [`UnpackedResponseBody::as_mut_bytes()`]
 	/// * [`UnpackedResponseBody::into_bytes()`]
 	/// 
+	#[must_use]
 	pub fn to_bytes(&self) -> Vec<u8> {
 		self.body.clone()
 	}
@@ -483,6 +508,7 @@ impl UnpackedResponseBody {
 	/// 
 	/// * [`UnpackedResponseBody::from_base64()`]
 	/// 
+	#[must_use]
 	pub fn to_base64(&self) -> String {
 		BASE64.encode(&self.body)
 	}
@@ -498,6 +524,12 @@ impl UnpackedResponseBody {
 	/// 
 	/// Note that unlike the [`From`] type conversion implementations, this
 	/// returns a [`Result`].
+	/// 
+	/// # Errors
+	/// 
+	/// This method will return an error if the input string is not valid
+	/// base64. Such an error will be returned as a [`DecodeError`], which is
+	/// passed through from the [`base64`] crate.
 	/// 
 	/// # See also
 	/// 
@@ -526,6 +558,7 @@ impl UnpackedResponseBody {
 	/// creating a new response body with [`UnpackedResponseBody::new()`], but
 	/// without having to supply any parameters.
 	/// 
+	#[must_use]
 	pub fn empty() -> Self {
 		Self { body: Vec::new(), ..Default::default() }
 	}
@@ -536,6 +569,7 @@ impl UnpackedResponseBody {
 	/// This method returns whether the response body is empty. This is
 	/// equivalent to checking whether the length of the response body is zero.
 	/// 
+	#[must_use]
 	pub fn is_empty(&self) -> bool {
 		self.body.is_empty()
 	}
@@ -547,6 +581,7 @@ impl UnpackedResponseBody {
 	/// equivalent to the length of the vector of bytes that the response body
 	/// contains.
 	/// 
+	#[must_use]
 	pub fn len(&self) -> usize {
 		self.body.len()
 	}
@@ -581,7 +616,7 @@ impl UnpackedResponseBody {
 	/// * [`UnpackedResponseBody::push_str()`]
 	/// 
 	pub fn push(&mut self, byte: u8) {
-		self.body.push(byte)
+		self.body.push(byte);
 	}
 	
 	//		push_bytes															
@@ -626,6 +661,8 @@ impl UnpackedResponseBody {
 	pub fn push_char(&mut self, char: &char) {
 		let mut bytes = [0; 4];
 		let used      = char.encode_utf8(&mut bytes).len();
+		#[cfg_attr(    feature = "reasons",  allow(clippy::indexing_slicing, reason = "Infallible"))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::indexing_slicing))]
 		self.body.extend(&bytes[..used]);
 	}
 	
@@ -786,7 +823,7 @@ impl Add<&Vec<u8>> for UnpackedResponseBody {
 	}
 }
 
-impl Add<UnpackedResponseBody> for UnpackedResponseBody {
+impl Add<Self> for UnpackedResponseBody {
 	type Output = Self;
 	
 	//		add																	
@@ -797,7 +834,7 @@ impl Add<UnpackedResponseBody> for UnpackedResponseBody {
 	}
 }
 
-impl Add<&UnpackedResponseBody> for UnpackedResponseBody {
+impl Add<&Self> for UnpackedResponseBody {
 	type Output = Self;
 	
 	//		add																	
@@ -908,7 +945,7 @@ impl AddAssign<&Vec<u8>> for UnpackedResponseBody {
 	}
 }
 
-impl AddAssign<UnpackedResponseBody> for UnpackedResponseBody {
+impl AddAssign<Self> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds an [`UnpackedResponseBody`] to an [`UnpackedResponseBody`].
 	fn add_assign(&mut self, other: Self) {
@@ -916,7 +953,7 @@ impl AddAssign<UnpackedResponseBody> for UnpackedResponseBody {
 	}
 }
 
-impl AddAssign<&UnpackedResponseBody> for UnpackedResponseBody {
+impl AddAssign<&Self> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds an [`&UnpackedResponseBody`](UnpackedResponseBody) to an
 	/// [`UnpackedResponseBody`].
@@ -988,7 +1025,7 @@ impl Display for UnpackedResponseBody {
 			ContentType::Text   => String::from_utf8_lossy(&self.body),
 			ContentType::Binary => Cow::Owned(self.to_base64()),
 		};
-		write!(f, "{}", body)
+		write!(f, "{body}")
 	}
 }
 
@@ -997,7 +1034,7 @@ impl From<&[u8]> for UnpackedResponseBody {
 	/// Converts a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html)
 	/// to an [`UnpackedResponseBody`].
 	fn from(b: &[u8]) -> Self {
-		UnpackedResponseBody { body: b.to_vec(), ..Default::default() }
+		Self { body: b.to_vec(), ..Default::default() }
 	}
 }
 
@@ -1006,7 +1043,7 @@ impl<const N: usize> From<&[u8; N]> for UnpackedResponseBody {
 	/// Converts a [`&[u8; N]`](https://doc.rust-lang.org/std/primitive.slice.html)
 	/// to an [`UnpackedResponseBody`].
 	fn from(b: &[u8; N]) -> Self {
-		UnpackedResponseBody { body: b.to_vec(), ..Default::default() }
+		Self { body: b.to_vec(), ..Default::default() }
 	}
 }
 
@@ -1041,6 +1078,8 @@ impl From<char> for UnpackedResponseBody {
 	fn from(c: char) -> Self {
 		let mut bytes = [0; 4];
 		let used      = c.encode_utf8(&mut bytes).len();
+		#[cfg_attr(    feature = "reasons",  allow(clippy::indexing_slicing, reason = "Infallible"))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::indexing_slicing))]
 		Self { body: bytes[..used].to_vec(), ..Default::default() }
 	}
 }
@@ -1075,11 +1114,8 @@ impl From<HyperBody> for UnpackedResponseBody {
 	/// Converts a [`UnsyncBoxBody<Bytes, E>`](UnsyncBoxBody) to an
 	/// [`UnpackedResponseBody`].
 	fn from(b: HyperBody) -> Self {
-		let bytes    =  executor::block_on(to_bytes(b));
-		let body     =  match bytes {
-			Ok(body) => body.to_vec(),
-			Err(_)   => b"Conversion error".to_vec(),
-		};
+		let bytes = executor::block_on(to_bytes(b));
+		let body  = bytes.map_or_else(|_| b"Conversion error".to_vec(), |body| body.to_vec());
 		Self { body, ..Default::default() }
 	}
 }
@@ -1142,11 +1178,8 @@ where
 	/// Converts a [`UnsyncBoxBody<Bytes, E>`](UnsyncBoxBody) to an
 	/// [`UnpackedResponseBody`].
 	fn from(b: UnsyncBoxBody<Bytes, E>) -> Self {
-		let bytes    =  executor::block_on(to_bytes(b));
-		let body     =  match bytes {
-			Ok(body) => body.to_vec(),
-			Err(_)   => b"Conversion error".to_vec(),
-		};
+		let bytes = executor::block_on(to_bytes(b));
+		let body  = bytes.map_or_else(|_| b"Conversion error".to_vec(), |body| body.to_vec());
 		Self { body, ..Default::default() }
 	}
 }
@@ -1251,6 +1284,10 @@ impl <'de> Deserialize<'de> for UnpackedResponseBody {
 		D: Deserializer<'de>,
 	{
 		let string = String::deserialize(deserializer)?;
+		#[cfg_attr(    feature = "reasons",  allow(clippy::option_if_let_else,
+			reason = "Using map_or_else() here would not be as clear, and no more concise"
+		))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::option_if_let_else))]
 		match BASE64.decode(&string) {
 			Ok(decoded) => Ok(Self { body: decoded,             content_type: ContentType::Binary }),
 			Err(_)      => Ok(Self { body: string.into_bytes(), content_type: ContentType::Text }),
@@ -1292,10 +1329,21 @@ pub trait ResponseExt {
 	/// body matches, this is fine, as the data is known and constrained, and
 	/// memory/performance is less of a concern.
 	/// 
+	/// # Errors
+	/// 
+	/// This function will potentially return an error if the response body
+	/// cannot be converted to bytes. This should not happen under normal
+	/// circumstances, but it may be possible if the response body is streamed
+	/// and the stream cannot be read. Many implementations of this function are
+	/// in fact infallible.
+	/// 
+	/// At present [`ResponseError`] only contains one error variant, but it is
+	/// possible that more will be added.
+	/// 
 	/// # See also
 	/// 
-	/// * [`axum::response`]
-	/// * [`axum::response::Response`]
+	/// * [`axum::response`](https://docs.rs/axum/latest/axum/response/index.html)
+	/// * [`axum::response::Response`](https://docs.rs/axum/latest/axum/response/type.Response.html)
 	/// * [`http::Response`]
 	/// * [`hyper::Response`]
 	/// * [`UnpackedResponse`]
@@ -1306,7 +1354,7 @@ pub trait ResponseExt {
 impl ResponseExt for Response<()> {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
-		Ok(convert_response(self.status(), self.headers(), Bytes::new()))
+		Ok(convert_response(self.status(), self.headers(), &Bytes::new()))
 	}
 }
 
@@ -1316,10 +1364,10 @@ where
 {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
-		let body = executor::block_on(to_bytes(self.body_mut()));
-		match body {
-			Ok(body) => Ok(convert_response(self.status(), self.headers(), body)),
-			Err(_)   => Err(ResponseError::ConversionError),
+		let result = executor::block_on(to_bytes(self.body_mut()));
+		match result {
+			Ok(body) => Ok(convert_response(self.status(), self.headers(), &body)),
+			Err(err) => Err(ResponseError::ConversionError(Box::new(err))),
 		}
 	}
 }
@@ -1327,10 +1375,10 @@ where
 impl ResponseExt for Response<HyperBody> {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
-		let body = executor::block_on(to_bytes(self.body_mut()));
-		match body {
-			Ok(body) => Ok(convert_response(self.status(), self.headers(), body)),
-			Err(_)   => Err(ResponseError::ConversionError),
+		let result = executor::block_on(to_bytes(self.body_mut()));
+		match result {
+			Ok(body) => Ok(convert_response(self.status(), self.headers(), &body)),
+			Err(err) => Err(ResponseError::ConversionError(Box::new(err))),
 		}
 	}
 }
@@ -1338,8 +1386,11 @@ impl ResponseExt for Response<HyperBody> {
 impl ResponseExt for Response<String> {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
-		let body = executor::block_on(to_bytes(self.body_mut())).unwrap();  //  Infallible
-		Ok(convert_response(self.status(), self.headers(), body))
+		let result = executor::block_on(to_bytes(self.body_mut()));
+		match result {
+			Ok(body) => Ok(convert_response(self.status(), self.headers(), &body)),
+			Err(err) => Err(ResponseError::ConversionError(Box::new(err))),
+		}
 	}
 }
 
@@ -1363,6 +1414,8 @@ impl ResponseExt for Response<String> {
 /// 
 fn convert_headers(headermap: &HeaderMap<HeaderValue>) -> Vec<UnpackedResponseHeader> {
 	let mut headers = vec![];
+	#[cfg_attr(    feature = "reasons",  allow(clippy::shadow_reuse, reason = "Clear purpose"))]
+	#[cfg_attr(not(feature = "reasons"), allow(clippy::shadow_reuse))]
 	for (name, value) in headermap {
 		let name    = name.as_str().to_owned();
 		let value   = String::from_utf8_lossy(value.as_bytes()).into_owned();
@@ -1370,8 +1423,9 @@ fn convert_headers(headermap: &HeaderMap<HeaderValue>) -> Vec<UnpackedResponseHe
 	}
 	headers.sort_by(|a, b| {
 		match a.name.cmp(&b.name) {
-			Ordering::Equal => a.value.cmp(&b.value),
-			other           => other,
+			Ordering::Equal   => a.value.cmp(&b.value),
+			Ordering::Greater => Ordering::Greater,
+			Ordering::Less    => Ordering::Less,
 		}
 	});
 	headers
@@ -1392,9 +1446,9 @@ fn convert_headers(headermap: &HeaderMap<HeaderValue>) -> Vec<UnpackedResponseHe
 /// * `body`    - The response body.
 /// 
 /// # See also
-///
-/// * [`axum::response`]
-/// * [`axum::response::Response`]
+/// 
+/// * [`axum::response`](https://docs.rs/axum/latest/axum/response/index.html)
+/// * [`axum::response::Response`](https://docs.rs/axum/latest/axum/response/type.Response.html)
 /// * [`http::Response`]
 /// * [`hyper::Response`]
 /// * [`ResponseExt::unpack()`]
@@ -1404,7 +1458,7 @@ fn convert_headers(headermap: &HeaderMap<HeaderValue>) -> Vec<UnpackedResponseHe
 fn convert_response(
 	status:  StatusCode,
 	headers: &HeaderMap<HeaderValue>,
-	body:    Bytes,
+	body:    &Bytes,
 ) -> UnpackedResponse {
 	UnpackedResponse {
 		status,
@@ -1415,23 +1469,25 @@ fn convert_response(
 
 //		serialize_status_code													
 /// Returns the status code as a number.
-///
+/// 
 /// This function is used by [`serde`] to serialise the status code as a number
 /// rather than an enum. This is necessary because the [`UnpackedResponse`]
 /// struct is used for comparison, and the status code is not directly
 /// comparable to a number.
-///
+/// 
 /// # Parameters
-///
+/// 
 /// * `status_code` - The status code to serialise.
 /// * `serializer`  - The serialiser to use.
-///
+/// 
 /// # See also
-///
+/// 
 /// * [`deserialize_status_code()`]
 /// * [`http::StatusCode`]
 /// * [`UnpackedResponse`]
-///
+/// 
+#[cfg_attr(    feature = "reasons",  allow(clippy::trivially_copy_pass_by_ref, reason = "Needs to match trait"))]
+#[cfg_attr(not(feature = "reasons"), allow(clippy::trivially_copy_pass_by_ref))]
 fn serialize_status_code<S>(status_code: &StatusCode, serializer: S) -> Result<S::Ok, S::Error>
 where
 	S: Serializer,
@@ -1441,28 +1497,28 @@ where
 
 //		deserialize_status_code													
 /// Returns the status code as an enum.
-///
+/// 
 /// This function is used by [`serde`] to deserialise the status code as an
 /// enum rather than a number. This is necessary because the
 /// [`UnpackedResponse`] struct is used for comparison, and the status code is
 /// not directly comparable to a number.
-///
+/// 
 /// # Parameters
-///
+/// 
 /// * `deserializer` - The deserialiser to use.
-///
+/// 
 /// # See also
-///
+/// 
 /// * [`http::StatusCode`]
 /// * [`serialize_status_code()`]
 /// * [`UnpackedResponse`]
-///
+/// 
 fn deserialize_status_code<'de, D>(deserializer: D) -> Result<StatusCode, D::Error>
 where
 	D: Deserializer<'de>,
 {
 	let status_code_value: u16 = Deserialize::deserialize(deserializer)?;
-	let status_code            = StatusCode::from_u16(status_code_value).map_err(serde::de::Error::custom)?;
+	let status_code            = StatusCode::from_u16(status_code_value).map_err(DeError::custom)?;
 	Ok(status_code)
 }
 

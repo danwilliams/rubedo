@@ -8,20 +8,31 @@ mod response_error {
 	use super::super::*;
 	use claims::assert_err;
 	
+	#[derive(Debug)]
+	struct TestError;
+	
+	impl Display for TestError {
+		fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+			write!(f, "Test error")
+		}
+	}
+	
+	impl Error for TestError {}
+	
 	//		debug																
 	#[test]
 	fn debug() {
-		let err = Err::<ResponseError, _>(ResponseError::ConversionError);
+		let err = Err::<ResponseError, _>(ResponseError::ConversionError(Box::new(TestError)));
 		assert_err!(&err);
-		assert_eq!(format!("{:?}", err), "Err(ConversionError)");
+		assert_eq!(format!("{:?}", err), "Err(ConversionError(TestError))");
 	}
 	
 	//		display																
 	#[test]
 	fn display() {
-		let err = Err::<ResponseError, _>(ResponseError::ConversionError);
+		let err = Err::<ResponseError, _>(ResponseError::ConversionError(Box::new(TestError)));
 		assert_err!(&err);
-		assert_eq!(err.unwrap_err().to_string(), "Error encountered while converting response body to bytes");
+		assert_eq!(err.unwrap_err().to_string(), "Error encountered while converting response body to bytes: Test error");
 	}
 }
 
@@ -174,6 +185,7 @@ mod unpacked_response {
 #[cfg(test)]
 mod unpacked_response_header {
 	use super::super::*;
+	use crate::sugar::s;
 	use assert_json_diff::assert_json_eq;
 	use claims::assert_ok_eq;
 	use serde_json::json;
@@ -276,10 +288,10 @@ mod unpacked_response_body__struct {
 		let mut body = UnpackedResponseBody { body: b"".to_vec(), ..Default::default() };
 		assert_eq!(body.content_type(), ContentType::Text);
 		
-		body.set_content_type(ContentType::Binary);
+		_ = body.set_content_type(ContentType::Binary);
 		assert_eq!(body.content_type(), ContentType::Binary);
 		
-		body.set_content_type(ContentType::Text);
+		_ = body.set_content_type(ContentType::Text);
 		assert_eq!(body.content_type(), ContentType::Text);
 		
 		let mut clone = body.clone();
@@ -294,10 +306,10 @@ mod unpacked_response_body__struct {
 		let mut body = UnpackedResponseBody { body: b"".to_vec(), ..Default::default() };
 		assert_eq!(body.is_binary(), false);
 		
-		body.set_content_type(ContentType::Binary);
+		_ = body.set_content_type(ContentType::Binary);
 		assert_eq!(body.is_binary(), true);
 		
-		body.set_content_type(ContentType::Text);
+		_ = body.set_content_type(ContentType::Text);
 		assert_eq!(body.is_binary(), false);
 	}
 	
@@ -307,10 +319,10 @@ mod unpacked_response_body__struct {
 		let mut body = UnpackedResponseBody { body: b"".to_vec(), ..Default::default() };
 		assert_eq!(body.is_text(), true);
 		
-		body.set_content_type(ContentType::Binary);
+		_ = body.set_content_type(ContentType::Binary);
 		assert_eq!(body.is_text(), false);
 		
-		body.set_content_type(ContentType::Text);
+		_ = body.set_content_type(ContentType::Text);
 		assert_eq!(body.is_text(), true);
 	}
 	
@@ -505,6 +517,7 @@ mod unpacked_response_body__struct {
 #[cfg(test)]
 mod unpacked_response_body__traits {
 	use super::super::*;
+	use crate::sugar::s;
 	use assert_json_diff::assert_json_eq;
 	use claims::{assert_ok, assert_ok_eq};
 	use serde_json::json;
@@ -1306,7 +1319,7 @@ mod functions {
 	#[test]
 	fn convert_headers__basic() {
 		let mut headers = HeaderMap::new();
-		headers.insert("foo", HeaderValue::from_static("bar"));
+		drop(headers.insert("foo", HeaderValue::from_static("bar")));
 		let converted   = convert_headers(&headers);
 		let crafted     = vec![
 			UnpackedResponseHeader {
@@ -1319,7 +1332,7 @@ mod functions {
 	#[test]
 	fn convert_headers__textcase() {
 		let mut headers = HeaderMap::new();
-		headers.insert("Foo", HeaderValue::from_static("Bar"));
+		drop(headers.insert("Foo", HeaderValue::from_static("Bar")));
 		let converted   = convert_headers(&headers);
 		let crafted     = vec![
 			UnpackedResponseHeader {
@@ -1332,8 +1345,8 @@ mod functions {
 	#[test]
 	fn convert_headers__order() {
 		let mut headers = HeaderMap::new();
-		headers.insert("foo", HeaderValue::from_static("bar"));
-		headers.insert("bar", HeaderValue::from_static("baz"));
+		drop(headers.insert("foo", HeaderValue::from_static("bar")));
+		drop(headers.insert("bar", HeaderValue::from_static("baz")));
 		let converted   = convert_headers(&headers);
 		let crafted1    = vec![
 			UnpackedResponseHeader {
@@ -1361,9 +1374,9 @@ mod functions {
 	#[test]
 	fn convert_headers__duplicates() {
 		let mut headers = HeaderMap::new();
-		headers.append("foo", HeaderValue::from_static("bar"));
-		headers.append("bar", HeaderValue::from_static("baz"));
-		headers.append("foo", HeaderValue::from_static("baz"));
+		_               = headers.append("foo", HeaderValue::from_static("bar"));
+		_               = headers.append("bar", HeaderValue::from_static("baz"));
+		_               = headers.append("foo", HeaderValue::from_static("baz"));
 		let converted   = convert_headers(&headers);
 		let crafted     = vec![
 			UnpackedResponseHeader {
@@ -1384,9 +1397,9 @@ mod functions {
 	#[test]
 	fn convert_headers__no_duplicates() {
 		let mut headers = HeaderMap::new();
-		headers.insert("foo", HeaderValue::from_static("bar"));
-		headers.insert("bar", HeaderValue::from_static("baz"));
-		headers.insert("foo", HeaderValue::from_static("baz"));
+		drop(headers.insert("foo", HeaderValue::from_static("bar")));
+		drop(headers.insert("bar", HeaderValue::from_static("baz")));
+		drop(headers.insert("foo", HeaderValue::from_static("baz")));
 		let converted   = convert_headers(&headers);
 		let crafted     = vec![
 			UnpackedResponseHeader {
@@ -1405,8 +1418,8 @@ mod functions {
 	#[test]
 	fn convert_response__basic() {
 		let mut headers  = HeaderMap::new();
-		headers.insert("foo", HeaderValue::from_static("bar"));
-		let converted    = convert_response(StatusCode::OK, &headers, Bytes::from("This is a test"));
+		drop(headers.insert("foo", HeaderValue::from_static("bar")));
+		let converted    = convert_response(StatusCode::OK, &headers, &Bytes::from("This is a test"));
 		let crafted      = UnpackedResponse {
 			status:        StatusCode::OK,
 			headers:       vec![

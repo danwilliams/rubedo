@@ -23,14 +23,17 @@ use chrono::{prelude::*, Duration, NaiveDate, Utc};
 //§		DurationExt																
 /// This trait provides additional functionality to [`Duration`].
 pub trait DurationExt {
+	/// The units used by [`humanize()`](DurationExt::humanize()). These
+	/// determine the units that will be used to represent a duration, with the
+	/// largest possible unit being used.
 	const UNITS:   [(i64, &'static str); 7] = [
-		(31536000, "year"),    //  60 * 60 * 24 * 365
-		(2592000,  "month"),   //  60 * 60 * 24 * 30
-		(604800,   "week"),    //  60 * 60 * 24 * 7
-		(86400,    "day"),     //  60 * 60 * 24
-		(3600,     "hour"),    //  60 * 60
-		(60,       "minute"),  //  60
-		(1,        "second"),  //  1
+		(31_536_000, "year"),    //  60 * 60 * 24 * 365
+		( 2_592_000, "month"),   //  60 * 60 * 24 * 30
+		(   604_800, "week"),    //  60 * 60 * 24 * 7
+		(    86_400, "day"),     //  60 * 60 * 24
+		(     3_600, "hour"),    //  60 * 60
+		(        60, "minute"),  //  60
+		(         1, "second"),  //  1
 	];
 	
 	//		humanize															
@@ -47,8 +50,16 @@ impl DurationExt for Duration {
 	//		humanize															
 	fn humanize(&self) -> String {
 		let seconds = self.num_seconds();
-		for (unit, name) in Self::UNITS.iter() {
-			if seconds >= *unit {
+		for &(unit, name) in &Self::UNITS {
+			if seconds >= unit {
+				#[cfg_attr(    feature = "reasons",  allow(clippy::arithmetic_side_effects,
+					reason = "Precision is not needed here, and unit cannot be zero"
+				))]
+				#[cfg_attr(not(feature = "reasons"), allow(clippy::arithmetic_side_effects))]
+				#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division,
+					reason = "Precision is not needed here"
+				))]
+				#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
 				let count = seconds / unit;
 				return format!("{} {}{}", count, name, if count == 1 { "" } else { "s" });
 			}
@@ -299,6 +310,8 @@ impl NaiveDateExt for NaiveDate {
 	
 	//		days_in_month														
 	fn days_in_month(&self) -> u32 {
+		#[cfg_attr(    feature = "reasons",  allow(clippy::unwrap_used, reason = "Infallible"))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::unwrap_used))]
 		Self::days_in_month_opt(self.year(), self.month()).unwrap()
 	}
 	
@@ -309,6 +322,8 @@ impl NaiveDateExt for NaiveDate {
 	
 	//		days_in_year														
 	fn days_in_year(&self) -> u32 {
+		#[cfg_attr(    feature = "reasons",  allow(clippy::unwrap_used, reason = "Infallible"))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::unwrap_used))]
 		Self::days_in_year_opt(self.year()).unwrap()
 	}
 	
@@ -319,6 +334,8 @@ impl NaiveDateExt for NaiveDate {
 	
 	//		is_leap_year														
 	fn is_leap_year(&self) -> bool {
+		#[cfg_attr(    feature = "reasons",  allow(clippy::unwrap_used, reason = "Infallible"))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::unwrap_used))]
 		Self::is_leap_year_opt(self.year()).unwrap()
 	}
 	
@@ -329,6 +346,8 @@ impl NaiveDateExt for NaiveDate {
 	
 	//		start_of_month														
 	fn start_of_month(&self) -> Self {
+		#[cfg_attr(    feature = "reasons",  allow(clippy::unwrap_used, reason = "Infallible"))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::unwrap_used))]
 		Self::start_of_month_opt(self.year(), self.month()).unwrap()
 	}
 	
@@ -339,12 +358,19 @@ impl NaiveDateExt for NaiveDate {
 	
 	//		end_of_month														
 	fn end_of_month(&self) -> Self {
+		#[cfg_attr(    feature = "reasons",  allow(clippy::unwrap_used, reason = "Infallible"))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::unwrap_used))]
 		Self::end_of_month_opt(self.year(), self.month()).unwrap()
 	}
 	
 	//		end_of_month_opt													
 	fn end_of_month_opt(year: i32, month: u32) -> Option<Self> {
-		Self::from_ymd_opt(year, month, 1)?;
+		_ = Self::from_ymd_opt(year, month, 1)?;
+		//	The range of years is controlled by having already validated the date
+		//	by attempting to create it above. This is well within the range of a u32.
+		//	The same applies to the month.
+		#[cfg_attr(    feature = "reasons",  allow(clippy::arithmetic_side_effects, reason = "Range is controlled"))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::arithmetic_side_effects))]
 		Self::from_ymd_opt(
 			if month == 12 { year + 1 } else { year      },
 			if month == 12 { month    } else { month + 1 },
@@ -354,6 +380,8 @@ impl NaiveDateExt for NaiveDate {
 	
 	//		start_of_year														
 	fn start_of_year(&self) -> Self {
+		#[cfg_attr(    feature = "reasons",  allow(clippy::unwrap_used, reason = "Infallible"))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::unwrap_used))]
 		Self::start_of_year_opt(self.year()).unwrap()
 	}
 	
@@ -364,6 +392,8 @@ impl NaiveDateExt for NaiveDate {
 	
 	//		end_of_year															
 	fn end_of_year(&self) -> Self {
+		#[cfg_attr(    feature = "reasons",  allow(clippy::unwrap_used, reason = "Infallible"))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::unwrap_used))]
 		Self::end_of_year_opt(self.year()).unwrap()
 	}
 	
