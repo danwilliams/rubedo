@@ -139,12 +139,13 @@ mod tests;
 
 //		Packages
 
-use crate::std::AsStr;
+use crate::std::{AsStr, FromIntWithScale, ToIntWithScale};
 use core::{
 	fmt::Display,
 	str::FromStr,
 };
-use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as DeError};
+use rust_decimal::Decimal;
+use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as DeError, ser::Error as SerError};
 
 
 
@@ -762,6 +763,526 @@ where
 	D:        Deserializer<'de>,
 {
 	String::deserialize(deserializer).and_then(|value| T::try_from(value).map_err(DeError::custom))
+}
+
+//		try_from_int_with_scale													
+/// Converts an integer to a floating-point number with scale.
+/// 
+/// This function takes an integer which represents a decimal value to a
+/// specified number of decimal places, and converts it to a floating-point
+/// number. So for instance, the integer `12345` could be converted to the
+/// floating-point number `123.45` if the scale is 2.
+/// 
+/// It is intended for use by [`serde`], indirectly when using the following
+/// convenience functions with [`#[serde(deserialize_with)]`]:
+/// 
+/// ```ignore
+/// #[serde(deserialize_with = "try_from_int_1dp::<T, i64, __D>")]
+/// #[serde(deserialize_with = "try_from_int_2dp::<T, i64, __D>")]
+/// #[serde(deserialize_with = "try_from_int_3dp::<T, i64, __D>")]
+/// #[serde(deserialize_with = "try_from_int_4dp::<T, i64, __D>")]
+/// ```
+/// 
+/// Note that the examples above will specify [`i64`] as the concrete type that
+/// the deserialiser will attempt to deserialise from. Any integer type can be
+/// used here, or indeed any type recognised by an implementation of
+/// [`FromIntWithScale`], but it must be specified explicitly.
+/// 
+/// # Parameters
+/// 
+/// * `deserializer` - The deserialiser to use.
+/// * `scale`        - The scale factor, i.e. the number of decimal places. Note
+///                    that this is essentially limited to a maximum of 19 DP of
+///                    movement for an [`f32`] or [`f64`] without overflowing,
+///                    and 28 DP for a [`Decimal`].
+/// 
+/// # Errors
+/// 
+/// This function will return an error if the deserialised value cannot be
+/// converted to the required type. The error will be a [`DeError`], which is
+/// passed through from the [`serde`] crate.
+/// 
+/// It will also return an error if the conversion from the integer to `T`
+/// fails. The nature of this error will be specific to the type being converted
+/// to.
+/// 
+/// # See also
+/// 
+/// * [`from_cents()`]
+/// * [`from_pence()`]
+/// * [`try_from_int_1dp()`]
+/// * [`try_from_int_2dp()`]
+/// * [`try_from_int_3dp()`]
+/// * [`try_from_int_4dp()`]
+/// * [`try_to_int_with_scale()`]
+/// 
+pub fn try_from_int_with_scale<'de, T, U, D>(deserializer: D, scale: u8) -> Result<T, D::Error>
+where
+	T: FromIntWithScale<U>,
+	U: Deserialize<'de>,
+	D: Deserializer<'de>,
+{
+	U::deserialize(deserializer).and_then(|value| {
+		T::from_int_with_scale(value, scale).ok_or_else(|| DeError::custom("Failed to convert from integer with scale"))
+	})
+}
+
+//		try_from_int_1dp														
+/// Converts an integer to a floating-point number to 1 decimal place.
+/// 
+/// This is a convenience function - see [`try_from_int_with_scale()`].
+/// 
+/// # Parameters
+/// 
+/// * `deserializer` - The deserialiser to use.
+/// 
+/// # Errors
+/// 
+/// See [`try_from_int_with_scale()`].
+/// 
+/// # See also
+/// 
+/// * [`try_from_int_2dp()`]
+/// * [`try_from_int_3dp()`]
+/// * [`try_from_int_4dp()`]
+/// * [`try_to_int_1dp()`]
+/// 
+pub fn try_from_int_1dp<'de, T, U, D>(deserializer: D) -> Result<T, D::Error>
+where
+	T: FromIntWithScale<U>,
+	U: Deserialize<'de>,
+	D: Deserializer<'de>,
+{
+	try_from_int_with_scale(deserializer, 1)
+}
+
+//		try_from_int_2dp														
+/// Converts an integer to a floating-point number to 2 decimal places.
+/// 
+/// This is a convenience function - see [`try_from_int_with_scale()`].
+/// 
+/// # Parameters
+/// 
+/// * `deserializer` - The deserialiser to use.
+/// 
+/// # Errors
+/// 
+/// See [`try_from_int_with_scale()`].
+/// 
+/// # See also
+/// 
+/// * [`from_cents()`]
+/// * [`from_pence()`]
+/// * [`try_from_int_1dp()`]
+/// * [`try_from_int_3dp()`]
+/// * [`try_from_int_4dp()`]
+/// * [`try_to_int_2dp()`]
+/// 
+pub fn try_from_int_2dp<'de, T, U, D>(deserializer: D) -> Result<T, D::Error>
+where
+	T: FromIntWithScale<U>,
+	U: Deserialize<'de>,
+	D: Deserializer<'de>,
+{
+	try_from_int_with_scale(deserializer, 2)
+}
+
+//		try_from_int_3dp														
+/// Converts an integer to a floating-point number to 3 decimal places.
+/// 
+/// This is a convenience function - see [`try_from_int_with_scale()`].
+/// 
+/// # Parameters
+/// 
+/// * `deserializer` - The deserialiser to use.
+/// 
+/// # Errors
+/// 
+/// See [`try_from_int_with_scale()`].
+/// 
+/// # See also
+/// 
+/// * [`try_from_int_1dp()`]
+/// * [`try_from_int_2dp()`]
+/// * [`try_from_int_4dp()`]
+/// * [`try_to_int_3dp()`]
+/// 
+pub fn try_from_int_3dp<'de, T, U, D>(deserializer: D) -> Result<T, D::Error>
+where
+	T: FromIntWithScale<U>,
+	U: Deserialize<'de>,
+	D: Deserializer<'de>,
+{
+	try_from_int_with_scale(deserializer, 3)
+}
+
+//		try_from_int_4dp														
+/// Converts an integer to a floating-point number to 4 decimal places.
+/// 
+/// This is a convenience function - see [`try_from_int_with_scale()`].
+/// 
+/// # Parameters
+/// 
+/// * `deserializer` - The deserialiser to use.
+/// 
+/// # Errors
+/// 
+/// See [`try_from_int_with_scale()`].
+/// 
+/// # See also
+/// 
+/// * [`try_from_int_1dp()`]
+/// * [`try_from_int_2dp()`]
+/// * [`try_from_int_3dp()`]
+/// * [`try_to_int_4dp()`]
+/// 
+pub fn try_from_int_4dp<'de, T, U, D>(deserializer: D) -> Result<T, D::Error>
+where
+	T: FromIntWithScale<U>,
+	U: Deserialize<'de>,
+	D: Deserializer<'de>,
+{
+	try_from_int_with_scale(deserializer, 4)
+}
+
+//		try_to_int_with_scale													
+/// Converts a floating-point number to an integer with scale.
+/// 
+/// This function takes a floating-point number and converts it to an integer
+/// which represents a decimal value to a specified number of decimal places. So
+/// for instance, the floating-point number `123.45` could be converted to the
+/// integer `12345` if the scale is 2.
+/// 
+/// It is intended for use by [`serde`], indirectly when using the following
+/// convenience functions with [`#[serde(serialize_with)]`]:
+/// 
+/// ```ignore
+/// #[serde(serialize_with = "try_to_int_1dp::<T, i64, __S>")]
+/// #[serde(serialize_with = "try_to_int_2dp::<T, i64, __S>")]
+/// #[serde(serialize_with = "try_to_int_3dp::<T, i64, __S>")]
+/// #[serde(serialize_with = "try_to_int_4dp::<T, i64, __S>")]
+/// ```
+/// 
+/// Note that the examples above will specify [`i64`] as the concrete type that
+/// the serialiser will attempt to serialise to. Any integer type can be used
+/// here, or indeed any type recognised by an implementation of
+/// [`ToIntWithScale`], but it must be specified explicitly.
+/// 
+/// # Parameters
+/// 
+/// * `serializer` - The serialiser to use.
+/// * `scale`      - The scale factor, i.e. the number of decimal places. Note
+///                  that this is essentially limited to a maximum of 19 DP of
+///                  movement without overflowing.
+/// 
+/// # Errors
+/// 
+/// This function will return an error if the value cannot be serialised to the
+/// the required type. The error will be a [`DeError`], which is passed through
+/// from the [`serde`] crate.
+/// 
+/// It will also return an error if the conversion from `T` to the integer type
+/// fails. The nature of this error will be specific to the type being converted
+/// from.
+/// 
+/// # See also
+/// 
+/// * [`to_cents()`]
+/// * [`to_pence()`]
+/// * [`try_from_int_with_scale()`]
+/// * [`try_to_int_1dp()`]
+/// * [`try_to_int_2dp()`]
+/// * [`try_to_int_3dp()`]
+/// * [`try_to_int_4dp()`]
+/// 
+pub fn try_to_int_with_scale<T, U, S>(value: &T, serializer: S, scale: u8) -> Result<S::Ok, S::Error>
+where
+	T: ToIntWithScale<U>,
+	U: Serialize,
+	S: Serializer,
+{
+	T::to_int_with_scale(value, scale)
+		.ok_or_else(|| SerError::custom("Failed to convert to integer with scale"))
+		.and_then(|scaled_value| scaled_value.serialize(serializer))
+}
+
+//		try_to_int_1dp															
+/// Converts a floating-point number to an integer to 1 decimal place.
+/// 
+/// This is a convenience function - see [`try_to_int_with_scale()`].
+/// 
+/// # Parameters
+/// 
+/// * `serializer` - The serialiser to use.
+/// 
+/// # Errors
+/// 
+/// See [`try_to_int_with_scale()`].
+/// 
+/// # See also
+/// 
+/// * [`try_from_int_1dp()`]
+/// * [`try_to_int_2dp()`]
+/// * [`try_to_int_3dp()`]
+/// * [`try_to_int_4dp()`]
+/// 
+pub fn try_to_int_1dp<T, U, S>(value: &T, serializer: S) -> Result<S::Ok, S::Error>
+where
+	T: ToIntWithScale<U>,
+	U: Serialize,
+	S: Serializer,
+{
+	try_to_int_with_scale(value, serializer, 1)
+}
+
+//		try_to_int_2dp															
+/// Converts a floating-point number to an integer to 2 decimal places.
+/// 
+/// This is a convenience function - see [`try_to_int_with_scale()`].
+/// 
+/// # Parameters
+/// 
+/// * `serializer` - The serialiser to use.
+/// 
+/// # Errors
+/// 
+/// See [`try_to_int_with_scale()`].
+/// 
+/// # See also
+/// 
+/// * [`to_cents()`]
+/// * [`to_pence()`]
+/// * [`try_from_int_2dp()`]
+/// * [`try_to_int_1dp()`]
+/// * [`try_to_int_3dp()`]
+/// * [`try_to_int_4dp()`]
+/// 
+pub fn try_to_int_2dp<T, U, S>(value: &T, serializer: S) -> Result<S::Ok, S::Error>
+where
+	T: ToIntWithScale<U>,
+	U: Serialize,
+	S: Serializer,
+{
+	try_to_int_with_scale(value, serializer, 2)
+}
+
+//		try_to_int_3dp															
+/// Converts a floating-point number to an integer to 3 decimal places.
+/// 
+/// This is a convenience function - see [`try_to_int_with_scale()`].
+/// 
+/// # Parameters
+/// 
+/// * `serializer` - The serialiser to use.
+/// 
+/// # Errors
+/// 
+/// See [`try_to_int_with_scale()`].
+/// 
+/// # See also
+/// 
+/// * [`try_from_int_3dp()`]
+/// * [`try_to_int_1dp()`]
+/// * [`try_to_int_2dp()`]
+/// * [`try_to_int_4dp()`]
+/// 
+pub fn try_to_int_3dp<T, U, S>(value: &T, serializer: S) -> Result<S::Ok, S::Error>
+where
+	T: ToIntWithScale<U>,
+	U: Serialize,
+	S: Serializer,
+{
+	try_to_int_with_scale(value, serializer, 3)
+}
+
+//		try_to_int_4dp															
+/// Converts a floating-point number to an integer to 4 decimal places.
+/// 
+/// This is a convenience function - see [`try_to_int_with_scale()`].
+/// 
+/// # Parameters
+/// 
+/// * `serializer` - The serialiser to use.
+/// 
+/// # Errors
+/// 
+/// See [`try_to_int_with_scale()`].
+/// 
+/// # See also
+/// 
+/// * [`try_from_int_4dp()`]
+/// * [`try_to_int_1dp()`]
+/// * [`try_to_int_2dp()`]
+/// * [`try_to_int_3dp()`]
+/// 
+pub fn try_to_int_4dp<T, U, S>(value: &T, serializer: S) -> Result<S::Ok, S::Error>
+where
+	T: ToIntWithScale<U>,
+	U: Serialize,
+	S: Serializer,
+{
+	try_to_int_with_scale(value, serializer, 4)
+}
+
+//		from_cents																
+/// Converts an integer to a [`Decimal`] to 2 decimal places.
+/// 
+/// This is a convenience function that can be used instead of
+/// [`try_from_int_2dp()`] when the input type is [`i64`] and the output type
+/// is [`Decimal`]:
+/// 
+/// ```ignore
+/// #[serde(deserialize_with = "from_cents")]
+/// ```
+/// 
+/// It is equivalent to the following:
+/// 
+/// ```ignore
+/// #[serde(deserialize_with = "try_from_int_2dp::<Decimal, i64, __D>")]
+/// ```
+/// 
+/// This function takes an [`i64`] integer which represents a decimal value to 2
+/// DP, and converts it to a [`Decimal`]. So for instance, the integer `12345`
+/// would be converted to the decimal number `123.45`. The types were chosen
+/// because [`Decimal`] is the safest to use for currency values (floats should
+/// never be used as they are not safe), and [`i64`] is the most common integer
+/// type in this context.
+///
+/// For more information, see the documentation for
+/// [`try_from_int_with_scale()`].
+/// 
+/// # Parameters
+/// 
+/// * `deserializer` - The deserialiser to use.
+/// 
+/// # Errors
+/// 
+/// This function will return an error if the deserialised value cannot be
+/// converted to the required type. The error will be a [`DeError`], which is
+/// passed through from the [`serde`] crate.
+/// 
+/// It will also return an error if the conversion from the [`i64`] to
+/// [`Decimal`] fails (which should never happen). The nature of this error will
+/// be specific to the type being converted to.
+/// 
+/// # See also
+/// 
+/// * [`from_pence()`]
+/// * [`to_cents()`]
+/// * [`try_from_int_2dp()`]
+/// 
+pub fn from_cents<'de, D>(deserializer: D) -> Result<Decimal, D::Error>
+where
+	D: Deserializer<'de>,
+{
+	try_from_int_2dp::<Decimal, i64, D>(deserializer)
+}
+
+//		to_cents																
+/// Converts a [`Decimal`] to an integer to 2 decimal places.
+/// 
+/// This is a convenience function that can be used instead of
+/// [`try_to_int_2dp()`] when the input type is [`Decimal`] and the output type
+/// is [`i64`]:
+/// 
+/// ```ignore
+/// #[serde(serialize_with = "to_cents")]
+/// ```
+/// 
+/// It is equivalent to the following:
+/// 
+/// ```ignore
+/// #[serde(serialize_with = "try_to_int_2dp::<Decimal, i64, __S>")]
+/// ```
+/// 
+/// This function takes a [`Decimal`], and converts it to an integer which
+/// represents a decimal value to 2 DP. So for instance, the decimal `123.45`
+/// would be converted to the integer `12345`. The types were chosen because
+/// [`Decimal`] is the safest to use for currency values (floats should never be
+/// used as they are not safe), and [`i64`] is the most common integer type in
+/// this context.
+///
+/// For more information, see the documentation for
+/// [`try_to_int_with_scale()`].
+/// 
+/// # Parameters
+/// 
+/// * `serializer` - The serialiser to use.
+/// 
+/// # Errors
+/// 
+/// This function will return an error if the value cannot be serialised to the
+/// the required type. The error will be a [`DeError`], which is passed through
+/// from the [`serde`] crate.
+/// 
+/// It will also return an error if the conversion from [`Decimal`] to [`i64`]
+/// fails (for instance if the decimal is larger than can fit into the integer's
+/// range). The nature of this error will be specific to the type being
+/// converted from.
+/// 
+/// # See also
+/// 
+/// * [`from_cents()`]
+/// * [`to_pence()`]
+/// * [`try_to_int_2dp()`]
+/// 
+pub fn to_cents<S>(value: &Decimal, serializer: S) -> Result<S::Ok, S::Error>
+where
+	S: Serializer,
+{
+	try_to_int_2dp::<Decimal, i64, S>(value, serializer)
+}
+
+//		from_pence																
+/// Converts an integer to a [`Decimal`] to 2 decimal places.
+/// 
+/// This is an alias of [`from_cents()`] for convenience.
+/// 
+/// # Parameters
+/// 
+/// * `deserializer` - The deserialiser to use.
+/// 
+/// # Errors
+/// 
+/// See [`from_cents()`].
+/// 
+/// # See also
+/// 
+/// * [`from_cents()`]
+/// * [`to_pence()`]
+/// * [`try_from_int_2dp()`]
+/// 
+pub fn from_pence<'de, D>(deserializer: D) -> Result<Decimal, D::Error>
+where
+	D: Deserializer<'de>,
+{
+	from_cents(deserializer)
+}
+
+//		to_pence																
+/// Converts a [`Decimal`] to an integer to 2 decimal places.
+/// 
+/// This is an alias of [`to_cents()`] for convenience.
+/// 
+/// # Parameters
+/// 
+/// * `serializer` - The serialiser to use.
+/// 
+/// # Errors
+/// 
+/// See [`to_cents()`].
+/// 
+/// # See also
+/// 
+/// * [`from_pence()`]
+/// * [`to_cents()`]
+/// * [`try_to_int_2dp()`]
+/// 
+pub fn to_pence<S>(value: &Decimal, serializer: S) -> Result<S::Ok, S::Error>
+where
+	S: Serializer,
+{
+	to_cents(value, serializer)
 }
 
 

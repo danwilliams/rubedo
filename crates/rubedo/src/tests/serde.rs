@@ -343,6 +343,90 @@ struct PosTryFromStringGeneric {
 	foo: Position,
 }
 
+//		F32TryFromInt1DpU8														
+#[derive(Debug, Deserialize)]
+struct F32TryFromInt1DpU8 {
+	#[serde(deserialize_with = "try_from_int_1dp::<f32, u8, __D>")]
+	foo: f32,
+}
+
+//		F64TryFromInt2DpU16														
+#[derive(Debug, Deserialize)]
+struct F64TryFromInt2DpU16 {
+	#[serde(deserialize_with = "try_from_int_2dp::<f64, u16, __D>")]
+	foo: f64,
+}
+
+//		DecimalTryFromInt3DpU32													
+#[derive(Debug, Deserialize)]
+struct DecimalTryFromInt3DpU32 {
+	#[serde(deserialize_with = "try_from_int_3dp::<Decimal, u32, __D>")]
+	foo: Decimal,
+}
+
+//		F32TryFromInt4DpU64														
+#[derive(Debug, Deserialize)]
+struct F32TryFromInt4DpU64 {
+	#[serde(deserialize_with = "try_from_int_4dp::<f32, u64, __D>")]
+	foo: f32,
+}
+
+//		F64TryToInt1DpU128														
+#[derive(Debug, Serialize)]
+struct F64TryToInt1DpU128 {
+	#[serde(serialize_with = "try_to_int_1dp::<f64, u128, __S>")]
+	foo: f64,
+}
+
+//		DecimalTryToInt2DpI8													
+#[derive(Debug, Serialize)]
+struct DecimalTryToInt2DpI8 {
+	#[serde(serialize_with = "try_to_int_2dp::<Decimal, i8, __S>")]
+	foo: Decimal,
+}
+
+//		F32TryToInt3DpI16														
+#[derive(Debug, Serialize)]
+struct F32TryToInt3DpI16 {
+	#[serde(serialize_with = "try_to_int_3dp::<f32, i16, __S>")]
+	foo: f32,
+}
+
+//		F64TryToInt4DpI32														
+#[derive(Debug, Serialize)]
+struct F64TryToInt4DpI32 {
+	#[serde(serialize_with = "try_to_int_4dp::<f64, i32, __S>")]
+	foo: f64,
+}
+
+//		FromCents																
+#[derive(Debug, Deserialize)]
+struct FromCents {
+	#[serde(deserialize_with = "from_cents")]
+	foo: Decimal,
+}
+
+//		ToCents																	
+#[derive(Debug, Serialize)]
+struct ToCents {
+	#[serde(serialize_with = "to_cents")]
+	foo: Decimal,
+}
+
+//		FromPence																
+#[derive(Debug, Deserialize)]
+struct FromPence {
+	#[serde(deserialize_with = "from_pence")]
+	foo: Decimal,
+}
+
+//		ToPence																	
+#[derive(Debug, Serialize)]
+struct ToPence {
+	#[serde(serialize_with = "to_pence")]
+	foo: Decimal,
+}
+
 
 
 //		Tests
@@ -554,6 +638,102 @@ fn try_from__string_absent() {
 	assert_err!(&test);
 	//	The line and column come from Serde's deserialiser
 	assert_eq!(test.unwrap_err().to_string(), "Invalid value for Position: Three at line 1 column 15");
+}
+
+//		try_from_int_1dp__f32_u8												
+#[test]
+fn try_from_int_1dp__f32_u8() {
+	let test: F32TryFromInt1DpU8 = serde_json::from_str(r#"{"foo":123}"#).unwrap();
+	assert_eq!(test.foo, 12.3_f32);
+}
+
+//		try_from_int_2dp__f64_u16												
+#[test]
+fn try_from_int_2dp__f64_u16() {
+	let test: F64TryFromInt2DpU16 = serde_json::from_str(r#"{"foo":1234}"#).unwrap();
+	assert_eq!(test.foo, 12.34_f64);
+}
+
+//		try_from_int_3dp__Decimal_u32											
+#[test]
+fn try_from_int_3dp__Decimal_u32() {
+	let test: DecimalTryFromInt3DpU32 = serde_json::from_str(r#"{"foo":1234}"#).unwrap();
+	assert_eq!(test.foo, Decimal::from_str("1.234").unwrap());
+}
+
+//		try_from_int_4dp__f32_u64												
+#[test]
+fn try_from_int_4dp__f32_u64() {
+	let test: F32TryFromInt4DpU64 = serde_json::from_str(r#"{"foo":12345}"#).unwrap();
+	assert_eq!(test.foo, 1.2345_f32);
+}
+
+//		try_to_int_1dp__f64_u128												
+#[test]
+fn try_to_int_1dp__f64_u128() {
+	let test = F64TryToInt1DpU128 {
+		foo: 123.4_f64,
+	};
+	assert_eq!(serde_json::to_string(&test).unwrap(), r#"{"foo":1234}"#);
+}
+
+//		try_to_int_2dp__Decimal_i8												
+#[test]
+fn try_to_int_2dp__Decimal_i8() {
+	let test = DecimalTryToInt2DpI8 {
+		foo: Decimal::from_str("1.23").unwrap(),
+	};
+	assert_eq!(serde_json::to_string(&test).unwrap(), r#"{"foo":123}"#);
+}
+
+//		try_to_int_3dp__f32_i16													
+#[test]
+fn try_to_int_3dp__f32_i16() {
+	let test = F32TryToInt3DpI16 {
+		foo: 1.234_f32,
+	};
+	assert_eq!(serde_json::to_string(&test).unwrap(), r#"{"foo":1234}"#);
+}
+
+//		try_to_int_4dp__f64_i32													
+#[test]
+fn try_to_int_4dp__f64_i32() {
+	let test = F64TryToInt4DpI32 {
+		foo: 1.2345_f64,
+	};
+	assert_eq!(serde_json::to_string(&test).unwrap(), r#"{"foo":12345}"#);
+}
+
+//		from_cents__success														
+#[test]
+fn from_cents__success() {
+	let test: FromCents = serde_json::from_str(r#"{"foo":1234}"#).unwrap();
+	assert_eq!(test.foo, Decimal::from_str("12.34").unwrap());
+}
+
+//		to_cents__success														
+#[test]
+fn to_cents__success() {
+	let test = ToCents {
+		foo: Decimal::from_str("12.34").unwrap(),
+	};
+	assert_eq!(serde_json::to_string(&test).unwrap(), r#"{"foo":1234}"#);
+}
+
+//		from_pence__success														
+#[test]
+fn from_pence__success() {
+	let test: FromPence = serde_json::from_str(r#"{"foo":12345}"#).unwrap();
+	assert_eq!(test.foo, Decimal::from_str("123.45").unwrap());
+}
+
+//		to_pence__success														
+#[test]
+fn to_pence__success() {
+	let test = ToPence {
+		foo: Decimal::from_str("123.45").unwrap(),
+	};
+	assert_eq!(serde_json::to_string(&test).unwrap(), r#"{"foo":12345}"#);
 }
 
 
