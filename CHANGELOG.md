@@ -12,6 +12,84 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.4.0 (07 December 2023)
+
+### Added
+
+  - Added `serde` module to provide useful conversions when (de)serialising
+      - Added general type conversion functions
+          - Added `as_str()`
+          - Added `from()`
+          - Added `from_str()`
+          - Added `from_string()`
+          - Added `into()`
+          - Added `into_string()`
+          - Added `to_string()`
+          - Added `try_from()`
+          - Added `try_from_string()`
+      - Added helpers for scaling integers to/from floating-point numbers
+          - Added `from_cents()`
+          - Added `from_pence()`
+          - Added `to_cents()`
+          - Added `to_pence()`
+          - Added `try_from_int_1dp()`
+          - Added `try_from_int_2dp()`
+          - Added `try_from_int_3dp()`
+          - Added `try_from_int_4dp()`
+          - Added `try_from_int_with_scale()`
+          - Added `try_to_int_1dp()`
+          - Added `try_to_int_2dp()`
+          - Added `try_to_int_3dp()`
+          - Added `try_to_int_4dp()`
+          - Added `try_to_int_with_scale()`
+  - Extended the `chrono` module
+      - Added `MAX_YEAR` and `MIN_YEAR` constants to `NaiveDateExt`
+  - Extended the `std` module
+      - Added `AsStr` trait
+      - Added `FromIntWithScale` trait
+      - Added `ToIntWithScale` trait
+      - Added implementations of `FromIntWithScale::from_int_with_scale()` and
+        `ToIntWithScale::to_int_with_scale()` to/from `f32`/`f64`/`Decimal` and
+        all integer types
+  - Extended the `sugar` module
+      - Added macros for enum variant shorthand
+          - Added `variants!()`
+          - Added `variants_hashset!()`
+          - Added `vv!()` alias
+          - Added `vh!()` alias
+      - Re-exported `rubedo_macros::ip` as `rubedo::sugar::ip`
+  - Added some integration tests
+  - Added standard linting configuration
+
+### Fixed
+
+  - Improved `sugar::s!()` macro to detect string literals
+
+### Changed
+
+  - In the `http` module
+      - Improved `ResponseError`, allowing any errors raised by `to_bytes()` to
+        be captured
+      - Amended `convert_response()` to deal with a borrowed body rather than
+        taking ownership
+      - Derived `Eq` for `ContentType`
+      - Made `UnpackedResponseBody.content_type()` const
+  - In the `std` module
+      - Improved handling of `cwd` in `PathExt::normalize()`, to fall back to
+        the filesystem root directory
+      - Derived `Clone` and `Debug` for `LimitIterator`
+  - General changes
+      - Annotated non-exhaustive enums and structs as such
+      - Applied `must_use` annotation to appropriate functions
+      - Used `core` instead of `std` where possible
+      - Refactored some functions
+      - Improved documentation
+
+### Removed
+
+  - Removed support for using the `sugar::s!()` macro with non-string literals
+
+
 ## 0.3.6 (17 October 2023)
 
 ### Added
@@ -36,26 +114,20 @@ The format is based on [Keep a Changelog][], and this project adheres to
 ### Added
 
   - Implemented `From<Json>` for `http::UnpackedResponseBody`
-
   - Implemented custom `Serialize` and `Deserialize` implementations for
     `http::UnpackedResponseBody`
-
   - Added `http::ContentType` enum to specify `http:UnpackedResponseBody`
     content type
-
   - Added `content_type()`, `set_content_type()`, `is_binary()`, `is_text()`,
     `to_base64()`, and `from_base64()` to `http::UnpackedResponseBody`
 
 ### Changed
 
   - Updated `Debug`, `Display`, `Serialize`, and `Deserialize` implementations
-    for `http::UnpackedResponseBody` to be content-type aware.
-
+    for `http::UnpackedResponseBody` to be content-type aware
   - Updated `http::UnpackedResponseBody::new()` to accept any types that `From`
-    has been implemented for.
-
+    has been implemented for
   - Changed `http::UnpackedResponseBody` from tuple struct to standard struct
-
   - Improved performance in `http::UnpackedResponseBody::from()`
 
 
@@ -64,19 +136,16 @@ The format is based on [Keep a Changelog][], and this project adheres to
 ### Added
 
   - Added `push_char()` to `http::UnpackedResponseBody`
-
   - Implemented additional `Add` and `AddAssign` functionality for
     `http::UnpackedResponseBody`: `char`, `&char`, `String`, `&String`,
     `Box<str>`, `Cow<'a, str>`, `u8`, `Vec<u8>`, `&Vec<u8>`,
     `UnpackedResponseBody`, `&UnpackedResponseBody`
-
   - Implemented additional `From` conversions for `http::UnpackedResponseBody`:
     `&[u8]`, `&[u8; N]`, `&char`, `Vec<u8>`, `&Vec<u8>`
 
 ### Changed
 
   - Improved performance in `chrono::DurationExt.humanize()`
-
   - Improved performance in `http::UnpackedResponseBody::from<&String>()`
 
 
@@ -87,13 +156,10 @@ The format is based on [Keep a Changelog][], and this project adheres to
   - Added `new()`, `clear()`, `empty()`, `is_empty()`, `len()`, `push()`,
     `push_bytes()`, `push_str()`, `as_bytes()`, `as_mut_bytes()`,
     `into_bytes()`, and `to_bytes()` to `http::UnpackedResponseBody`
-
   - Implemented `Add` and `AddAssign` functionality for
     `http::UnpackedResponseBody`: `&[u8]`, `&[u8; N]`, and `&str`
-
   - Implemented `AsRef`, `AsMut`, `Clone`, `Default`, and `Write` for
     `http::UnpackedResponseBody`
-
   - Implemented a range of `From` conversions for `http::UnpackedResponseBody`:
     `&str`, `&mut str`, `String`, `&String`, `Box<str>`, `Cow<'a, str>`, `char`,
     and `u8`
