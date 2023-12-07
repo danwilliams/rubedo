@@ -49,7 +49,7 @@ pub use rubedo_macros::ip;
 /// # Examples
 /// 
 /// ```
-/// use rubedo::s;
+/// use rubedo::sugar::s;
 /// 
 /// assert_eq!(s!("foo"), "foo");
 /// assert_eq!(s!("foo"), "foo".to_owned());
@@ -82,5 +82,109 @@ macro_rules! s {
 }
 
 pub use s;
+
+//		variants!																
+/// Allows shorthand for referring to multiple variants of the same enum.
+/// 
+/// This macro provides syntactic sugar to specify multiple enum variants using
+/// reduced syntax, making such usage more concise, and easier to read.
+/// 
+/// It supports lists of variants separated by commas. It would be nice to also
+/// use the boolean OR operator for use in matches, but this is not possible at
+/// present, as match arms must be explicit, and cannot rely on expressions.
+/// 
+/// This macro returns the variants as a [`Vec`], and there is an alternative
+/// macro, [`variants_hashset!`], which returns a [`HashSet`](std::collections::HashSet)
+/// instead.
+/// 
+/// It is is exported as `vv!` (meaning "variants vector") as well as
+/// `variants!`, to allow for more concise usage.
+/// 
+/// # Examples
+/// 
+/// ```
+/// use rubedo::sugar::variants;
+/// 
+/// #[derive(Copy, Clone, Debug, Eq, PartialEq)]
+/// enum Foo {
+///     Bar,
+///     Baz,
+///     Qux,
+/// }
+/// 
+/// assert_eq!(variants!(Foo: Bar, Baz, Qux), vec![Foo::Bar, Foo::Baz, Foo::Qux]);
+/// ```
+/// 
+/// # See also
+/// 
+/// * [`variants_hashset!`]
+/// 
+#[macro_export]
+macro_rules! variants {
+	//	Comma-separated list
+	($enum:ident: $variant:ident $(, $other_variants:ident)*) => {
+		vec![$enum::$variant $(, $enum::$other_variants )*]
+	};
+	//	Comma-separated list with trailing comma
+	($enum:ident: $variant:ident $(, $other_variants:ident)*,) => {
+		vec![$enum::$variant $(, $enum::$other_variants )*]
+	};
+	//	Empty expression
+	() => {
+		vec![]
+	};
+}
+
+pub use variants;
+pub use variants as vv;
+
+//		variants_hashset!														
+/// Allows shorthand for referring to multiple variants of the same enum.
+/// 
+/// This macro is the same as [`variants!`], but returns a [`HashSet`](std::collections::HashSet)
+/// instead of a [`Vec`]. For more information, see the documentation for
+/// [`variants!`].
+/// 
+/// It is is exported as `vh!` (meaning "variants hashset") as well as
+/// `variants_hashset!`, to allow for more concise usage.
+/// 
+/// # Examples
+/// 
+/// ```
+/// use rubedo::sugar::variants_hashset;
+/// use std::collections::HashSet;
+/// 
+/// #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+/// enum Foo {
+///     Bar,
+///     Baz,
+///     Qux,
+/// }
+/// 
+/// assert_eq!(variants_hashset!(Foo: Bar, Baz, Qux), HashSet::from([Foo::Bar, Foo::Baz, Foo::Qux]));
+/// ```
+/// 
+/// # See also
+/// 
+/// * [`variants!`]
+/// 
+#[macro_export]
+macro_rules! variants_hashset {
+	//	Comma-separated list
+	($enum:ident: $variant:ident $(, $other_variants:ident)*) => {
+		std::collections::HashSet::from([$enum::$variant $(, $enum::$other_variants )*])
+	};
+	//	Comma-separated list with trailing comma
+	($enum:ident: $variant:ident $(, $other_variants:ident)*,) => {
+		std::collections::HashSet::from([$enum::$variant $(, $enum::$other_variants )*])
+	};
+	//	Empty expression
+	() => {
+		std::collections::HashSet::new()
+	};
+}
+
+pub use variants_hashset;
+pub use variants_hashset as vh;
 
 

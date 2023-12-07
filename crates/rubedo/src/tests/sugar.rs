@@ -44,4 +44,77 @@ mod s {
 	}
 }
 
+//		variants!																
+#[cfg(test)]
+mod variants {
+	use super::super::*;
+	
+	//		Position															
+	#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+	#[repr(u8)]
+	enum Position {
+		Zero = 0,
+		One  = 1,
+		Two  = 2,
+	}
+	
+	//		variants!															
+	#[test]
+	#[cfg_attr(    feature = "reasons",  allow(trivial_casts,
+		reason = "Trivial cast here is needed for the test"
+	))]
+	#[cfg_attr(not(feature = "reasons"), allow(trivial_casts))]
+	fn variants__empty() {
+		assert_eq!(variants!() as Vec<Position>, vec![]);
+	}
+	#[test]
+	fn variants__single() {
+		assert_eq!(variants!(Position: One  ), vec![Position::One]);
+		assert_eq!(variants!(Position: One, ), vec![Position::One]);
+	}
+	#[test]
+	fn variants__multiple() {
+		assert_eq!(variants!(Position: Zero, One     ), vec![Position::Zero, Position::One]);
+		assert_eq!(variants!(Position: Zero, One,    ), vec![Position::Zero, Position::One]);
+		assert_eq!(variants!(Position: Zero, One, Two), vec![Position::Zero, Position::One, Position::Two]);
+	}
+}
+
+//		variants_hashset!														
+#[cfg(test)]
+mod variants_hashset {
+	use super::super::*;
+	use std::collections::HashSet;
+	
+	//		Position															
+	#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+	#[repr(u8)]
+	enum Position {
+		Zero = 0,
+		One  = 1,
+		Two  = 2,
+	}
+	
+	//		variants_hashset!													
+	#[test]
+	#[cfg_attr(    feature = "reasons",  allow(trivial_casts,
+		reason = "Trivial cast here is needed for the test"
+	))]
+	#[cfg_attr(not(feature = "reasons"), allow(trivial_casts))]
+	fn variants__empty() {
+		assert_eq!(variants_hashset!() as HashSet<Position>, HashSet::new());
+	}
+	#[test]
+	fn variants__single() {
+		assert_eq!(variants_hashset!(Position: One  ), HashSet::from([Position::One]));
+		assert_eq!(variants_hashset!(Position: One, ), HashSet::from([Position::One]));
+	}
+	#[test]
+	fn variants__multiple() {
+		assert_eq!(variants_hashset!(Position: Zero, One     ), HashSet::from([Position::Zero, Position::One]));
+		assert_eq!(variants_hashset!(Position: Zero, One,    ), HashSet::from([Position::Zero, Position::One]));
+		assert_eq!(variants_hashset!(Position: Zero, One, Two), HashSet::from([Position::Zero, Position::One, Position::Two]));
+	}
+}
+
 
