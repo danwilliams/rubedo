@@ -20,13 +20,15 @@ your Rust code into gold... well, maybe... or at least make it easier to write.
 
 ### std
 
-The `std` module provides extensions to the Rust standard library.
+The [`std`](https://docs.rs/rubedo/latest/rubedo/std/index.html) module provides
+extensions to the [Rust standard library](https://doc.rust-lang.org/std/).
 
 #### AsStr
 
 The [`AsStr`](https://docs.rs/rubedo/latest/rubedo/std/trait.AsStr.html) trait
 is essentially a marker trait, indicating the presence of an `as_str()` method,
-primarily for use with the `serde` module, most usefully with enums:
+primarily for use with the [`serde`](https://docs.rs/rubedo/latest/rubedo/serde/index.html)
+module, most usefully with enums:
 
   - [`as_str()`](https://docs.rs/rubedo/latest/rubedo/std/trait.AsStr.html#tymethod.as_str) -
     Provides a string slice representation of the type.
@@ -37,7 +39,8 @@ The [`FromIntWithScale`](https://docs.rs/rubedo/latest/rubedo/std/trait.FromIntW
 and [`ToIntWithScale`](https://docs.rs/rubedo/latest/rubedo/std/trait.ToIntWithScale.html)
 traits are used to convert between integers and floating-point numbers using
 specified scales, i.e. different numbers of decimal places, primarily for use
-with the `serde` module, most usefully with currency values:
+with the [`serde`](https://docs.rs/rubedo/latest/rubedo/serde/index.html)
+module, most usefully with currency values:
 
   - [`from_int_with_scale()`](https://docs.rs/rubedo/latest/rubedo/std/trait.FromIntWithScale.html#tymethod.from_int_with_scale) -
     Converts from an integer to a floating-point number with a specified scale.
@@ -85,8 +88,8 @@ extended with the following methods:
 
 ### chrono
 
-The `chrono` module provides extensions to the [Chrono](https://crates.io/crates/chrono)
-crate.
+The [`chrono`](https://docs.rs/rubedo/latest/rubedo/chrono/index.html) module
+provides extensions to the [Chrono](https://crates.io/crates/chrono) crate.
 
 #### Duration
 
@@ -149,9 +152,9 @@ struct is extended with the following methods:
 
 ### http
 
-The `http` module provides extensions to the [HTTP](https://crates.io/crates/http),
-[Hyper](https://crates.io/crates/hyper), and [Axum](https://crates.io/crates/axum)
-crates.
+The [`http`](https://docs.rs/rubedo/latest/rubedo/http/index.html) module
+provides extensions to the [HTTP](https://crates.io/crates/http), [Hyper](https://crates.io/crates/hyper),
+and [Axum](https://crates.io/crates/axum) crates.
 
 #### Response
 
@@ -164,7 +167,8 @@ struct is extended with the following methods:
 
 ### serde
 
-The `serde` module provides conversion utility functions for use with [Serde](https://crates.io/crates/serde).
+The [`serde`](https://docs.rs/rubedo/latest/rubedo/serde/index.html) module
+provides conversion utility functions for use with [Serde](https://crates.io/crates/serde).
 
 #### Functions
 
