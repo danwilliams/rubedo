@@ -12,6 +12,17 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.4.1 (08 December 2023)
+
+### Fixed
+
+  - Fixed wrong links in README documentation
+
+### Changed
+
+  - Restructured README documentation
+
+
 ## 0.4.0 (07 December 2023)
 
 ### Added
