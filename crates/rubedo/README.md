@@ -50,7 +50,7 @@ with the `serde` module, most usefully with currency values:
 The [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html) trait
 is extended with (technically, complemented by) the following methods:
 
-  - [`limit()`](https://docs.rs/rubedo/latest/rubedo/std/trait.PathExt.html#tymethod.append) -
+  - [`limit()`](https://docs.rs/rubedo/latest/rubedo/std/trait.IteratorExt.html#tymethod.limit) -
     Limits the number of items returned by an iterator, similar to
     [`take()`](https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.take),
     but accepts an `Option`.
@@ -158,7 +158,7 @@ crates.
 The [`Response`](https://docs.rs/http/latest/http/response/struct.Response.html)
 struct is extended with the following methods:
 
-  - [`unpack()`](https://docs.rs/rubedo/latest/rubedo/chrono/trait.ResponseExt.html#tymethod.unpack) -
+  - [`unpack()`](https://docs.rs/rubedo/latest/rubedo/http/trait.ResponseExt.html#tymethod.unpack) -
     Unpacks the response and provides the headers and body in a more accessible
     form, to allow it to be checked, compared, and printed easily.
 
@@ -259,7 +259,7 @@ Some macros are provided to provide syntactic sugar for common operations.
   - [`s!`](https://docs.rs/rubedo/latest/rubedo/sugar/macro.s.html) -
     Converts a `str` string literal to an owned `String`, saving having to do
     `"foo".to_owned()` or `String::from("foo")`. It will also convert any other
-    type that implements the [`ToString`] trait to a `String`.
+    type that implements the `ToString` trait to a `String`.
 
   - [`variants!`](https://docs.rs/rubedo/latest/rubedo/sugar/macro.variants.html) -
     Allows shorthand for referring to multiple variants of the same enum,

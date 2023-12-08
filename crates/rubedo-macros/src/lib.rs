@@ -38,8 +38,8 @@ use std::net::IpAddr;
 /// 
 /// # Examples
 /// 
-/// ```ignore
-/// use rubedo::ip;
+/// ```
+/// use rubedo_macros::ip;
 /// use std::net::IpAddr;
 /// 
 /// assert_eq!(ip!(1.2.3.4), IpAddr::from([1, 2, 3, 4]));
