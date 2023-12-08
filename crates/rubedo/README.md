@@ -16,14 +16,20 @@ choice of name are firstly that the "redness" is tangentially related to Rust
 through colour, and secondly that this crate will aspirationally help to turn
 your Rust code into gold... well, maybe... or at least make it easier to write.
 
-## Features
+The modules provided are:
 
-### std
+  - [std](#std)
+  - [chrono](#chrono)
+  - [http](#http)
+  - [serde](#serde)
+  - [sugar](#sugar)
+
+## std
 
 The [`std`](https://docs.rs/rubedo/latest/rubedo/std/index.html) module provides
 extensions to the [Rust standard library](https://doc.rust-lang.org/std/).
 
-#### AsStr
+### AsStr
 
 The [`AsStr`](https://docs.rs/rubedo/latest/rubedo/std/trait.AsStr.html) trait
 is essentially a marker trait, indicating the presence of an `as_str()` method,
@@ -33,7 +39,7 @@ module, most usefully with enums:
   - [`as_str()`](https://docs.rs/rubedo/latest/rubedo/std/trait.AsStr.html#tymethod.as_str) -
     Provides a string slice representation of the type.
 
-#### FromIntWithScale and ToIntWithScale
+### FromIntWithScale and ToIntWithScale
 
 The [`FromIntWithScale`](https://docs.rs/rubedo/latest/rubedo/std/trait.FromIntWithScale.html)
 and [`ToIntWithScale`](https://docs.rs/rubedo/latest/rubedo/std/trait.ToIntWithScale.html)
@@ -48,7 +54,7 @@ module, most usefully with currency values:
   - [`to_int_with_scale()`](https://docs.rs/rubedo/latest/rubedo/std/trait.ToIntWithScale.html#tymethod.to_int_with_scale) -
     Converts from a floating-point number to an integer with a specified scale.
 
-#### Iterator
+### Iterator
 
 The [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html) trait
 is extended with (technically, complemented by) the following methods:
@@ -58,7 +64,7 @@ is extended with (technically, complemented by) the following methods:
     [`take()`](https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.take),
     but accepts an `Option`.
 
-#### Path
+### Path
 
 The [`Path`](https://doc.rust-lang.org/std/path/struct.Path.html) struct is
 extended with the following methods:
@@ -86,12 +92,12 @@ extended with the following methods:
   - [`strip_root()`](https://docs.rs/rubedo/latest/rubedo/std/trait.PathExt.html#tymethod.strip_root) -
     Makes the path relative by removing the root and/or prefix components.
 
-### chrono
+## chrono
 
 The [`chrono`](https://docs.rs/rubedo/latest/rubedo/chrono/index.html) module
 provides extensions to the [Chrono](https://crates.io/crates/chrono) crate.
 
-#### Duration
+### Duration
 
 The [`Duration`](https://docs.rs/chrono/latest/chrono/struct.Duration.html)
 struct is extended with the following methods:
@@ -100,7 +106,7 @@ struct is extended with the following methods:
     Returns a human-readable string representation of the duration, as an
     expression of the largest unit available.
 
-#### NaiveDate
+### NaiveDate
 
 The [`NaiveDate`](https://docs.rs/chrono/latest/chrono/naive/struct.NaiveDate.html)
 struct is extended with the following methods:
@@ -150,13 +156,13 @@ struct is extended with the following methods:
   - [`end_of_year_opt()`](https://docs.rs/rubedo/latest/rubedo/chrono/trait.NaiveDateExt.html#tymethod.end_of_year_opt) -
     Returns the date of the last day of the given year.
 
-### http
+## http
 
 The [`http`](https://docs.rs/rubedo/latest/rubedo/http/index.html) module
 provides extensions to the [HTTP](https://crates.io/crates/http), [Hyper](https://crates.io/crates/hyper),
 and [Axum](https://crates.io/crates/axum) crates.
 
-#### Response
+### Response
 
 The [`Response`](https://docs.rs/http/latest/http/response/struct.Response.html)
 struct is extended with the following methods:
@@ -165,14 +171,12 @@ struct is extended with the following methods:
     Unpacks the response and provides the headers and body in a more accessible
     form, to allow it to be checked, compared, and printed easily.
 
-### serde
+## serde
 
 The [`serde`](https://docs.rs/rubedo/latest/rubedo/serde/index.html) module
 provides conversion utility functions for use with [Serde](https://crates.io/crates/serde).
 
-#### Functions
-
-##### Serialisation
+### Serialisation
 
   - [`as_str()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.as_str.html) -
     Returns a string representation of a type from a string slice.
@@ -186,7 +190,7 @@ provides conversion utility functions for use with [Serde](https://crates.io/cra
   - [`to_string()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.to_string.html) -
     Returns a string copy of a type.
 
-##### Deserialisation
+### Deserialisation
 
   - [`from()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.from.html) -
     Returns a type from a string or other serialised representation.
@@ -203,7 +207,7 @@ provides conversion utility functions for use with [Serde](https://crates.io/cra
   - [`try_from_string()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.try_from_string.html) -
     Returns a type from a string representation.
 
-##### Decimal helpers
+### Decimal helpers
 
   - [`from_cents()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.from_cents.html) -
     Converts an integer to a [`Decimal`](https://crates.io/crates/rust_decimal)
@@ -251,9 +255,10 @@ provides conversion utility functions for use with [Serde](https://crates.io/cra
   - [`try_to_int_4dp()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.try_to_int_4dp.html) -
     Converts a floating-point number to an integer to 4 decimal places.
 
-### Macros
+## sugar
 
-Some macros are provided to provide syntactic sugar for common operations.
+The [`sugar`](https://docs.rs/rubedo/latest/rubedo/sugar/index.html) module
+provides macros that add syntactic sugar for common operations.
 
   - [`ip!`](https://docs.rs/rubedo-macros/latest/rubedo_macros/macro.ip.html) -
     Builds an IP address from a range of input types. Note that this macro is
