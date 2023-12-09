@@ -112,7 +112,7 @@ pub use s;
 ///     Qux,
 /// }
 /// 
-/// assert_eq!(variants!(Foo: Bar, Baz, Qux), vec![Foo::Bar, Foo::Baz, Foo::Qux]);
+/// assert_eq!(variants![Foo: Bar, Baz, Qux], vec![Foo::Bar, Foo::Baz, Foo::Qux]);
 /// ```
 /// 
 /// # See also
@@ -161,7 +161,7 @@ pub use variants as vv;
 ///     Qux,
 /// }
 /// 
-/// assert_eq!(variants_hashset!(Foo: Bar, Baz, Qux), HashSet::from([Foo::Bar, Foo::Baz, Foo::Qux]));
+/// assert_eq!(variants_hashset![Foo: Bar, Baz, Qux], HashSet::from([Foo::Bar, Foo::Baz, Foo::Qux]));
 /// ```
 /// 
 /// # See also
