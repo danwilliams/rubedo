@@ -68,6 +68,9 @@ mod variants {
 		assert_eq!(variants![] as Vec<Position>, vec![]);
 		assert_eq!(variants!() as Vec<Position>, vec![]);
 		assert_eq!(variants!{} as Vec<Position>, vec![]);
+		assert_eq!(variants![Position: ], vec![]);
+		assert_eq!(variants!(Position: ), vec![]);
+		assert_eq!(variants!{Position: }, vec![]);
 	}
 	#[test]
 	fn variants__single() {
@@ -111,6 +114,9 @@ mod variants_hashset {
 		assert_eq!(variants_hashset![] as HashSet<Position>, HashSet::new());
 		assert_eq!(variants_hashset!() as HashSet<Position>, HashSet::new());
 		assert_eq!(variants_hashset!{} as HashSet<Position>, HashSet::new());
+		assert_eq!(variants_hashset![Position: ], HashSet::new());
+		assert_eq!(variants_hashset!(Position: ), HashSet::new());
+		assert_eq!(variants_hashset!{Position: }, HashSet::new());
 	}
 	#[test]
 	fn variants__single() {

@@ -103,7 +103,7 @@ pub use s;
 /// # Examples
 /// 
 /// ```
-/// use rubedo::sugar::variants;
+/// use rubedo::sugar::vv;
 /// 
 /// #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 /// enum Foo {
@@ -112,7 +112,8 @@ pub use s;
 ///     Qux,
 /// }
 /// 
-/// assert_eq!(variants![Foo: Bar, Baz, Qux], vec![Foo::Bar, Foo::Baz, Foo::Qux]);
+/// assert_eq!(vv![Foo: Bar, Baz, Qux], vec![Foo::Bar, Foo::Baz, Foo::Qux]);
+/// assert_eq!(vv![Foo: ], vec![]);
 /// ```
 /// 
 /// # See also
@@ -128,6 +129,10 @@ macro_rules! variants {
 	//	Comma-separated list with trailing comma
 	($enum:ident: $variant:ident $(, $other_variants:ident)*,) => {
 		vec![$enum::$variant $(, $enum::$other_variants )*]
+	};
+	//	Empty list
+	($enum:ident:) => {
+		Vec::<$enum>::new()
 	};
 	//	Empty expression
 	() => {
@@ -151,7 +156,7 @@ pub use variants as vv;
 /// # Examples
 /// 
 /// ```
-/// use rubedo::sugar::variants_hashset;
+/// use rubedo::sugar::vh;
 /// use std::collections::HashSet;
 /// 
 /// #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
@@ -161,7 +166,8 @@ pub use variants as vv;
 ///     Qux,
 /// }
 /// 
-/// assert_eq!(variants_hashset![Foo: Bar, Baz, Qux], HashSet::from([Foo::Bar, Foo::Baz, Foo::Qux]));
+/// assert_eq!(vh![Foo: Bar, Baz, Qux], HashSet::from([Foo::Bar, Foo::Baz, Foo::Qux]));
+/// assert_eq!(vh![Foo: ], HashSet::from([]));
 /// ```
 /// 
 /// # See also
@@ -177,6 +183,10 @@ macro_rules! variants_hashset {
 	//	Comma-separated list with trailing comma
 	($enum:ident: $variant:ident $(, $other_variants:ident)*,) => {
 		std::collections::HashSet::from([$enum::$variant $(, $enum::$other_variants )*])
+	};
+	//	Empty list
+	($enum:ident:) => {
+		std::collections::HashSet::<$enum>::new()
 	};
 	//	Empty expression
 	() => {
