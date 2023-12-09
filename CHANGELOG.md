@@ -12,6 +12,13 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.4.2 (09 December 2023)
+
+### Added
+
+  - Enhanced `variants!()` macro to type-hint empty lists
+
+
 ## 0.4.1 (08 December 2023)
 
 ### Fixed

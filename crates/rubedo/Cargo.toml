@@ -1,6 +1,6 @@
 [package]
 name = "rubedo"
-version = "0.4.1"
+version = "0.4.2"
 description = "Library of useful functionality and extensions"
 categories = ["development-tools"]
 keywords = ["library", "utility"]
@@ -22,7 +22,7 @@ futures = "0.3.29"
 http = "0.2.11"
 http-body = "0.4.5"
 hyper = "0.14.27"
-rubedo-macros = { path = "../rubedo-macros", version = "0.4.1" }
+rubedo-macros = { path = "../rubedo-macros", version = "0.4.2" }
 rust_decimal = "1.33.1"
 serde = { version = "1.0.193", features = ["derive"] }
 serde_json = { version = "1.0.108", features = ["preserve_order"] }
