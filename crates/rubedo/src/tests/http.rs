@@ -37,7 +37,6 @@ mod response_error {
 }
 
 //		UnpackedResponse														
-
 #[cfg(test)]
 mod unpacked_response {
 	use super::super::*;
@@ -181,7 +180,6 @@ mod unpacked_response {
 }
 
 //		UnpackedResponseHeader													
-
 #[cfg(test)]
 mod unpacked_response_header {
 	use super::super::*;
@@ -249,7 +247,6 @@ mod unpacked_response_header {
 }
 
 //		UnpackedResponseBody													
-
 #[cfg(test)]
 mod unpacked_response_body__struct {
 	use super::super::*;

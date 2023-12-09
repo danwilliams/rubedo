@@ -112,8 +112,8 @@ pub use s;
 ///     Qux,
 /// }
 /// 
-/// assert_eq!(vv![Foo: Bar, Baz, Qux], vec![Foo::Bar, Foo::Baz, Foo::Qux]);
-/// assert_eq!(vv![Foo: ], vec![]);
+/// assert_eq!(vv![ Foo: Bar, Baz, Qux ], vec![ Foo::Bar, Foo::Baz, Foo::Qux ]);
+/// assert_eq!(vv![ Foo: ], vec![]);
 /// ```
 /// 
 /// # See also
@@ -166,8 +166,8 @@ pub use variants as vv;
 ///     Qux,
 /// }
 /// 
-/// assert_eq!(vh![Foo: Bar, Baz, Qux], HashSet::from([Foo::Bar, Foo::Baz, Foo::Qux]));
-/// assert_eq!(vh![Foo: ], HashSet::from([]));
+/// assert_eq!(vh![ Foo: Bar, Baz, Qux ], HashSet::from([ Foo::Bar, Foo::Baz, Foo::Qux ]));
+/// assert_eq!(vh![ Foo: ], HashSet::from([]));
 /// ```
 /// 
 /// # See also

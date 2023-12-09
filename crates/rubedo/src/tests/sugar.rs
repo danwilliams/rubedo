@@ -68,24 +68,24 @@ mod variants {
 		assert_eq!(variants![] as Vec<Position>, vec![]);
 		assert_eq!(variants!() as Vec<Position>, vec![]);
 		assert_eq!(variants!{} as Vec<Position>, vec![]);
-		assert_eq!(variants![Position: ], vec![]);
-		assert_eq!(variants!(Position: ), vec![]);
-		assert_eq!(variants!{Position: }, vec![]);
+		assert_eq!(variants![ Position: ], vec![]);
+		assert_eq!(variants!( Position: ), vec![]);
+		assert_eq!(variants!{ Position: }, vec![]);
 	}
 	#[test]
 	fn variants__single() {
-		assert_eq!(variants![Position: One  ], vec![Position::One]);
-		assert_eq!(variants![Position: One, ], vec![Position::One]);
-		assert_eq!(variants!(Position: One  ), vec![Position::One]);
-		assert_eq!(variants!{Position: One, }, vec![Position::One]);
+		assert_eq!(variants![ Position: One  ], vec![ Position::One ]);
+		assert_eq!(variants![ Position: One, ], vec![ Position::One ]);
+		assert_eq!(variants!( Position: One  ), vec![ Position::One ]);
+		assert_eq!(variants!{ Position: One, }, vec![ Position::One ]);
 	}
 	#[test]
 	fn variants__multiple() {
-		assert_eq!(variants![Position: Zero, One     ], vec![Position::Zero, Position::One]);
-		assert_eq!(variants![Position: Zero, One,    ], vec![Position::Zero, Position::One]);
-		assert_eq!(variants![Position: Zero, One, Two], vec![Position::Zero, Position::One, Position::Two]);
-		assert_eq!(variants!(Position: Zero, One, Two), vec![Position::Zero, Position::One, Position::Two]);
-		assert_eq!(variants!{Position: Zero, One, Two}, vec![Position::Zero, Position::One, Position::Two]);
+		assert_eq!(variants![ Position: Zero, One      ], vec![ Position::Zero, Position::One ]);
+		assert_eq!(variants![ Position: Zero, One,     ], vec![ Position::Zero, Position::One ]);
+		assert_eq!(variants![ Position: Zero, One, Two ], vec![ Position::Zero, Position::One, Position::Two ]);
+		assert_eq!(variants!( Position: Zero, One, Two ), vec![ Position::Zero, Position::One, Position::Two ]);
+		assert_eq!(variants!{ Position: Zero, One, Two }, vec![ Position::Zero, Position::One, Position::Two ]);
 	}
 }
 
@@ -114,24 +114,24 @@ mod variants_hashset {
 		assert_eq!(variants_hashset![] as HashSet<Position>, HashSet::new());
 		assert_eq!(variants_hashset!() as HashSet<Position>, HashSet::new());
 		assert_eq!(variants_hashset!{} as HashSet<Position>, HashSet::new());
-		assert_eq!(variants_hashset![Position: ], HashSet::new());
-		assert_eq!(variants_hashset!(Position: ), HashSet::new());
-		assert_eq!(variants_hashset!{Position: }, HashSet::new());
+		assert_eq!(variants_hashset![ Position: ], HashSet::new());
+		assert_eq!(variants_hashset!( Position: ), HashSet::new());
+		assert_eq!(variants_hashset!{ Position: }, HashSet::new());
 	}
 	#[test]
 	fn variants__single() {
-		assert_eq!(variants_hashset![Position: One  ], HashSet::from([Position::One]));
-		assert_eq!(variants_hashset![Position: One, ], HashSet::from([Position::One]));
-		assert_eq!(variants_hashset!(Position: One  ), HashSet::from([Position::One]));
-		assert_eq!(variants_hashset!{Position: One, }, HashSet::from([Position::One]));
+		assert_eq!(variants_hashset![ Position: One  ], HashSet::from([ Position::One ]));
+		assert_eq!(variants_hashset![ Position: One, ], HashSet::from([ Position::One ]));
+		assert_eq!(variants_hashset!( Position: One  ), HashSet::from([ Position::One ]));
+		assert_eq!(variants_hashset!{ Position: One, }, HashSet::from([ Position::One ]));
 	}
 	#[test]
 	fn variants__multiple() {
-		assert_eq!(variants_hashset![Position: Zero, One     ], HashSet::from([Position::Zero, Position::One]));
-		assert_eq!(variants_hashset![Position: Zero, One,    ], HashSet::from([Position::Zero, Position::One]));
-		assert_eq!(variants_hashset![Position: Zero, One, Two], HashSet::from([Position::Zero, Position::One, Position::Two]));
-		assert_eq!(variants_hashset!(Position: Zero, One, Two), HashSet::from([Position::Zero, Position::One, Position::Two]));
-		assert_eq!(variants_hashset!{Position: Zero, One, Two}, HashSet::from([Position::Zero, Position::One, Position::Two]));
+		assert_eq!(variants_hashset![ Position: Zero, One      ], HashSet::from([ Position::Zero, Position::One ]));
+		assert_eq!(variants_hashset![ Position: Zero, One,     ], HashSet::from([ Position::Zero, Position::One ]));
+		assert_eq!(variants_hashset![ Position: Zero, One, Two ], HashSet::from([ Position::Zero, Position::One, Position::Two ]));
+		assert_eq!(variants_hashset!( Position: Zero, One, Two ), HashSet::from([ Position::Zero, Position::One, Position::Two ]));
+		assert_eq!(variants_hashset!{ Position: Zero, One, Two }, HashSet::from([ Position::Zero, Position::One, Position::Two ]));
 	}
 }
 
