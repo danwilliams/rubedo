@@ -830,7 +830,7 @@ where
 //		try_from_int_1dp														
 /// Converts an integer to a floating-point number to 1 decimal place.
 /// 
-/// This is a convenience function - see [`try_from_int_with_scale()`].
+/// This is a convenience function — see [`try_from_int_with_scale()`].
 /// 
 /// # Parameters
 /// 
@@ -859,7 +859,7 @@ where
 //		try_from_int_2dp														
 /// Converts an integer to a floating-point number to 2 decimal places.
 /// 
-/// This is a convenience function - see [`try_from_int_with_scale()`].
+/// This is a convenience function — see [`try_from_int_with_scale()`].
 /// 
 /// # Parameters
 /// 
@@ -890,7 +890,7 @@ where
 //		try_from_int_3dp														
 /// Converts an integer to a floating-point number to 3 decimal places.
 /// 
-/// This is a convenience function - see [`try_from_int_with_scale()`].
+/// This is a convenience function — see [`try_from_int_with_scale()`].
 /// 
 /// # Parameters
 /// 
@@ -919,7 +919,7 @@ where
 //		try_from_int_4dp														
 /// Converts an integer to a floating-point number to 4 decimal places.
 /// 
-/// This is a convenience function - see [`try_from_int_with_scale()`].
+/// This is a convenience function — see [`try_from_int_with_scale()`].
 /// 
 /// # Parameters
 /// 
@@ -1009,7 +1009,7 @@ where
 //		try_to_int_1dp															
 /// Converts a floating-point number to an integer to 1 decimal place.
 /// 
-/// This is a convenience function - see [`try_to_int_with_scale()`].
+/// This is a convenience function — see [`try_to_int_with_scale()`].
 /// 
 /// # Parameters
 /// 
@@ -1038,7 +1038,7 @@ where
 //		try_to_int_2dp															
 /// Converts a floating-point number to an integer to 2 decimal places.
 /// 
-/// This is a convenience function - see [`try_to_int_with_scale()`].
+/// This is a convenience function — see [`try_to_int_with_scale()`].
 /// 
 /// # Parameters
 /// 
@@ -1069,7 +1069,7 @@ where
 //		try_to_int_3dp															
 /// Converts a floating-point number to an integer to 3 decimal places.
 /// 
-/// This is a convenience function - see [`try_to_int_with_scale()`].
+/// This is a convenience function — see [`try_to_int_with_scale()`].
 /// 
 /// # Parameters
 /// 
@@ -1098,7 +1098,7 @@ where
 //		try_to_int_4dp															
 /// Converts a floating-point number to an integer to 4 decimal places.
 /// 
-/// This is a convenience function - see [`try_to_int_with_scale()`].
+/// This is a convenience function — see [`try_to_int_with_scale()`].
 /// 
 /// # Parameters
 /// 

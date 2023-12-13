@@ -598,7 +598,7 @@ impl UnpackedResponseBody {
 	/// 4 bytes long because it can represent any Unicode scalar value,
 	/// including those outside the Basic Multilingual Plane. If `push()`
 	/// accepted a [`char`], it would be signaling that [`UnpackedResponseBody`]
-	/// is Unicode-aware and can handle any Unicode character - which is not the
+	/// is Unicode-aware and can handle any Unicode character — which is not the
 	/// case. A [`u8`], on the other hand, represents a single byte. By having
 	/// `push()` accept a [`u8`], it's signaling that [`UnpackedResponseBody`]
 	/// is byte-oriented. A specific [`push_char()`](UnpackedResponseBody::push_char())

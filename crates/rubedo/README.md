@@ -24,6 +24,7 @@ The modules provided are:
   - [serde](#serde)
   - [sugar](#sugar)
 
+
 ## std
 
 The [`std`](https://docs.rs/rubedo/latest/rubedo/std/index.html) module provides
@@ -92,6 +93,7 @@ extended with the following methods:
   - [`strip_root()`](https://docs.rs/rubedo/latest/rubedo/std/trait.PathExt.html#tymethod.strip_root) -
     Makes the path relative by removing the root and/or prefix components.
 
+
 ## chrono
 
 The [`chrono`](https://docs.rs/rubedo/latest/rubedo/chrono/index.html) module
@@ -156,6 +158,7 @@ struct is extended with the following methods:
   - [`end_of_year_opt()`](https://docs.rs/rubedo/latest/rubedo/chrono/trait.NaiveDateExt.html#tymethod.end_of_year_opt) -
     Returns the date of the last day of the given year.
 
+
 ## http
 
 The [`http`](https://docs.rs/rubedo/latest/rubedo/http/index.html) module
@@ -170,6 +173,7 @@ struct is extended with the following methods:
   - [`unpack()`](https://docs.rs/rubedo/latest/rubedo/http/trait.ResponseExt.html#tymethod.unpack) -
     Unpacks the response and provides the headers and body in a more accessible
     form, to allow it to be checked, compared, and printed easily.
+
 
 ## serde
 
@@ -254,6 +258,7 @@ provides conversion utility functions for use with [Serde](https://crates.io/cra
 
   - [`try_to_int_4dp()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.try_to_int_4dp.html) -
     Converts a floating-point number to an integer to 4 decimal places.
+
 
 ## sugar
 

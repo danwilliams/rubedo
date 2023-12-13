@@ -29,7 +29,7 @@ pub use rubedo_macros::ip;
 /// `String::from("foo")`.
 /// 
 /// It will also convert any other type that implements the [`ToString`] trait
-/// to a [`String`] - providing that it is passed in as a variable or some kind
+/// to a [`String`] — providing that it is passed in as a variable or some kind
 /// of expression, and not as a literal. That's because, at present, there is no
 /// way for the macro to tell the difference between [`str`] literals and other
 /// literals such as numbers, and as a result it will call `to_owned()` on them
