@@ -35,7 +35,13 @@ pub trait DurationExt {
 	/// is not possible, and therefore this constant indicates the maximum
 	/// number of nanoseconds that can be expressed with current Chrono
 	/// functionality.
-	const MAX_NANOSECONDS:  i64 = i64::MAX;
+	const MAX_NANOSECONDS:       i64  = i64::MAX;
+	
+	/// The maximum number of nanoseconds that can be represented by a
+	/// [`Duration`]. Note that this is the maximum number of nanoseconds that
+	/// can actually be stored by a [`Duration`], which is more than can be
+	/// expressed alone using standard Chrono functionality.
+	const MAX_NANOSECONDS_FULL:  i128 = i64::MAX as i128 * 1_000 * 1_000;
 	
 	/// The maximum number of microseconds that can be represented by a
 	/// [`Duration`] when expressed alone. Note that this is not the maximum
@@ -49,7 +55,13 @@ pub trait DurationExt {
 	/// microseconds is not possible, and therefore this constant indicates the
 	/// maximum number of microseconds that can be expressed with current Chrono
 	/// functionality.
-	const MAX_MICROSECONDS: i64 = i64::MAX;
+	const MAX_MICROSECONDS:      i64  = i64::MAX;
+	
+	/// The maximum number of microseconds that can be represented by a
+	/// [`Duration`]. Note that this is the maximum number of microseconds that
+	/// can actually be stored by a [`Duration`], which is more than can be
+	/// expressed alone using standard Chrono functionality.
+	const MAX_MICROSECONDS_FULL: i128 = i64::MAX as i128 * 1_000;
 	
 	/// The maximum number of milliseconds that can be represented by a
 	/// [`Duration`]. The [`Duration`] struct stores its value as a number of
@@ -58,7 +70,7 @@ pub trait DurationExt {
 	/// milliseconds that can be stored is therefore the maximum number of
 	/// seconds multiplied by one thousand, and the expression of this full
 	/// value as milliseconds is possible.
-	const MAX_MILLISECONDS: i64 = i64::MAX;
+	const MAX_MILLISECONDS:      i64  = i64::MAX;
 	
 	/// The maximum number of seconds that can be represented by a [`Duration`].
 	/// The [`Duration`] struct stores its value as a number of seconds and
@@ -66,27 +78,27 @@ pub trait DurationExt {
 	/// milliseconds will never overflow.
 	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
 	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
-	const MAX_SECONDS:      i64 = i64::MAX / 1_000;
+	const MAX_SECONDS:           i64  = i64::MAX / 1_000;
 	
 	/// The maximum number of minutes that can be represented by a [`Duration`].
 	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
 	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
-	const MAX_MINUTES:      i64 = i64::MAX / 1_000 / 60;
+	const MAX_MINUTES:           i64  = i64::MAX / 1_000 / 60;
 	
 	/// The maximum number of hours that can be represented by a [`Duration`].
 	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
 	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
-	const MAX_HOURS:        i64 = i64::MAX / 1_000 / 60 / 60;
+	const MAX_HOURS:             i64  = i64::MAX / 1_000 / 60 / 60;
 	
 	/// The maximum number of days that can be represented by a [`Duration`].
 	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
 	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
-	const MAX_DAYS:         i64 = i64::MAX / 1_000 / 60 / 60 / 24;
+	const MAX_DAYS:              i64  = i64::MAX / 1_000 / 60 / 60 / 24;
 	
 	/// The maximum number of weeks that can be represented by a [`Duration`].
 	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
 	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
-	const MAX_WEEKS:        i64 = i64::MAX / 1_000 / 60 / 60 / 24 / 7;
+	const MAX_WEEKS:             i64  = i64::MAX / 1_000 / 60 / 60 / 24 / 7;
 	
 	/// The minimum number of nanoseconds that can be represented by a
 	/// [`Duration`] when expressed alone. Note that this is not the minimum
@@ -100,7 +112,13 @@ pub trait DurationExt {
 	/// is not possible, and therefore this constant indicates the minimum
 	/// number of nanoseconds that can be expressed with current Chrono
 	/// functionality.
-	const MIN_NANOSECONDS:  i64 = i64::MIN;
+	const MIN_NANOSECONDS:       i64  = i64::MIN;
+	
+	/// The minimum number of nanoseconds that can be represented by a
+	/// [`Duration`]. Note that this is the minimum number of nanoseconds that
+	/// can actually be stored by a [`Duration`], which is more than can be
+	/// expressed alone using standard Chrono functionality.
+	const MIN_NANOSECONDS_FULL:  i128 = i64::MIN as i128 * 1_000 * 1_000;
 	
 	/// The minimum number of microseconds that can be represented by a
 	/// [`Duration`] when expressed alone. Note that this is not the minimum
@@ -114,7 +132,13 @@ pub trait DurationExt {
 	/// microseconds is not possible, and therefore this constant indicates the
 	/// minimum number of microseconds that can be expressed with current Chrono
 	/// functionality.
-	const MIN_MICROSECONDS: i64 = i64::MIN;
+	const MIN_MICROSECONDS:      i64  = i64::MIN;
+	
+	/// The minimum number of microseconds that can be represented by a
+	/// [`Duration`]. Note that this is the minimum number of microseconds that
+	/// can actually be stored by a [`Duration`], which is more than can be
+	/// expressed alone using standard Chrono functionality.
+	const MIN_MICROSECONDS_FULL: i128 = i64::MIN as i128 * 1_000;
 	
 	/// The minimum number of milliseconds that can be represented by a
 	/// [`Duration`]. The [`Duration`] struct stores its value as a number of
@@ -123,7 +147,7 @@ pub trait DurationExt {
 	/// milliseconds that can be stored is therefore the minimum number of
 	/// seconds multiplied by one thousand, and the expression of this full
 	/// value as milliseconds is possible.
-	const MIN_MILLISECONDS: i64 = i64::MIN;
+	const MIN_MILLISECONDS:      i64  = i64::MIN;
 	
 	/// The minimum number of seconds that can be represented by a [`Duration`].
 	/// The [`Duration`] struct stores its value as a number of seconds and
@@ -131,27 +155,27 @@ pub trait DurationExt {
 	/// milliseconds will never overflow.
 	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
 	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
-	const MIN_SECONDS:      i64 = i64::MIN / 1_000;
+	const MIN_SECONDS:           i64  = i64::MIN / 1_000;
 	
 	/// The minimum number of minutes that can be represented by a [`Duration`].
 	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
 	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
-	const MIN_MINUTES:      i64 = i64::MIN / 1_000 / 60;
+	const MIN_MINUTES:           i64  = i64::MIN / 1_000 / 60;
 	
 	/// The minimum number of hours that can be represented by a [`Duration`].
 	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
 	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
-	const MIN_HOURS:        i64 = i64::MIN / 1_000 / 60 / 60;
+	const MIN_HOURS:             i64  = i64::MIN / 1_000 / 60 / 60;
 	
 	/// The minimum number of days that can be represented by a [`Duration`].
 	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
 	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
-	const MIN_DAYS:         i64 = i64::MIN / 1_000 / 60 / 60 / 24;
+	const MIN_DAYS:              i64  = i64::MIN / 1_000 / 60 / 60 / 24;
 	
 	/// The minimum number of weeks that can be represented by a [`Duration`].
 	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
 	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
-	const MIN_WEEKS:        i64 = i64::MIN / 1_000 / 60 / 60 / 24 / 7;
+	const MIN_WEEKS:             i64  = i64::MIN / 1_000 / 60 / 60 / 24 / 7;
 	
 	/// The units used by [`humanize()`](DurationExt::humanize()). These
 	/// determine the units that will be used to represent a duration, with the

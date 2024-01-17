@@ -18,6 +18,16 @@ mod duration_ext {
 		assert!(duration.num_nanoseconds().is_none());
 	}
 	
+	//		MAX_NANOSECONDS_FULL												
+	#[test]
+	fn max_nanoseconds_full__max_allowed() {
+		assert_eq!(Duration::milliseconds(Duration::MAX_MILLISECONDS).num_nanoseconds_full(), Duration::MAX_NANOSECONDS_FULL);
+	}
+	#[test]
+	fn max_nanoseconds_full__overflow() {
+		assert!(Duration::milliseconds(Duration::MAX_MILLISECONDS).checked_add(&Duration::nanoseconds(1)).is_none());
+	}
+	
 	//		MAX_MICROSECONDS													
 	#[test]
 	fn max_microseconds__max_allowed() {
@@ -27,6 +37,16 @@ mod duration_ext {
 	fn max_microseconds__overflow() {
 		let duration = Duration::microseconds(Duration::MAX_MICROSECONDS) + Duration::microseconds(1);
 		assert!(duration.num_microseconds().is_none());
+	}
+	
+	//		MAX_MICROSECONDS_FULL												
+	#[test]
+	fn max_microseconds_full__max_allowed() {
+		assert_eq!(Duration::milliseconds(Duration::MAX_MILLISECONDS).num_microseconds_full(), Duration::MAX_MICROSECONDS_FULL);
+	}
+	#[test]
+	fn max_microseconds_full__overflow() {
+		assert!(Duration::milliseconds(Duration::MAX_MILLISECONDS).checked_add(&Duration::microseconds(1)).is_none());
 	}
 	
 	//		MAX_MILLISECONDS													
@@ -125,6 +145,16 @@ mod duration_ext {
 		assert!(duration.num_nanoseconds().is_none());
 	}
 	
+	//		MIN_NANOSECONDS_FULL												
+	#[test]
+	fn min_nanoseconds_full__min_allowed() {
+		assert_eq!(Duration::milliseconds(Duration::MIN_MILLISECONDS).num_nanoseconds_full(), Duration::MIN_NANOSECONDS_FULL);
+	}
+	#[test]
+	fn min_nanoseconds_full__overflow() {
+		assert!(Duration::milliseconds(Duration::MIN_MILLISECONDS).checked_add(&Duration::nanoseconds(1)).is_none());
+	}
+	
 	//		MIN_MICROSECONDS													
 	#[test]
 	fn min_microseconds__min_allowed() {
@@ -134,6 +164,16 @@ mod duration_ext {
 	fn min_microseconds__overflow() {
 		let duration = Duration::microseconds(Duration::MIN_MICROSECONDS) - Duration::microseconds(1);
 		assert!(duration.num_microseconds().is_none());
+	}
+	
+	//		MIN_MICROSECONDS_FULL												
+	#[test]
+	fn min_microseconds_full__min_allowed() {
+		assert_eq!(Duration::milliseconds(Duration::MIN_MILLISECONDS).num_microseconds_full(), Duration::MIN_MICROSECONDS_FULL);
+	}
+	#[test]
+	fn min_microseconds_full__overflow() {
+		assert!(Duration::milliseconds(Duration::MIN_MILLISECONDS).checked_add(&Duration::microseconds(1)).is_none());
 	}
 	
 	//		MIN_MILLISECONDS													
