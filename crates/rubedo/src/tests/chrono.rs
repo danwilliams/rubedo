@@ -7,6 +7,220 @@
 mod duration_ext {
 	use super::super::*;
 	
+	//		MAX_NANOSECONDS														
+	#[test]
+	fn max_nanoseconds__max_allowed() {
+		assert_eq!(Duration::nanoseconds(Duration::MAX_NANOSECONDS).num_nanoseconds(), Some(Duration::MAX_NANOSECONDS));
+	}
+	#[test]
+	fn max_nanoseconds__overflow() {
+		let duration = Duration::nanoseconds(Duration::MAX_NANOSECONDS) + Duration::nanoseconds(1);
+		assert!(duration.num_nanoseconds().is_none());
+	}
+	
+	//		MAX_MICROSECONDS													
+	#[test]
+	fn max_microseconds__max_allowed() {
+		assert_eq!(Duration::microseconds(Duration::MAX_MICROSECONDS).num_microseconds(), Some(Duration::MAX_MICROSECONDS));
+	}
+	#[test]
+	fn max_microseconds__overflow() {
+		let duration = Duration::microseconds(Duration::MAX_MICROSECONDS) + Duration::microseconds(1);
+		assert!(duration.num_microseconds().is_none());
+	}
+	
+	//		MAX_MILLISECONDS													
+	#[test]
+	fn max_milliseconds__max_allowed() {
+		assert_eq!(Duration::milliseconds(Duration::MAX_MILLISECONDS).num_milliseconds(), Duration::MAX_MILLISECONDS);
+	}
+	#[test]
+	fn max_milliseconds__overflow_addition() {
+		assert!(Duration::milliseconds(Duration::MAX_MILLISECONDS).checked_add(&Duration::milliseconds(1)).is_none());
+	}
+	
+	//		MAX_SECONDS															
+	#[test]
+	fn max_seconds__max_allowed() {
+		assert_eq!(Duration::seconds(Duration::MAX_SECONDS).num_seconds(), Duration::MAX_SECONDS);
+	}
+	#[test]
+	#[should_panic(expected = "Duration::seconds out of bounds")]
+	fn max_seconds__overflow_construction() {
+		let _ = Duration::seconds(Duration::MAX_SECONDS + 1);
+	}
+	#[test]
+	fn max_seconds__overflow_addition() {
+		assert!(Duration::seconds(Duration::MAX_SECONDS).checked_add(&Duration::seconds(1)).is_none());
+	}
+	
+	//		MAX_MINUTES															
+	#[test]
+	fn max_minutes__max_allowed() {
+		assert_eq!(Duration::minutes(Duration::MAX_MINUTES).num_minutes(), Duration::MAX_MINUTES);
+	}
+	#[test]
+	#[should_panic(expected = "Duration::minutes out of bounds")]
+	fn max_minutes__overflow_construction() {
+		let _ = Duration::minutes(Duration::MAX_MINUTES + 1);
+	}
+	#[test]
+	fn max_minutes__overflow_addition() {
+		assert!(Duration::minutes(Duration::MAX_MINUTES).checked_add(&Duration::minutes(1)).is_none());
+	}
+	
+	//		MAX_HOURS															
+	#[test]
+	fn max_hours__max_allowed() {
+		assert_eq!(Duration::hours(Duration::MAX_HOURS).num_hours(), Duration::MAX_HOURS);
+	}
+	#[test]
+	#[should_panic(expected = "Duration::hours ouf of bounds")]  //  Typo in Chrono
+	fn max_hours__overflow_construction() {
+		let _ = Duration::hours(Duration::MAX_HOURS + 1);
+	}
+	#[test]
+	fn max_hours__overflow_addition() {
+		assert!(Duration::hours(Duration::MAX_HOURS).checked_add(&Duration::hours(1)).is_none());
+	}
+	
+	//		MAX_DAYS															
+	#[test]
+	fn max_days__max_allowed() {
+		assert_eq!(Duration::days(Duration::MAX_DAYS).num_days(), Duration::MAX_DAYS);
+	}
+	#[test]
+	#[should_panic(expected = "Duration::days out of bounds")]
+	fn max_days__overflow_construction() {
+		let _ = Duration::days(Duration::MAX_DAYS + 1);
+	}
+	#[test]
+	fn max_days__overflow_addition() {
+		assert!(Duration::days(Duration::MAX_DAYS).checked_add(&Duration::days(1)).is_none());
+	}
+	
+	//		MAX_WEEKS															
+	#[test]
+	fn max_weeks__max_allowed() {
+		assert_eq!(Duration::weeks(Duration::MAX_WEEKS).num_weeks(), Duration::MAX_WEEKS);
+	}
+	#[test]
+	#[should_panic(expected = "Duration::weeks out of bounds")]
+	fn max_weeks__overflow_construction() {
+		let _ = Duration::weeks(Duration::MAX_WEEKS + 1);
+	}
+	#[test]
+	fn max_weeks__overflow_addition() {
+		assert!(Duration::weeks(Duration::MAX_WEEKS).checked_add(&Duration::weeks(1)).is_none());
+	}
+	
+	//		MIN_NANOSECONDS														
+	#[test]
+	fn min_nanoseconds__min_allowed() {
+		assert_eq!(Duration::nanoseconds(Duration::MIN_NANOSECONDS).num_nanoseconds(), Some(Duration::MIN_NANOSECONDS));
+	}
+	#[test]
+	fn min_nanoseconds__overflow() {
+		let duration = Duration::nanoseconds(Duration::MIN_NANOSECONDS) - Duration::nanoseconds(1);
+		assert!(duration.num_nanoseconds().is_none());
+	}
+	
+	//		MIN_MICROSECONDS													
+	#[test]
+	fn min_microseconds__min_allowed() {
+		assert_eq!(Duration::microseconds(Duration::MIN_MICROSECONDS).num_microseconds(), Some(Duration::MIN_MICROSECONDS));
+	}
+	#[test]
+	fn min_microseconds__overflow() {
+		let duration = Duration::microseconds(Duration::MIN_MICROSECONDS) - Duration::microseconds(1);
+		assert!(duration.num_microseconds().is_none());
+	}
+	
+	//		MIN_MILLISECONDS													
+	#[test]
+	fn min_milliseconds__min_allowed() {
+		assert_eq!(Duration::milliseconds(Duration::MIN_MILLISECONDS).num_milliseconds(), Duration::MIN_MILLISECONDS);
+	}
+	#[test]
+	fn min_milliseconds__overflow_addition() {
+		assert!(Duration::milliseconds(Duration::MIN_MILLISECONDS).checked_sub(&Duration::milliseconds(1)).is_none());
+	}
+	
+	//		MIN_SECONDS															
+	#[test]
+	fn min_seconds__min_allowed() {
+		assert_eq!(Duration::seconds(Duration::MIN_SECONDS).num_seconds(), Duration::MIN_SECONDS);
+	}
+	#[test]
+	#[should_panic(expected = "Duration::seconds out of bounds")]
+	fn min_seconds__overflow_construction() {
+		let _ = Duration::seconds(Duration::MIN_SECONDS - 1);
+	}
+	#[test]
+	fn min_seconds__overflow_addition() {
+		assert!(Duration::seconds(Duration::MIN_SECONDS).checked_sub(&Duration::seconds(1)).is_none());
+	}
+	
+	//		MIN_MINUTES															
+	#[test]
+	fn min_minutes__min_allowed() {
+		assert_eq!(Duration::minutes(Duration::MIN_MINUTES).num_minutes(), Duration::MIN_MINUTES);
+	}
+	#[test]
+	#[should_panic(expected = "Duration::minutes out of bounds")]
+	fn min_minutes__overflow_construction() {
+		let _ = Duration::minutes(Duration::MIN_MINUTES - 1);
+	}
+	#[test]
+	fn min_minutes__overflow_addition() {
+		assert!(Duration::minutes(Duration::MIN_MINUTES).checked_sub(&Duration::minutes(1)).is_none());
+	}
+	
+	//		MIN_HOURS															
+	#[test]
+	fn min_hours__min_allowed() {
+		assert_eq!(Duration::hours(Duration::MIN_HOURS).num_hours(), Duration::MIN_HOURS);
+	}
+	#[test]
+	#[should_panic(expected = "Duration::hours ouf of bounds")]  //  Typo in Chrono
+	fn min_hours__overflow_construction() {
+		let _ = Duration::hours(Duration::MIN_HOURS - 1);
+	}
+	#[test]
+	fn min_hours__overflow_addition() {
+		assert!(Duration::hours(Duration::MIN_HOURS).checked_sub(&Duration::hours(1)).is_none());
+	}
+	
+	//		MIN_DAYS															
+	#[test]
+	fn min_days__min_allowed() {
+		assert_eq!(Duration::days(Duration::MIN_DAYS).num_days(), Duration::MIN_DAYS);
+	}
+	#[test]
+	#[should_panic(expected = "Duration::days out of bounds")]
+	fn min_days__overflow_construction() {
+		let _ = Duration::days(Duration::MIN_DAYS - 1);
+	}
+	#[test]
+	fn min_days__overflow_addition() {
+		assert!(Duration::days(Duration::MIN_DAYS).checked_sub(&Duration::days(1)).is_none());
+	}
+	
+	//		MIN_WEEKS															
+	#[test]
+	fn min_weeks__min_allowed() {
+		assert_eq!(Duration::weeks(Duration::MIN_WEEKS).num_weeks(), Duration::MIN_WEEKS);
+	}
+	#[test]
+	#[should_panic(expected = "Duration::weeks out of bounds")]
+	fn min_weeks__overflow_construction() {
+		let _ = Duration::weeks(Duration::MIN_WEEKS - 1);
+	}
+	#[test]
+	fn min_weeks__overflow_addition() {
+		assert!(Duration::weeks(Duration::MIN_WEEKS).checked_sub(&Duration::weeks(1)).is_none());
+	}
+	
 	//		humanize															
 	#[test]
 	fn humanize() {
