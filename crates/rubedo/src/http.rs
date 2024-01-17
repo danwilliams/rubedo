@@ -110,16 +110,16 @@ impl Error for ResponseError {}
 /// If specific headers or body content needs to be checked, it is recommended
 /// to use the standard functions as they will be more efficient and performant.
 /// 
-/// Note that the [`body`](UnpackedResponse.body) property, which is stored as a
-/// vector of bytes, will get converted to a [`String`] if it is run through the
-/// standard [`Debug`] or [`Display`] formatters. This is because human-readable
-/// output is the intuitively-expected outcome in this situation. The behaviour
-/// can be controlled with the [`ContentType`] enum, which is used to determine
-/// whether the data is binary or text. If [`Text`](ContentType::Text), then the
-/// conversion uses [`from_utf8_lossy()`](String::from_utf8_lossy()), so no
-/// errors will occur, but if the body is not valid UTF8 then the resulting
-/// [`String`] will not be exactly the same. If an accurate representation of
-/// the body is required then it should be set to [`Binary`](ContentType::Binary),
+/// Note that the [`body`](UnpackedResponse::body) property, which is stored as
+/// a vector of bytes, will get converted to a [`String`] if it is run through
+/// the standard [`Debug`] or [`Display`] formatters. This is because
+/// human-readable output is the intuitively-expected outcome in this situation.
+/// The behaviour can be controlled with the [`ContentType`] enum, which is used
+/// to determine whether the data is binary or text. If [`Text`](ContentType::Text),
+/// then the conversion uses [`from_utf8_lossy()`](String::from_utf8_lossy()),
+/// so no errors will occur, but if the body is not valid UTF8 then the
+/// resulting [`String`] will not be exactly the same. If an accurate
+/// representation of the body is required then it should be set to [`Binary`](ContentType::Binary),
 /// or else it should be extracted and converted to a `Vec<u8>` and then run
 /// through the [`Debug`] or [`Display`] formatters directly.
 /// 
