@@ -17,7 +17,7 @@ reasons = []
 
 [dependencies]
 base64 = "0.21.7"
-chrono = { version = "0.4.31", features = ["alloc", "clock", "std"] }
+chrono = { version = "0.4.32", features = ["alloc", "clock", "std"] }
 futures = "0.3.30"
 http = "0.2.11"
 http-body = "0.4.5"

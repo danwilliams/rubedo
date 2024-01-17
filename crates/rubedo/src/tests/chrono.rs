@@ -103,10 +103,37 @@ mod duration_ext {
 	}
 }
 
+//§		MonthsExt																
+#[cfg(test)]
+mod months_ext {
+	use super::super::*;
+	
+	//		num_months															
+	#[test]
+	fn num_months() {
+		assert_eq!(Months::new(0).num_months(), 0);
+		assert_eq!(Months::new(1).num_months(), 1);
+		assert_eq!(Months::new(u32::MAX).num_months(), u32::MAX);
+	}
+	
+	//		num_years															
+	#[test]
+	fn num_years() {
+		assert_eq!(Months::new(0).num_years(), 0);
+		assert_eq!(Months::new(1).num_years(), 0);
+		assert_eq!(Months::new(11).num_years(), 0);
+		assert_eq!(Months::new(12).num_years(), 1);
+		assert_eq!(Months::new(23).num_years(), 1);
+		assert_eq!(Months::new(24).num_years(), 2);
+		assert_eq!(Months::new(u32::MAX).num_years(), u32::MAX / 12);
+	}
+}
+
 //§		NaiveDateExt															
 #[cfg(test)]
 mod naivedate_ext {
 	use super::super::*;
+	use chrono::NaiveDateTime;
 	use claims::{assert_none, assert_some_eq};
 	
 	//		today																

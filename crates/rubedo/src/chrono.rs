@@ -14,7 +14,7 @@ mod tests;
 //		Packages
 
 use crate::sugar::s;
-use chrono::{prelude::*, Duration, NaiveDate, Utc};
+use chrono::{Datelike, Duration, Months, NaiveDate, Utc};
 
 
 
@@ -65,6 +65,40 @@ impl DurationExt for Duration {
 			}
 		}
 		s!("0 seconds")
+	}
+}
+
+//§		MonthsExt																
+/// This trait provides additional functionality to [`Months`].
+pub trait MonthsExt {
+	//		num_months															
+	/// Returns the total number of months in the [`Months`] instance.
+	/// 
+	/// This is a convenience function, to make the behaviour of [`Months`] fit
+	/// more closely with the behaviour of [`Duration`].
+	/// 
+	fn num_months(&self) -> u32;
+	
+	//		num_years															
+	/// Returns the total number of whole years in the [`Months`] instance.
+	/// 
+	/// This is a convenience function, to make the behaviour of [`Months`] fit
+	/// more closely with the behaviour of [`Duration`].
+	/// 
+	fn num_years(&self) -> u32;
+}
+
+impl MonthsExt for Months {
+	//		num_months															
+	fn num_months(&self) -> u32 {
+		self.as_u32()
+	}
+	
+	//		num_years															
+	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
+	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
+	fn num_years(&self) -> u32 {
+		self.as_u32() / 12
 	}
 }
 
