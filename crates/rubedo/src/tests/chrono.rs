@@ -395,8 +395,30 @@ mod months_ext {
 #[cfg(test)]
 mod naivedate_ext {
 	use super::super::*;
-	use chrono::NaiveDateTime;
+	use chrono::{NaiveDateTime, TimeZone};
 	use claims::{assert_none, assert_some_eq};
+	
+	//		MAX_YEAR															
+	#[test]
+	fn max_year__max_allowed() {
+		assert_eq!(Utc.with_ymd_and_hms(NaiveDate::MAX_YEAR, 12, 31, 00, 00, 00).unwrap(), Utc.with_ymd_and_hms(262_142, 12, 31, 00, 00, 00).unwrap());
+	}
+	#[test]
+	#[should_panic(expected = "No such local time")]
+	fn max_year__overflow() {
+		let _ = Utc.with_ymd_and_hms(NaiveDate::MAX_YEAR + 1, 12, 31, 00, 00, 00).unwrap();
+	}
+	
+	//		MIN_YEAR															
+	#[test]
+	fn min_year__min_allowed() {
+		assert_eq!(Utc.with_ymd_and_hms(NaiveDate::MIN_YEAR, 1, 1, 00, 00, 00).unwrap(), Utc.with_ymd_and_hms(-262_143, 1, 1, 00, 00, 00).unwrap());
+	}
+	#[test]
+	#[should_panic(expected = "No such local time")]
+	fn min_year__overflow() {
+		let _ = Utc.with_ymd_and_hms(NaiveDate::MIN_YEAR - 1, 1, 1, 00, 00, 00).unwrap();
+	}
 	
 	//		today																
 	#[test]
