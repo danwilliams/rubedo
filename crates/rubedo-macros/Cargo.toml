@@ -16,7 +16,7 @@ readme = "README.md"
 proc-macro = true
 
 [dependencies]
-quote = "1.0.33"
+quote = "1.0.35"
 
 [dev-dependencies]
-trybuild = "1.0.85"
+trybuild = "1.0.89"
