@@ -174,6 +174,33 @@ pub trait DurationExt {
 	/// 4 days, 5 hours, 6 minutes, and 7 seconds, it will return "1 year".
 	/// 
 	fn humanize(&self) -> String;
+	
+	//		num_nanoseconds_full												
+	/// Returns the total number of nanoseconds in the [`Duration`] instance.
+	/// 
+	/// This function is necessary because although the [`Duration`] struct
+	/// stores its value internally as seconds and nanoseconds, the
+	/// [`num_nanoseconds()`](Duration::num_nanoseconds()) method returns the
+	/// nanoseconds as an `i64`, which is not large enough to express the full
+	/// range of nanoseconds that can be stored by a [`Duration`] instance. This
+	/// function therefore returns the nanoseconds as an `i128`, which is large
+	/// enough to express the full range of nanoseconds that can be stored.
+	/// 
+	fn num_nanoseconds_full(&self) -> i128;
+	
+	//		num_microseconds_full												
+	/// Returns the total number of microseconds in the [`Duration`] instance.
+	/// 
+	/// This function is necessary because although the [`Duration`] struct
+	/// stores its value internally as seconds and nanoseconds, the
+	/// [`num_microseconds()`](Duration::num_microseconds()) method returns the
+	/// microseconds as an `i64`, which is not large enough to express the full
+	/// range of microseconds that can be stored by a [`Duration`] instance.
+	/// This function therefore returns the microseconds as an `i128`, which is
+	/// large enough to express the full range of microseconds that can be
+	/// stored.
+	/// 
+	fn num_microseconds_full(&self) -> i128;
 }
 
 impl DurationExt for Duration {
@@ -195,6 +222,22 @@ impl DurationExt for Duration {
 			}
 		}
 		s!("0 seconds")
+	}
+	
+	//		num_nanoseconds_full												
+	fn num_nanoseconds_full(&self) -> i128 {
+		//	This will actually never saturate, as Chrono uses i64 internally
+		i128::from(self.num_seconds())
+			.saturating_mul(1_000_000_000)
+			.saturating_add(i128::from(self.subsec_nanos()))
+	}
+	
+	//		num_microseconds_full												
+	fn num_microseconds_full(&self) -> i128 {
+		//	This will actually never saturate, as Chrono uses i64 internally
+		i128::from(self.num_seconds())
+			.saturating_mul(1_000_000)
+			.saturating_add(i128::from(self.subsec_nanos()).saturating_div(1_000))
 	}
 }
 

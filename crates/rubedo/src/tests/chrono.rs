@@ -315,6 +315,62 @@ mod duration_ext {
 		let duration = Duration::seconds(31536000000);
 		assert_eq!(duration.humanize(), "1000 years");
 	}
+	
+	//		num_nanoseconds_full												
+	#[test]
+	fn num_nanoseconds_full() {
+		assert_eq!(Duration::nanoseconds(             0).num_nanoseconds_full(),              0);
+		assert_eq!(Duration::nanoseconds(             1).num_nanoseconds_full(),              1);
+		assert_eq!(Duration::nanoseconds(            -1).num_nanoseconds_full(),             -1);
+		assert_eq!(Duration::nanoseconds( 1_000_000_000).num_nanoseconds_full(),  1_000_000_000);
+		assert_eq!(Duration::nanoseconds(-1_000_000_000).num_nanoseconds_full(), -1_000_000_000);
+		assert_eq!(Duration::nanoseconds( 1_234_567_890).num_nanoseconds_full(),  1_234_567_890);
+		assert_eq!(Duration::nanoseconds(-1_234_567_890).num_nanoseconds_full(), -1_234_567_890);
+	}
+	#[test]
+	fn num_nanoseconds_full__beyond_normal_limits() {
+		let duration = Duration::nanoseconds(Duration::MAX_NANOSECONDS)
+			.checked_add(&Duration::nanoseconds(Duration::MAX_NANOSECONDS))
+			.unwrap()
+		;
+		assert!(duration.num_nanoseconds().is_none());
+		assert_eq!(duration.num_nanoseconds_full(), Duration::MAX_NANOSECONDS as i128 * 2);
+		
+		let duration = Duration::nanoseconds(Duration::MIN_NANOSECONDS)
+			.checked_add(&Duration::nanoseconds(Duration::MIN_NANOSECONDS))
+			.unwrap()
+		;
+		assert!(duration.num_nanoseconds().is_none());
+		assert_eq!(duration.num_nanoseconds_full(), Duration::MIN_NANOSECONDS as i128 * 2);
+	}
+	
+	//		num_microseconds_full												
+	#[test]
+	fn num_microseconds_full() {
+		assert_eq!(Duration::microseconds(         0).num_microseconds_full(),          0);
+		assert_eq!(Duration::microseconds(         1).num_microseconds_full(),          1);
+		assert_eq!(Duration::microseconds(        -1).num_microseconds_full(),         -1);
+		assert_eq!(Duration::microseconds( 1_000_000).num_microseconds_full(),  1_000_000);
+		assert_eq!(Duration::microseconds(-1_000_000).num_microseconds_full(), -1_000_000);
+		assert_eq!(Duration::microseconds( 1_234_567).num_microseconds_full(),  1_234_567);
+		assert_eq!(Duration::microseconds(-1_234_567).num_microseconds_full(), -1_234_567);
+	}
+	#[test]
+	fn num_microseconds_full__beyond_normal_limits() {
+		let duration = Duration::microseconds(Duration::MAX_MICROSECONDS)
+			.checked_add(&Duration::microseconds(Duration::MAX_MICROSECONDS))
+			.unwrap()
+		;
+		assert!(duration.num_microseconds().is_none());
+		assert_eq!(duration.num_microseconds_full(), Duration::MAX_MICROSECONDS as i128 * 2);
+		
+		let duration = Duration::microseconds(Duration::MAX_MICROSECONDS)
+			.checked_add(&Duration::microseconds(Duration::MAX_MICROSECONDS))
+			.unwrap()
+		;
+		assert!(duration.num_microseconds().is_none());
+		assert_eq!(duration.num_microseconds_full(), Duration::MAX_MICROSECONDS as i128 * 2);
+	}
 }
 
 //§		MonthsExt																
