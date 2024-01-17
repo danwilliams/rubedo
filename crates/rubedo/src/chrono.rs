@@ -268,6 +268,14 @@ impl DurationExt for Duration {
 //§		MonthsExt																
 /// This trait provides additional functionality to [`Months`].
 pub trait MonthsExt {
+	/// The maximum number of months that can be represented by a [`Months`].
+	const MAX_MONTHS: u32 = u32::MAX;
+	
+	/// The maximum number of years that can be represented by a [`Months`].
+	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
+	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
+	const MAX_YEARS:  u32 = u32::MAX / 12;
+	
 	//		num_months															
 	/// Returns the total number of months in the [`Months`] instance.
 	/// 

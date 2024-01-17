@@ -418,6 +418,18 @@ mod duration_ext {
 mod months_ext {
 	use super::super::*;
 	
+	//		MAX_MONTHS															
+	#[test]
+	fn max_months__max_allowed() {
+		assert_eq!(Months::new(Months::MAX_MONTHS).num_months(), Months::MAX_MONTHS);
+	}
+	
+	//		MAX_YEARS															
+	#[test]
+	fn max_years__max_allowed() {
+		assert_eq!(Months::new(Months::MAX_YEARS * 12).num_years(), Months::MAX_YEARS);
+	}
+	
 	//		num_months															
 	#[test]
 	fn num_months() {
