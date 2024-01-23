@@ -12,6 +12,47 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.4.3 (23 January 2024)
+
+### Added
+
+  - Extended the `chrono` module
+      - Added `MonthsExt` trait
+          - Added `Months::MAX_MONTHS`
+          - Added `Months::MAX_YEARS`
+          - Added `Months.num_months()`
+          - Added `Months.num_years()`
+      - Added `MAX_*` and `MIN_*` constants to `DurationExt`
+          - Added `Duration::MAX_NANOSECONDS`
+          - Added `Duration::MAX_MICROSECONDS`
+          - Added `Duration::MAX_MILLISECONDS`
+          - Added `Duration::MAX_SECONDS`
+          - Added `Duration::MAX_MINUTES`
+          - Added `Duration::MAX_HOURS`
+          - Added `Duration::MAX_DAYS`
+          - Added `Duration::MAX_WEEKS`
+          - Added `Duration::MIN_NANOSECONDS`
+          - Added `Duration::MIN_MICROSECONDS`
+          - Added `Duration::MIN_MILLISECONDS`
+          - Added `Duration::MIN_SECONDS`
+          - Added `Duration::MIN_MINUTES`
+          - Added `Duration::MIN_HOURS`
+          - Added `Duration::MIN_DAYS`
+          - Added `Duration::MIN_WEEKS`
+      - Added constants and methods to `DurationExt` for full range
+          - Added `Duration.num_nanoseconds_full()`
+          - Added `Duration.num_microseconds_full()`
+          - Added `Duration::MAX_NANOSECONDS_FULL`
+          - Added `Duration::MAX_MICROSECONDS_FULL`
+          - Added `Duration::MIN_NANOSECONDS_FULL`
+          - Added `Duration::MIN_MICROSECONDS_FULL`
+
+### Changed
+
+  - Updated `NaiveDateExt::MAX_YEAR` and `MIN_YEAR` for Chrono 0.4.32
+  - Updated crate dependencies
+
+
 ## 0.4.2 (09 December 2023)
 
 ### Added
