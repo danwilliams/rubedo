@@ -117,8 +117,10 @@ pub trait DurationExt {
 	/// The minimum number of nanoseconds that can be represented by a
 	/// [`Duration`]. Note that this is the minimum number of nanoseconds that
 	/// can actually be stored by a [`Duration`], which is more than can be
-	/// expressed alone using standard Chrono functionality.
-	const MIN_NANOSECONDS_FULL:  i128 = i64::MIN as i128 * 1_000 * 1_000;
+	/// expressed alone using standard Chrono functionality. The range here
+	/// notably is from `-i64::MAX` and not `i64::MIN`, due to changes in
+	/// <https://github.com/chronotope/chrono/pull/1334>.
+	const MIN_NANOSECONDS_FULL:  i128 = -i64::MAX as i128 * 1_000 * 1_000;
 	
 	/// The minimum number of microseconds that can be represented by a
 	/// [`Duration`] when expressed alone. Note that this is not the minimum
@@ -137,8 +139,10 @@ pub trait DurationExt {
 	/// The minimum number of microseconds that can be represented by a
 	/// [`Duration`]. Note that this is the minimum number of microseconds that
 	/// can actually be stored by a [`Duration`], which is more than can be
-	/// expressed alone using standard Chrono functionality.
-	const MIN_MICROSECONDS_FULL: i128 = i64::MIN as i128 * 1_000;
+	/// expressed alone using standard Chrono functionality. The range here
+	/// notably is from `-i64::MAX` and not `i64::MIN`, due to changes in
+	/// <https://github.com/chronotope/chrono/pull/1334>.
+	const MIN_MICROSECONDS_FULL: i128 = -i64::MAX as i128 * 1_000;
 	
 	/// The minimum number of milliseconds that can be represented by a
 	/// [`Duration`]. The [`Duration`] struct stores its value as a number of
@@ -146,8 +150,10 @@ pub trait DurationExt {
 	/// so that the milliseconds will never overflow. The minimum number of
 	/// milliseconds that can be stored is therefore the minimum number of
 	/// seconds multiplied by one thousand, and the expression of this full
-	/// value as milliseconds is possible.
-	const MIN_MILLISECONDS:      i64  = i64::MIN;
+	/// value as milliseconds is possible. The range here notably is from
+	/// `-i64::MAX` and not `i64::MIN`, due to changes in
+	/// <https://github.com/chronotope/chrono/pull/1334>.
+	const MIN_MILLISECONDS:      i64  = -i64::MAX;
 	
 	/// The minimum number of seconds that can be represented by a [`Duration`].
 	/// The [`Duration`] struct stores its value as a number of seconds and

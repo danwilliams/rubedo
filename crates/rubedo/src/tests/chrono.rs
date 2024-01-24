@@ -152,7 +152,7 @@ mod duration_ext {
 	}
 	#[test]
 	fn min_nanoseconds_full__overflow() {
-		assert!(Duration::milliseconds(Duration::MIN_MILLISECONDS).checked_add(&Duration::nanoseconds(1)).is_none());
+		assert!(Duration::milliseconds(Duration::MIN_MILLISECONDS).checked_sub(&Duration::nanoseconds(1)).is_none());
 	}
 	
 	//		MIN_MICROSECONDS													
@@ -173,7 +173,7 @@ mod duration_ext {
 	}
 	#[test]
 	fn min_microseconds_full__overflow() {
-		assert!(Duration::milliseconds(Duration::MIN_MILLISECONDS).checked_add(&Duration::microseconds(1)).is_none());
+		assert!(Duration::milliseconds(Duration::MIN_MILLISECONDS).checked_sub(&Duration::microseconds(1)).is_none());
 	}
 	
 	//		MIN_MILLISECONDS													
