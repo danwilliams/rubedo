@@ -205,10 +205,11 @@ pub trait DurationExt {
 	/// This function is necessary because although the [`Duration`] struct
 	/// stores its value internally as seconds and nanoseconds, the
 	/// [`num_nanoseconds()`](Duration::num_nanoseconds()) method returns the
-	/// nanoseconds as an `i64`, which is not large enough to express the full
+	/// nanoseconds as an [`i64`], which is not large enough to express the full
 	/// range of nanoseconds that can be stored by a [`Duration`] instance. This
-	/// function therefore returns the nanoseconds as an `i128`, which is large
-	/// enough to express the full range of nanoseconds that can be stored.
+	/// function therefore returns the nanoseconds as an [`i128`], which is
+	/// large enough to express the full range of nanoseconds that can be
+	/// stored.
 	/// 
 	fn num_nanoseconds_full(&self) -> i128;
 	
@@ -218,11 +219,11 @@ pub trait DurationExt {
 	/// This function is necessary because although the [`Duration`] struct
 	/// stores its value internally as seconds and nanoseconds, the
 	/// [`num_microseconds()`](Duration::num_microseconds()) method returns the
-	/// microseconds as an `i64`, which is not large enough to express the full
-	/// range of microseconds that can be stored by a [`Duration`] instance.
-	/// This function therefore returns the microseconds as an `i128`, which is
-	/// large enough to express the full range of microseconds that can be
-	/// stored.
+	/// microseconds as an [`i64`], which is not large enough to express the
+	/// full range of microseconds that can be stored by a [`Duration`]
+	/// instance. This function therefore returns the microseconds as an
+	/// [`i128`], which is large enough to express the full range of
+	/// microseconds that can be stored.
 	/// 
 	fn num_microseconds_full(&self) -> i128;
 }
