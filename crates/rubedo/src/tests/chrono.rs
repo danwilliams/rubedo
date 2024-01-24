@@ -296,6 +296,70 @@ mod duration_ext {
 		assert_eq!(Duration::seconds(31536000000).humanize(), "1000 years");
 	}
 	
+	//		nanoseconds_full													
+	#[test]
+	fn nanoseconds_full() {
+		assert_eq!(Duration::nanoseconds_full(             0).unwrap(), Duration::nanoseconds(             0));
+		assert_eq!(Duration::nanoseconds_full(             1).unwrap(), Duration::nanoseconds(             1));
+		assert_eq!(Duration::nanoseconds_full(            -1).unwrap(), Duration::nanoseconds(            -1));
+		assert_eq!(Duration::nanoseconds_full( 1_000_000_000).unwrap(), Duration::nanoseconds( 1_000_000_000));
+		assert_eq!(Duration::nanoseconds_full(-1_000_000_000).unwrap(), Duration::nanoseconds(-1_000_000_000));
+		assert_eq!(Duration::nanoseconds_full( 1_234_567_890).unwrap(), Duration::nanoseconds( 1_234_567_890));
+		assert_eq!(Duration::nanoseconds_full(-1_234_567_890).unwrap(), Duration::nanoseconds(-1_234_567_890));
+	}
+	#[test]
+	fn nanoseconds_full__standard_limit_allowed() {
+		assert_eq!(Duration::nanoseconds_full(Duration::MAX_NANOSECONDS as i128).unwrap(), Duration::nanoseconds(Duration::MAX_NANOSECONDS));
+		assert_eq!(Duration::nanoseconds_full(Duration::MIN_NANOSECONDS as i128).unwrap(), Duration::nanoseconds(Duration::MIN_NANOSECONDS));
+	}
+	#[test]
+	fn nanoseconds_full__standard_overflow() {
+		assert_eq!(Duration::nanoseconds_full(Duration::MAX_NANOSECONDS as i128 + 1).unwrap().num_nanoseconds_full(), Duration::MAX_NANOSECONDS as i128 + 1);
+		assert_eq!(Duration::nanoseconds_full(Duration::MIN_NANOSECONDS as i128 - 1).unwrap().num_nanoseconds_full(), Duration::MIN_NANOSECONDS as i128 - 1);
+	}
+	#[test]
+	fn nanoseconds_full__full_limit_allowed() {
+		assert_eq!(Duration::nanoseconds_full(Duration::MAX_NANOSECONDS_FULL).unwrap().num_nanoseconds_full(), Duration::MAX_NANOSECONDS_FULL);
+		assert_eq!(Duration::nanoseconds_full(Duration::MIN_NANOSECONDS_FULL).unwrap().num_nanoseconds_full(), Duration::MIN_NANOSECONDS_FULL);
+	}
+	#[test]
+	fn nanoseconds_full__full_overflow() {
+		assert!(Duration::nanoseconds_full(Duration::MAX_NANOSECONDS_FULL + 1).is_none());
+		assert!(Duration::nanoseconds_full(Duration::MIN_NANOSECONDS_FULL - 1).is_none());
+	}
+	
+	//		microseconds_full													
+	#[test]
+	fn microseconds_full() {
+		assert_eq!(Duration::microseconds_full(             0).unwrap(), Duration::microseconds(             0));
+		assert_eq!(Duration::microseconds_full(             1).unwrap(), Duration::microseconds(             1));
+		assert_eq!(Duration::microseconds_full(            -1).unwrap(), Duration::microseconds(            -1));
+		assert_eq!(Duration::microseconds_full( 1_000_000_000).unwrap(), Duration::microseconds( 1_000_000_000));
+		assert_eq!(Duration::microseconds_full(-1_000_000_000).unwrap(), Duration::microseconds(-1_000_000_000));
+		assert_eq!(Duration::microseconds_full( 1_234_567_890).unwrap(), Duration::microseconds( 1_234_567_890));
+		assert_eq!(Duration::microseconds_full(-1_234_567_890).unwrap(), Duration::microseconds(-1_234_567_890));
+	}
+	#[test]
+	fn microseconds_full__standard_limit_allowed() {
+		assert_eq!(Duration::microseconds_full(Duration::MAX_MICROSECONDS as i128).unwrap(), Duration::microseconds(Duration::MAX_MICROSECONDS));
+		assert_eq!(Duration::microseconds_full(Duration::MIN_MICROSECONDS as i128).unwrap(), Duration::microseconds(Duration::MIN_MICROSECONDS));
+	}
+	#[test]
+	fn microseconds_full__standard_overflow() {
+		assert_eq!(Duration::microseconds_full(Duration::MAX_MICROSECONDS as i128 + 1).unwrap().num_microseconds_full(), Duration::MAX_MICROSECONDS as i128 + 1);
+		assert_eq!(Duration::microseconds_full(Duration::MIN_MICROSECONDS as i128 - 1).unwrap().num_microseconds_full(), Duration::MIN_MICROSECONDS as i128 - 1);
+	}
+	#[test]
+	fn microseconds_full__full_limit_allowed() {
+		assert_eq!(Duration::microseconds_full(Duration::MAX_MICROSECONDS_FULL).unwrap().num_microseconds_full(), Duration::MAX_MICROSECONDS_FULL);
+		assert_eq!(Duration::microseconds_full(Duration::MIN_MICROSECONDS_FULL).unwrap().num_microseconds_full(), Duration::MIN_MICROSECONDS_FULL);
+	}
+	#[test]
+	fn microseconds_full__full_overflow() {
+		assert!(Duration::microseconds_full(Duration::MAX_MICROSECONDS_FULL + 1).is_none());
+		assert!(Duration::microseconds_full(Duration::MIN_MICROSECONDS_FULL - 1).is_none());
+	}
+	
 	//		num_nanoseconds_full												
 	#[test]
 	fn num_nanoseconds_full() {

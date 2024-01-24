@@ -15,6 +15,7 @@ mod tests;
 
 use crate::sugar::s;
 use chrono::{Datelike, Duration, Months, NaiveDate, Utc};
+use core::ops::Neg;
 
 
 
@@ -205,6 +206,54 @@ pub trait DurationExt {
 	/// 
 	fn humanize(&self) -> String;
 	
+	//		nanoseconds_full												
+	/// Make a new [`Duration`] with the given number of nanoseconds.
+	/// 
+	/// This function is necessary because although the [`Duration`] struct
+	/// stores its value internally as seconds and nanoseconds, the
+	/// [`nanoseconds()`](Duration::nanoseconds()) method only accepts the
+	/// number of nanoseconds as an [`i64`], which is not large enough to
+	/// express the full range of nanoseconds that can be stored by a
+	/// [`Duration`] instance. This function therefore accepts the number of
+	/// nanoseconds as an [`i128`], which is large enough to express the full
+	/// range of nanoseconds that can be stored, and creates a [`Duration`]
+	/// instance appropriately.
+	/// 
+	/// # Errors
+	/// 
+	/// This function will return [`None`] if the number of nanoseconds is
+	/// greater than [`MAX_NANOSECONDS_FULL`](DurationExt::MAX_NANOSECONDS_FULL)
+	/// or less than [`MIN_NANOSECONDS_FULL`](DurationExt::MIN_NANOSECONDS_FULL).
+	/// This is not quite the same as Chrono's behaviour, which panics under
+	/// similar conditions, but panics are undesirable in library code and hence
+	/// this deviation seems justifiable.
+	/// 
+	fn nanoseconds_full(nanoseconds: i128) -> Option<Self> where Self: Sized;
+	
+	//		microseconds_full												
+	/// Make a new [`Duration`] with the given number of microseconds.
+	/// 
+	/// This function is necessary because although the [`Duration`] struct
+	/// stores its value internally as seconds and microseconds, the
+	/// [`microseconds()`](Duration::microseconds()) method only accepts the
+	/// number of microseconds as an [`i64`], which is not large enough to
+	/// express the full range of microseconds that can be stored by a
+	/// [`Duration`] instance. This function therefore accepts the number of
+	/// microseconds as an [`i128`], which is large enough to express the full
+	/// range of microseconds that can be stored, and creates a [`Duration`]
+	/// instance appropriately.
+	/// 
+	/// # Errors
+	/// 
+	/// This function will return [`None`] if the number of microseconds is
+	/// greater than [`MAX_MICROSECONDS_FULL`](DurationExt::MAX_MICROSECONDS_FULL)
+	/// or less than [`MIN_MICROSECONDS_FULL`](DurationExt::MAX_MICROSECONDS_FULL).
+	/// This is not quite the same as Chrono's behaviour, which panics under
+	/// similar conditions, but panics are undesirable in library code and hence
+	/// this deviation seems justifiable.
+	/// 
+	fn microseconds_full(microseconds: i128) -> Option<Self> where Self: Sized;
+	
 	//		num_nanoseconds_full												
 	/// Returns the total number of nanoseconds in the [`Duration`] instance.
 	/// 
@@ -253,6 +302,46 @@ impl DurationExt for Duration {
 			}
 		}
 		s!("0 seconds")
+	}
+	
+	//		nanoseconds_full												
+	fn nanoseconds_full(nanoseconds: i128) -> Option<Self> {
+		if !(Self::MIN_NANOSECONDS_FULL..=Self::MAX_NANOSECONDS_FULL).contains(&nanoseconds) {
+			return None;
+		}
+		#[cfg_attr(    feature = "reasons",  allow(clippy::cast_possible_truncation, reason = "Range is controlled"))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_possible_truncation))]
+		if (i128::from(Self::MIN_NANOSECONDS)..=i128::from(Self::MAX_NANOSECONDS)).contains(&nanoseconds) {
+			Some(Self::nanoseconds(nanoseconds as i64))
+		} else if nanoseconds < 0 {
+			Self::seconds(         nanoseconds.abs().div_euclid(1_000_000_000_i128).neg() as i64).checked_sub(
+				&Self::nanoseconds(nanoseconds.abs().rem_euclid(1_000_000_000_i128)       as i64)
+			)
+		} else {
+			Self::seconds(         nanoseconds.div_euclid(1_000_000_000_i128) as i64).checked_add(
+				&Self::nanoseconds(nanoseconds.rem_euclid(1_000_000_000_i128) as i64)
+			)
+		}
+	}
+	
+	//		microseconds_full												
+	fn microseconds_full(microseconds: i128) -> Option<Self> {
+		if !(Self::MIN_MICROSECONDS_FULL..=Self::MAX_MICROSECONDS_FULL).contains(&microseconds) {
+			return None;
+		}
+		#[cfg_attr(    feature = "reasons",  allow(clippy::cast_possible_truncation, reason = "Range is controlled"))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_possible_truncation))]
+		if (i128::from(Self::MIN_MICROSECONDS)..=i128::from(Self::MAX_MICROSECONDS)).contains(&microseconds) {
+			Some(Self::microseconds(microseconds as i64))
+		} else if microseconds < 0 {
+			Self::seconds(          microseconds.abs().div_euclid(1_000_000_i128).neg() as i64).checked_sub(
+				&Self::microseconds(microseconds.abs().rem_euclid(1_000_000_i128)       as i64)
+			)
+		} else {
+			Self::seconds(          microseconds.div_euclid(1_000_000_i128) as i64).checked_add(
+				&Self::microseconds(microseconds.rem_euclid(1_000_000_i128) as i64)
+			)
+		}
 	}
 	
 	//		num_nanoseconds_full												
