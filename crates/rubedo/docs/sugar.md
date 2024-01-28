@@ -1,4 +1,4 @@
-## sugar
+# sugar
 
 The [`sugar`](https://docs.rs/rubedo/latest/rubedo/sugar/index.html) module
 provides macros that add syntactic sugar for common operations.

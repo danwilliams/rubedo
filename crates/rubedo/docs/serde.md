@@ -1,11 +1,12 @@
-## serde
+# serde
 
 [`Decimal`]: https://crates.io/crates/rust_decimal
 
 The [`serde`](https://docs.rs/rubedo/latest/rubedo/serde/index.html) module
 provides conversion utility functions for use with [Serde](https://crates.io/crates/serde).
 
-### Serialisation
+
+## Serialisation
 
   - [`as_str()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.as_str.html) -
     Returns a string representation of a type from a string slice.
@@ -19,7 +20,8 @@ provides conversion utility functions for use with [Serde](https://crates.io/cra
   - [`to_string()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.to_string.html) -
     Returns a string copy of a type.
 
-### Deserialisation
+
+## Deserialisation
 
   - [`from()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.from.html) -
     Returns a type from a string or other serialised representation.
@@ -36,7 +38,8 @@ provides conversion utility functions for use with [Serde](https://crates.io/cra
   - [`try_from_string()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.try_from_string.html) -
     Returns a type from a string representation.
 
-### Decimal helpers
+
+## Decimal helpers
 
   - [`from_cents()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.from_cents.html) -
     Converts an integer to a [`Decimal`][] to 2 decimal places.

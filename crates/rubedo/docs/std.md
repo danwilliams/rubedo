@@ -1,9 +1,10 @@
-## std
+# std
 
 The [`std`](https://docs.rs/rubedo/latest/rubedo/std/index.html) module provides
 extensions to the [Rust standard library](https://doc.rust-lang.org/std/).
 
-### AsStr
+
+## AsStr
 
 The [`AsStr`](https://docs.rs/rubedo/latest/rubedo/std/trait.AsStr.html) trait
 is essentially a marker trait, indicating the presence of an `as_str()` method,
@@ -13,7 +14,8 @@ module, most usefully with enums:
   - [`as_str()`](https://docs.rs/rubedo/latest/rubedo/std/trait.AsStr.html#tymethod.as_str) -
     Provides a string slice representation of the type.
 
-### FromIntWithScale and ToIntWithScale
+
+## FromIntWithScale and ToIntWithScale
 
 The [`FromIntWithScale`](https://docs.rs/rubedo/latest/rubedo/std/trait.FromIntWithScale.html)
 and [`ToIntWithScale`](https://docs.rs/rubedo/latest/rubedo/std/trait.ToIntWithScale.html)
@@ -28,7 +30,8 @@ module, most usefully with currency values:
   - [`to_int_with_scale()`](https://docs.rs/rubedo/latest/rubedo/std/trait.ToIntWithScale.html#tymethod.to_int_with_scale) -
     Converts from a floating-point number to an integer with a specified scale.
 
-### Iterator
+
+## Iterator
 
 The [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html) trait
 is extended with (technically, complemented by) the following methods:
@@ -38,7 +41,8 @@ is extended with (technically, complemented by) the following methods:
     [`take()`](https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.take),
     but accepts an `Option`.
 
-### Path
+
+## Path
 
 The [`Path`](https://doc.rust-lang.org/std/path/struct.Path.html) struct is
 extended with the following methods:

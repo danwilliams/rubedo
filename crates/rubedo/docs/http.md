@@ -1,10 +1,11 @@
-## http
+# http
 
 The [`http`](https://docs.rs/rubedo/latest/rubedo/http/index.html) module
 provides extensions to the [HTTP](https://crates.io/crates/http), [Hyper](https://crates.io/crates/hyper),
 and [Axum](https://crates.io/crates/axum) crates.
 
-### Response
+
+## Response
 
 The [`Response`](https://docs.rs/http/latest/http/response/struct.Response.html)
 struct is extended with the following methods:

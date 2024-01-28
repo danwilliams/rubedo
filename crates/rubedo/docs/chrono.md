@@ -1,4 +1,4 @@
-## chrono
+# chrono
 
 [`Duration`]: https://docs.rs/chrono/latest/chrono/struct.Duration.html
 [`Months`]:   https://docs.rs/chrono/latest/chrono/struct.Months.html
@@ -6,7 +6,8 @@
 The [`chrono`](https://docs.rs/rubedo/latest/rubedo/chrono/index.html) module
 provides extensions to the [Chrono](https://crates.io/crates/chrono) crate.
 
-### Duration
+
+## Duration
 
 The [`Duration`][] struct is extended with the following methods:
 
@@ -26,7 +27,8 @@ The [`Duration`][] struct is extended with the following methods:
   - [`num_nanoseconds_full()`](https://docs.rs/rubedo/latest/rubedo/chrono/trait.DurationExt.html#tymethod.num_nanoseconds_full) -
     Returns the total number of nanoseconds in the [`Duration`][] instance.
 
-### Months
+
+## Months
 
 The [`Months`][] struct is extended with the following methods:
 
@@ -42,7 +44,8 @@ The [`Months`][] struct is extended with the following methods:
   - [`years()`](https://docs.rs/rubedo/latest/rubedo/chrono/trait.MonthsExt.html#tymethod.years) -
     Make a new [`Months`][] with the given number of years.
 
-### NaiveDate
+
+## NaiveDate
 
 The [`NaiveDate`](https://docs.rs/chrono/latest/chrono/naive/struct.NaiveDate.html)
 struct is extended with the following methods:
