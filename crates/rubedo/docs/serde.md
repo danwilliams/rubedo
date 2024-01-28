@@ -1,5 +1,7 @@
 ## serde
 
+[`Decimal`]: https://crates.io/crates/rust_decimal
+
 The [`serde`](https://docs.rs/rubedo/latest/rubedo/serde/index.html) module
 provides conversion utility functions for use with [Serde](https://crates.io/crates/serde).
 
@@ -37,20 +39,16 @@ provides conversion utility functions for use with [Serde](https://crates.io/cra
 ### Decimal helpers
 
   - [`from_cents()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.from_cents.html) -
-    Converts an integer to a [`Decimal`](https://crates.io/crates/rust_decimal)
-    to 2 decimal places.
+    Converts an integer to a [`Decimal`][] to 2 decimal places.
 
   - [`from_pence()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.from_pence.html) -
-    Converts an integer to a [`Decimal`](https://crates.io/crates/rust_decimal)
-    to 2 decimal places.
+    Converts an integer to a [`Decimal`][] to 2 decimal places.
 
   - [`to_cents()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.to_cents.html) -
-    Converts a [`Decimal`](https://crates.io/crates/rust_decimal) to an integer
-    to 2 decimal places.
+    Converts a [`Decimal`][] to an integer to 2 decimal places.
 
   - [`to_pence()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.to_pence.html) -
-    Converts a [`Decimal`](https://crates.io/crates/rust_decimal) to an integer
-    to 2 decimal places.
+    Converts a [`Decimal`][] to an integer to 2 decimal places.
 
   - [`try_from_int_with_scale()`](https://docs.rs/rubedo/latest/rubedo/serde/fn.try_from_int_with_scale.html) -
     Converts an integer to a floating-point number with scale.

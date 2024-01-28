@@ -1,53 +1,46 @@
 ## chrono
 
+[`Duration`]: https://docs.rs/chrono/latest/chrono/struct.Duration.html
+[`Months`]:   https://docs.rs/chrono/latest/chrono/struct.Months.html
+
 The [`chrono`](https://docs.rs/rubedo/latest/rubedo/chrono/index.html) module
 provides extensions to the [Chrono](https://crates.io/crates/chrono) crate.
 
 ### Duration
 
-The [`Duration`](https://docs.rs/chrono/latest/chrono/struct.Duration.html)
-struct is extended with the following methods:
+The [`Duration`][] struct is extended with the following methods:
 
   - [`humanize()`](https://docs.rs/rubedo/latest/rubedo/chrono/trait.DurationExt.html#tymethod.humanize) -
     Returns a human-readable string representation of the duration, as an
     expression of the largest unit available.
 
   - [`microseconds_full()`](https://docs.rs/rubedo/latest/rubedo/chrono/trait.DurationExt.html#tymethod.microseconds_full) -
-    Make a new [`Duration`](https://docs.rs/chrono/latest/chrono/struct.Duration.html)
-    with the given number of microseconds.
+    Make a new [`Duration`][] with the given number of microseconds.
 
   - [`nanoseconds_full()`](https://docs.rs/rubedo/latest/rubedo/chrono/trait.DurationExt.html#tymethod.nanoseconds_full) -
-    Make a new [`Duration`](https://docs.rs/chrono/latest/chrono/struct.Duration.html)
-    with the given number of nanoseconds.
+    Make a new [`Duration`][] with the given number of nanoseconds.
 
   - [`num_microseconds_full()`](https://docs.rs/rubedo/latest/rubedo/chrono/trait.DurationExt.html#tymethod.num_microseconds_full) -
-    Returns the total number of microseconds in the [`Duration`](https://docs.rs/chrono/latest/chrono/struct.Duration.html)
-    instance.
+    Returns the total number of microseconds in the [`Duration`][] instance.
 
   - [`num_nanoseconds_full()`](https://docs.rs/rubedo/latest/rubedo/chrono/trait.DurationExt.html#tymethod.num_nanoseconds_full) -
-    Returns the total number of nanoseconds in the [`Duration`](https://docs.rs/chrono/latest/chrono/struct.Duration.html)
-    instance.
+    Returns the total number of nanoseconds in the [`Duration`][] instance.
 
 ### Months
 
-The [`Months`](https://docs.rs/chrono/latest/chrono/struct.Months.html)
-struct is extended with the following methods:
+The [`Months`][] struct is extended with the following methods:
 
   - [`months()`](https://docs.rs/rubedo/latest/rubedo/chrono/trait.MonthsExt.html#tymethod.months) -
-    Make a new [`Months`](https://docs.rs/chrono/latest/chrono/struct.Months.html)
-    with the given number of months.
+    Make a new [`Months`][] with the given number of months.
 
   - [`num_months()`](https://docs.rs/rubedo/latest/rubedo/chrono/trait.DurationExt.html#tymethod.num_months) -
-    Returns the total number of months in the [`Months`](https://docs.rs/chrono/latest/chrono/struct.Months.html)
-    instance.
+    Returns the total number of months in the [`Months`][] instance.
 
   - [`num_years()`](https://docs.rs/rubedo/latest/rubedo/chrono/trait.DurationExt.html#tymethod.num_years) -
-    Returns the total number of whole years in the [`Months`](https://docs.rs/chrono/latest/chrono/struct.Months.html)
-    instance.
+    Returns the total number of whole years in the [`Months`][] instance.
 
   - [`years()`](https://docs.rs/rubedo/latest/rubedo/chrono/trait.MonthsExt.html#tymethod.years) -
-    Make a new [`Months`](https://docs.rs/chrono/latest/chrono/struct.Months.html)
-    with the given number of years.
+    Make a new [`Months`][] with the given number of years.
 
 ### NaiveDate
 
