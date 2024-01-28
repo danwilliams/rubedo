@@ -12,6 +12,14 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.4.5 (28 January 2024)
+
+### Changed
+
+  - Updated README content
+  - Split README into separate files per module
+
+
 ## 0.4.4 (28 January 2024)
 
 ### Added
