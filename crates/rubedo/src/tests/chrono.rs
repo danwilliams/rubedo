@@ -434,6 +434,34 @@ mod months_ext {
 		assert_eq!(Months::new(Months::MAX_YEARS * 12).num_years(), Months::MAX_YEARS);
 	}
 	
+	//		months																
+	#[test]
+	fn months() {
+		assert_eq!(Months::months(0), Months::new(0));
+		assert_eq!(Months::months(1), Months::new(1));
+	}
+	#[test]
+	fn months__max_allowed() {
+		assert_eq!(Months::months(Months::MAX_MONTHS).num_months(), Months::MAX_MONTHS);
+		assert_eq!(Months::months(Months::MAX_MONTHS),              Months::new(Months::MAX_MONTHS));
+	}
+	
+	//		years																
+	#[test]
+	fn years() {
+		assert_eq!(Months::years(0).unwrap(), Months::new( 0));
+		assert_eq!(Months::years(1).unwrap(), Months::new(12));
+	}
+	#[test]
+	fn years__max_allowed() {
+		assert_eq!(Months::years(Months::MAX_YEARS).unwrap().num_years(), Months::MAX_YEARS);
+		assert_eq!(Months::years(Months::MAX_YEARS).unwrap(),             Months::new(Months::MAX_YEARS * 12));
+	}
+	#[test]
+	fn years__overflow() {
+		assert!(Months::years(Months::MAX_YEARS + 1).is_none());
+	}
+	
 	//		num_months															
 	#[test]
 	fn num_months() {

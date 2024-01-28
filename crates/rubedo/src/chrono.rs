@@ -372,6 +372,33 @@ pub trait MonthsExt {
 	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
 	const MAX_YEARS:  u32 = u32::MAX / 12;
 	
+	//		months																
+	/// Make a new [`Months`] with the given number of months.
+	/// 
+	/// This is a convenience function, to make [`Months`] construction fit more
+	/// closely with the constructors available for [`Duration`].
+	/// 
+	/// It is actually a synonym for [`Months::new()`], but is provided for
+	/// consistency with the general style of constructor functions available.
+	/// 
+	fn months(months: u32) -> Self;
+	
+	//		years																
+	/// Make a new [`Months`] with the given number of years.
+	/// 
+	/// This is a convenience function, to make [`Months`] construction fit more
+	/// closely with the constructors available for [`Duration`].
+	/// 
+	/// # Errors
+	/// 
+	/// This function will return [`None`] if the number of years is greater
+	/// than [`MAX_YEARS`](MonthsExt::MAX_YEARS). This is not quite the same as
+	/// Chrono's behaviour, which tends to panic under similar conditions, but
+	/// panics are undesirable in library code and hence this deviation seems
+	/// justifiable.
+	/// 
+	fn years(years: u32) -> Option<Self> where Self: Sized;
+	
 	//		num_months															
 	/// Returns the total number of months in the [`Months`] instance.
 	/// 
@@ -390,6 +417,19 @@ pub trait MonthsExt {
 }
 
 impl MonthsExt for Months {
+	//		months																
+	fn months(months: u32) -> Self {
+		Self::new(months)
+	}
+	
+	//		years																
+	fn years(years: u32) -> Option<Self> {
+		if years > Self::MAX_YEARS {
+			return None;
+		}
+		Some(Self::new(years.checked_mul(12)?))
+	}
+	
 	//		num_months															
 	fn num_months(&self) -> u32 {
 		self.as_u32()
