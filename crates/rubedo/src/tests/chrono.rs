@@ -95,7 +95,7 @@ mod duration_ext {
 		assert_eq!(Duration::hours(Duration::MAX_HOURS).num_hours(), Duration::MAX_HOURS);
 	}
 	#[test]
-	#[should_panic(expected = "Duration::hours ouf of bounds")]  //  Typo in Chrono
+	#[should_panic(expected = "Duration::hours out of bounds")]
 	fn max_hours__overflow_construction() {
 		let _ = Duration::hours(Duration::MAX_HOURS + 1);
 	}
@@ -222,7 +222,7 @@ mod duration_ext {
 		assert_eq!(Duration::hours(Duration::MIN_HOURS).num_hours(), Duration::MIN_HOURS);
 	}
 	#[test]
-	#[should_panic(expected = "Duration::hours ouf of bounds")]  //  Typo in Chrono
+	#[should_panic(expected = "Duration::hours out of bounds")]
 	fn min_hours__overflow_construction() {
 		let _ = Duration::hours(Duration::MIN_HOURS - 1);
 	}
