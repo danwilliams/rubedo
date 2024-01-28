@@ -3,6 +3,11 @@
 The [`std`](https://docs.rs/rubedo/latest/rubedo/std/index.html) module provides
 extensions to the [Rust standard library](https://doc.rust-lang.org/std/).
 
+  - [`AsStr`](#asstr)
+  - [`FromIntWithScale` and `ToIntWithScale`](#fromintwithscale-and-tointwithscale)
+  - [`Iterator`](#iterator)
+  - [`Path`](#path)
+
 
 ## AsStr
 

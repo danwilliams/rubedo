@@ -5,6 +5,10 @@
 The [`serde`](https://docs.rs/rubedo/latest/rubedo/serde/index.html) module
 provides conversion utility functions for use with [Serde](https://crates.io/crates/serde).
 
+  - [Serialisation](#serialisation)
+  - [Deserialisation](#deserialisation)
+  - [Decimal helpers](#decimal-helpers)
+
 
 ## Serialisation
 

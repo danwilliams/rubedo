@@ -6,6 +6,10 @@
 The [`chrono`](https://docs.rs/rubedo/latest/rubedo/chrono/index.html) module
 provides extensions to the [Chrono](https://crates.io/crates/chrono) crate.
 
+  - [`Duration`](#duration)
+  - [`Months`](#months)
+  - [`NaiveDate`](#naivedate)
+
 
 ## Duration
 
