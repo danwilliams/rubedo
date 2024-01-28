@@ -12,6 +12,27 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.4.4 (28 January 2024)
+
+### Added
+
+  - Extended the `chrono` module
+      - Added `*_full()` constructor methods to `DurationExt`
+          - Added `Duration::nanoseconds_full()`
+          - Added `Duration::microseconds_full()`
+      - Added constructor methods to `MonthsExt`
+          - Added `Months::months()`
+          - Added `Months::years()`
+
+### Changed
+
+  - Updated `DurationExt::MIN_MILLISECONDS` for [Chrono][]
+    [0.4.32](https://github.com/chronotope/chrono/releases/tag/v0.4.32)
+  - Updated `DurationExt::MIN_NANOSECONDS_FULL` and `MIN_MICROSECONDS_FULL` for
+    [Chrono][] [0.4.32](https://github.com/chronotope/chrono/releases/tag/v0.4.32)
+  - Updated crate dependencies
+
+
 ## 0.4.3 (23 January 2024)
 
 ### Added
@@ -49,13 +70,14 @@ The format is based on [Keep a Changelog][], and this project adheres to
 
 ### Changed
 
-  - Updated `NaiveDateExt::MAX_YEAR` and `MIN_YEAR` for Chrono 0.4.32
+  - Updated `NaiveDateExt::MAX_YEAR` and `MIN_YEAR` for [Chrono][]
+    [0.4.32](https://github.com/chronotope/chrono/releases/tag/v0.4.32)
   - Updated crate dependencies
 
 
 ## 0.4.2 (09 December 2023)
 
-### Added
+### Changed
 
   - Enhanced `variants!()` macro to type-hint empty lists
 
