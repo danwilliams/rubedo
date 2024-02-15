@@ -12,6 +12,16 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.4.6 (15 February 2024)
+
+### Added
+
+  - Extended the `http` module
+      - Added `UnpackedResponse::new()`
+      - Added `UnpackedResponse::new_from_parts()`
+      - Added `UnpackedResponseHeader::new()`
+
+
 ## 0.4.5 (28 January 2024)
 
 ### Changed
