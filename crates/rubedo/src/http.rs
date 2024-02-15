@@ -167,6 +167,60 @@ pub struct UnpackedResponse {
 	pub body:    UnpackedResponseBody,
 }
 
+impl UnpackedResponse {
+	//		new																	
+	/// Creates a new unpacked response instance.
+	/// 
+	/// This constructor builds a new [`UnpackedResponse`] instance from the
+	/// response status code, header data, and body data. This is useful when
+	/// the parts 
+	/// 
+	/// # Parameters
+	/// 
+	/// * `status`  - The response status code. See [`status`](UnpackedResponse::status).
+	/// * `headers` - The response headers. See [`headers`](UnpackedResponse::headers).
+	/// * `body`    - The response body. See [`body`](UnpackedResponse::body).
+	/// 
+	#[must_use]
+	pub fn new<T: Into<UnpackedResponseBody>>(
+		status:  StatusCode,
+		headers: Vec<(String, String)>,
+		body:    T
+	) -> Self {
+		Self::new_from_parts(
+			status,
+			headers.into_iter().map(|(name, value)| UnpackedResponseHeader::new(name, value)).collect(),
+			body.into(),
+		)
+	}
+	
+	//		new_from_parts														
+	/// Creates a new unpacked response instance from existing parts.
+	/// 
+	/// This constructor builds a new [`UnpackedResponse`] instance from
+	/// constituent part instances that are already in the correct form. This is
+	/// useful when the parts are already available.
+	/// 
+	/// # Parameters
+	/// 
+	/// * `status`  - The response status code. See [`status`](UnpackedResponse::status).
+	/// * `headers` - The response headers. See [`headers`](UnpackedResponse::headers).
+	/// * `body`    - The response body. See [`body`](UnpackedResponse::body).
+	/// 
+	#[must_use]
+	pub fn new_from_parts(
+		status:  StatusCode,
+		headers: Vec<UnpackedResponseHeader>,
+		body:    UnpackedResponseBody
+	) -> Self {
+		Self {
+			status,
+			headers,
+			body,
+		}
+	}
+}
+
 impl PartialEq for UnpackedResponse {
 	//		eq																	
     fn eq(&self, other: &Self) -> bool {

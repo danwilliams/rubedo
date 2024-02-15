@@ -38,7 +38,51 @@ mod response_error {
 
 //		UnpackedResponse														
 #[cfg(test)]
-mod unpacked_response {
+mod unpacked_response__struct {
+	use crate::s;
+	use super::super::*;
+	
+	//		new																	
+	#[test]
+	fn new() {
+		let headers  = vec![
+			(s!("Foo"), s!("Bar")),
+			(s!("Bar"), s!("Baz")),
+		];
+		let body     = "This is a test";
+		let unpacked = UnpackedResponse::new(StatusCode::OK, headers, body);
+		assert_eq!(unpacked, UnpackedResponse {
+			status:  StatusCode::OK,
+			headers: vec![
+				UnpackedResponseHeader { name: s!("Foo"), value: s!("Bar") },
+				UnpackedResponseHeader { name: s!("Bar"), value: s!("Baz") },
+			],
+			body:    UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() },
+		});
+	}
+	
+	//		new_from_parts														
+	#[test]
+	fn new_from_parts() {
+		let headers  = vec![
+			UnpackedResponseHeader::new(s!("Foo"), s!("Bar")),
+			UnpackedResponseHeader::new(s!("Bar"), s!("Baz")),
+		];
+		let body     = UnpackedResponseBody::new("This is a test");
+		let unpacked = UnpackedResponse::new_from_parts(StatusCode::OK, headers, body);
+		assert_eq!(unpacked, UnpackedResponse {
+			status:  StatusCode::OK,
+			headers: vec![
+				UnpackedResponseHeader { name: s!("Foo"), value: s!("Bar") },
+				UnpackedResponseHeader { name: s!("Bar"), value: s!("Baz") },
+			],
+			body:    UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() },
+		});
+	}
+}
+
+#[cfg(test)]
+mod unpacked_response__traits {
 	use super::super::*;
 	use crate::sugar::s;
 	use assert_json_diff::assert_json_eq;
