@@ -1,11 +1,18 @@
 #![allow(non_snake_case)]
 
+//		Packages
+
+use super::*;
+use std::collections::HashSet;
+
+
+
 //		Tests
 
 //		s!																		
 #[cfg(test)]
 mod s {
-	use super::super::*;
+	use super::*;
 	
 	//		type_of																
 	fn type_of<T>(_: &T) -> &'static str {
@@ -47,7 +54,7 @@ mod s {
 //		variants!																
 #[cfg(test)]
 mod variants {
-	use super::super::*;
+	use super::*;
 	
 	//		Position															
 	#[derive(Copy, Clone, Debug, Eq, PartialEq)]
@@ -92,8 +99,7 @@ mod variants {
 //		variants_hashset!														
 #[cfg(test)]
 mod variants_hashset {
-	use super::super::*;
-	use std::collections::HashSet;
+	use super::*;
 	
 	//		Position															
 	#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]

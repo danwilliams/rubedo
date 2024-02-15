@@ -1,12 +1,29 @@
 #![allow(non_snake_case)]
 
+//		Packages
+
+use super::*;
+use crate::sugar::s;
+use assert_json_diff::assert_json_eq;
+use axum::response::IntoResponse;
+use claims::{assert_err, assert_ok, assert_ok_eq};
+use serde_assert::{
+	Deserializer as TestDeserializer,
+	Serializer as TestSerializer,
+	Token,
+	Tokens,
+};
+use serde_json::json;
+use std::str::from_utf8;
+
+
+
 //		Tests
 
 //		ResponseError															
 #[cfg(test)]
 mod response_error {
-	use super::super::*;
-	use claims::assert_err;
+	use super::*;
 	
 	#[derive(Debug)]
 	struct TestError;
@@ -39,8 +56,7 @@ mod response_error {
 //		UnpackedResponse														
 #[cfg(test)]
 mod unpacked_response__struct {
-	use crate::s;
-	use super::super::*;
+	use super::*;
 	
 	//		new																	
 	#[test]
@@ -83,11 +99,7 @@ mod unpacked_response__struct {
 
 #[cfg(test)]
 mod unpacked_response__traits {
-	use super::super::*;
-	use crate::sugar::s;
-	use assert_json_diff::assert_json_eq;
-	use claims::assert_ok_eq;
-	use serde_json::json;
+	use super::*;
 	
 	//		debug																
 	#[test]
@@ -226,8 +238,7 @@ mod unpacked_response__traits {
 //		UnpackedResponseHeader													
 #[cfg(test)]
 mod unpacked_response_header__struct {
-	use super::super::*;
-	use crate::sugar::s;
+	use super::*;
 	
 	//		new																	
 	#[test]
@@ -239,11 +250,7 @@ mod unpacked_response_header__struct {
 
 #[cfg(test)]
 mod unpacked_response_header__traits {
-	use super::super::*;
-	use crate::sugar::s;
-	use assert_json_diff::assert_json_eq;
-	use claims::assert_ok_eq;
-	use serde_json::json;
+	use super::*;
 	
 	//		partial_eq															
 	#[test]
@@ -306,9 +313,7 @@ mod unpacked_response_header__traits {
 //		UnpackedResponseBody													
 #[cfg(test)]
 mod unpacked_response_body__struct {
-	use super::super::*;
-	use claims::assert_err;
-	use std::str::from_utf8;
+	use super::*;
 	
 	//		new																	
 	#[test]
@@ -570,11 +575,7 @@ mod unpacked_response_body__struct {
 
 #[cfg(test)]
 mod unpacked_response_body__traits {
-	use super::super::*;
-	use crate::sugar::s;
-	use assert_json_diff::assert_json_eq;
-	use claims::{assert_ok, assert_ok_eq};
-	use serde_json::json;
+	use super::*;
 	
 	//		add																	
 	#[test]
@@ -1277,10 +1278,7 @@ mod unpacked_response_body__traits {
 //§		ResponseExt																
 #[cfg(test)]
 mod response_ext {
-	use super::super::*;
-	use crate::sugar::s;
-	use axum::response::IntoResponse;
-	use claims::assert_ok_eq;
+	use super::*;
 	
 	//		unpack																
 	#[test]
@@ -1359,15 +1357,7 @@ mod response_ext {
 //		Functions																
 #[cfg(test)]
 mod functions {
-	use super::super::*;
-	use crate::sugar::s;
-	use claims::assert_ok_eq;
-	use serde_assert::{
-		Deserializer as TestDeserializer,
-		Serializer as TestSerializer,
-		Token,
-		Tokens,
-	};
+	use super::*;
 	
 	//		convert_headers														
 	#[test]

@@ -1,11 +1,19 @@
 #![allow(non_snake_case)]
 
+//		Packages
+
+use super::*;
+use chrono::{NaiveDateTime, TimeZone};
+use claims::{assert_none, assert_some_eq};
+
+
+
 //		Tests
 
 //§		DurationExt																
 #[cfg(test)]
 mod duration_ext {
-	use super::super::*;
+	use super::*;
 	
 	//		MAX_NANOSECONDS														
 	#[test]
@@ -420,7 +428,7 @@ mod duration_ext {
 //§		MonthsExt																
 #[cfg(test)]
 mod months_ext {
-	use super::super::*;
+	use super::*;
 	
 	//		MAX_MONTHS															
 	#[test]
@@ -486,9 +494,7 @@ mod months_ext {
 //§		NaiveDateExt															
 #[cfg(test)]
 mod naivedate_ext {
-	use super::super::*;
-	use chrono::{NaiveDateTime, TimeZone};
-	use claims::{assert_none, assert_some_eq};
+	use super::*;
 	
 	//		MAX_YEAR															
 	#[test]

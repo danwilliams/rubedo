@@ -1,12 +1,19 @@
 #![allow(non_snake_case)]
 
+//		Packages
+
+use super::*;
+use crate::sugar::s;
+use rust_decimal::prelude::*;
+
+
+
 //		Tests
 
 //§		AsStr																	
 #[cfg(test)]
 mod as_str {
-	use super::super::*;
-	use crate::sugar::s;
+	use super::*;
 	
 	//		as_str																
 	#[test]
@@ -24,8 +31,7 @@ mod as_str {
 //§		FromIntWithScale														
 #[cfg(test)]
 mod from_int_with_scale {
-	use super::super::*;
-	use rust_decimal::prelude::*;
+	use super::*;
 	
 	//		from_int_with_scale													
 	#[test]
@@ -189,8 +195,7 @@ mod from_int_with_scale {
 //§		ToIntWithScale															
 #[cfg(test)]
 mod to_int_with_scale {
-	use super::super::*;
-	use rust_decimal::prelude::*;
+	use super::*;
 	
 	//		to_int_with_scale													
 	#[test]
@@ -393,7 +398,7 @@ mod to_int_with_scale {
 //§		IteratorExt																
 #[cfg(test)]
 mod iterator_ext {
-	use super::super::*;
+	use super::*;
 	
 	//		limit																
 	#[test]
@@ -428,7 +433,7 @@ mod iterator_ext {
 //§		PathExt																	
 #[cfg(test)]
 mod path_ext {
-	use super::super::*;
+	use super::*;
 	
 	//		append																
 	#[test]
