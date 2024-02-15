@@ -181,7 +181,20 @@ mod unpacked_response {
 
 //		UnpackedResponseHeader													
 #[cfg(test)]
-mod unpacked_response_header {
+mod unpacked_response_header__struct {
+	use super::super::*;
+	use crate::sugar::s;
+	
+	//		new																	
+	#[test]
+	fn new() {
+		let header = UnpackedResponseHeader::new(s!("Foo"), s!("Bar"));
+		assert_eq!(header, UnpackedResponseHeader { name: s!("Foo"), value: s!("Bar") });
+	}
+}
+
+#[cfg(test)]
+mod unpacked_response_header__traits {
 	use super::super::*;
 	use crate::sugar::s;
 	use assert_json_diff::assert_json_eq;

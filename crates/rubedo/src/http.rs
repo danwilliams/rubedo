@@ -200,6 +200,24 @@ pub struct UnpackedResponseHeader {
 	pub value: String,
 }
 
+impl UnpackedResponseHeader {
+	//		new																	
+	/// Creates a new response header instance.
+	/// 
+	/// # Parameters
+	/// 
+	/// * `name`  - The response header name.
+	/// * `value` - The response header value.
+	/// 
+	#[must_use]
+	pub const fn new(name: String, value: String) -> Self {
+		Self {
+			name,
+			value,
+		}
+	}
+}
+
 impl PartialEq for UnpackedResponseHeader {
 	//		eq																	
 	fn eq(&self, other: &Self) -> bool {
