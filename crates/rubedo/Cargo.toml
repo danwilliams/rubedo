@@ -19,6 +19,8 @@ reasons = []
 base64 = "0.22.0"
 chrono = { version = "=0.4.33", features = ["alloc", "clock", "std"] }
 futures = "0.3.30"
+generic-array = "0.14.7" # Cannot move to 1.0.0 until the digest crate does
+hex = "0.4.3"
 http = "0.2.11"
 http-body = "0.4.6"
 hyper = "0.14.28"
