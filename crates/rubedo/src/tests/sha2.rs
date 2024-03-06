@@ -38,6 +38,11 @@ mod sha256_hash__struct {
 		let hash = Sha256Hash::new(&TEST_256_HASH);
 		assert_eq!(hash, Sha256Hash { hash: TEST_256_HASH });
 	}
+}
+
+#[cfg(test)]
+mod sha256_hash__bytesized {
+	use super::*;
 	
 	//		as_bytes															
 	#[test]
@@ -306,19 +311,19 @@ mod sha256_hash__traits {
 	#[test]
 	fn from_str__err_decoding() {
 		let err = Sha256Hash::from_str("invalid@@hex");
-		assert_err_eq!(err, HashError::InvalidHexString);
+		assert_err_eq!(err, ByteSizedError::InvalidHexString);
 		assert_eq!(err.unwrap_err().to_string(), s!("The supplied data is not in valid hexadecimal format"));
 	}
 	#[test]
 	fn from_str__err_too_long() {
 		let err = Sha256Hash::from_str("010203040506070809101112131415161718192021222324252627282930313233");
-		assert_err_eq!(err, HashError::DataTooLong);
+		assert_err_eq!(err, ByteSizedError::DataTooLong(32));
 		assert_eq!(err.unwrap_err().to_string(), s!("The supplied data is longer than 32 bytes"));
 	}
 	#[test]
 	fn from_str__err_too_short() {
 		let err = Sha256Hash::from_str("01020304050607080910111213141516171819202122232425262728293031");
-		assert_err_eq!(err, HashError::DataTooShort);
+		assert_err_eq!(err, ByteSizedError::DataTooShort(32));
 		assert_eq!(err.unwrap_err().to_string(), s!("The supplied data is shorter than 32 bytes"));
 	}
 	
@@ -394,13 +399,13 @@ mod sha256_hash__traits {
 	fn try_from__byte_slice__err_too_long() {
 		let array: [u8; 33] = [0; 33];
 		let err = Sha256Hash::try_from(&array[..]);
-		assert_err_eq!(err, HashError::DataTooLong);
+		assert_err_eq!(err, ByteSizedError::DataTooLong(32));
 		assert_eq!(err.unwrap_err().to_string(), s!("The supplied data is longer than 32 bytes"));
 	}
 	#[test]
 	fn try_from__byte_slice__err_too_short() {
 		let err = Sha256Hash::try_from(&TEST_256_HASH[..31]);
-		assert_err_eq!(err, HashError::DataTooShort);
+		assert_err_eq!(err, ByteSizedError::DataTooShort(32));
 		assert_eq!(err.unwrap_err().to_string(), s!("The supplied data is shorter than 32 bytes"));
 	}
 	#[test]

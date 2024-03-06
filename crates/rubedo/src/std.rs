@@ -12,15 +12,63 @@ mod tests;
 
 //		Packages
 
+use crate::sugar::s;
+use base64::DecodeError;
+use core::{
+	convert::TryFrom,
+	fmt::{Debug, Display, self},
+	str::FromStr,
+};
+use hex::FromHexError;
 use rust_decimal::{
 	Decimal,
 	prelude::ToPrimitive,
 };
+use serde::{Deserialize, Serialize};
 use std::{
+	borrow::Cow,
 	env,
+	error::Error,
 	ffi::OsString,
 	path::{Component as PathComponent, Path, PathBuf},
 };
+
+
+
+//		Enums
+
+//		ByteSizedError															
+/// The possible errors that can occur when working with [`ByteSized`] types.
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[non_exhaustive]
+pub enum ByteSizedError {
+	/// The supplied data is longer than `ByteSized::SIZE` bytes.
+	DataTooLong(usize),
+	
+	/// The supplied data is shorter than `ByteSized::SIZE` bytes.
+	DataTooShort(usize),
+	
+	/// The supplied string is not in valid base64 format.
+	InvalidBase64String,
+	
+	/// The supplied string is not in valid hexadecimal format.
+	InvalidHexString,
+}
+
+impl Display for ByteSizedError {
+	//		fmt																	
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		let description = match *self {
+			Self::DataTooLong(size)   => format!("The supplied data is longer than {size} bytes"),
+			Self::DataTooShort(size)  => format!("The supplied data is shorter than {size} bytes"),
+			Self::InvalidBase64String => s!(     "The supplied data is not in valid base64 format"),
+			Self::InvalidHexString    => s!(     "The supplied data is not in valid hexadecimal format"),
+		};
+		write!(f, "{description}")
+	}
+}
+
+impl Error for ByteSizedError {}
 
 
 
@@ -132,6 +180,383 @@ impl AsStr for str {
 		//	to allow the trait to be applied to the type.
 		self
 	}
+}
+
+//§		ByteSized																
+/// Fixed-size byte container functionality.
+/// 
+/// This trait provides a formalised representation of a fixed-size byte array,
+/// with support for common conversions, including serialisation and
+/// deserialisation using [Serde](https://crates.io/crates/serde).
+/// 
+/// The container is expected to be stored internally as `[u8; N]`, where `N` is
+/// defined upon the implementation of this trait — but the actual internal type
+/// is arbitrary. Because there may or may not be control over the internal type
+/// (for instance when implementing for a third-party type), the methods that
+/// require the ability to mutate or consume the internal type are split out
+/// into a separate [`ByteSizedMut`] trait.
+///
+/// The conversion to and from a [`String`] defaults to using hex strings rather
+/// than base64-encoded strings, because this is more common for the primary use
+/// case of hashes and keys, due to it being a fixed-length string that is easy
+/// to read, verify, and transmit without any compatibility issues. However,
+/// base64 conversion functions are also provided for convenience in case that
+/// format is preferred.
+/// 
+/// # See also
+/// 
+/// * [`ByteSizedMut`]
+/// 
+#[cfg_attr(    feature = "reasons",  allow(clippy::trait_duplication_in_bounds, reason = "Not actually duplicates"))]
+#[cfg_attr(not(feature = "reasons"), allow(clippy::trait_duplication_in_bounds))]
+pub trait ByteSized<const SIZE: usize>:
+	Sized
+	+ AsRef<[u8; SIZE]>
+	+ Clone
+	+ Debug
+	+ Display
+	+ From<[u8; SIZE]>
+	+ for<'a> From<&'a [u8; SIZE]>
+	+ FromStr
+	+ for<'a> ForceFrom<&'a [u8]>
+//	+ for<'a> ForceFrom<&'a [u8; N]>  //  Cannot specify this as a constraint due to N
+	+ ForceFrom<Vec<u8>>
+	+ for<'a> ForceFrom<&'a Vec<u8>>
+	+ Serialize
+	+ for<'de> Deserialize<'de>
+	+ for<'a> TryFrom<&'a [u8]>
+	+ for<'a> TryFrom<&'a str>
+	+ TryFrom<String>
+	+ for<'a> TryFrom<&'a String>
+	+ TryFrom<Box<str>>
+	+ for<'a> TryFrom<Cow<'a, str>>
+	+ TryFrom<Vec<u8>>
+	+ for<'a> TryFrom<&'a Vec<u8>>
+{
+	//		as_bytes															
+	/// Returns a byte slice of the container's contents.
+	/// 
+	/// Provides a read-only view of the byte data within the container, without
+	/// consuming the data. The returned slice is a reference to the actual data
+	/// stored in the container, not a copy. Because of this, it is not possible
+	/// to mutate the contents of the container through the returned slice. It
+	/// does not allocate new memory or change the ownership of the byte data.
+	/// This method is useful when you need to work with the bytes of the
+	/// container in a read-only fashion, or when you want to avoid copying the
+	/// data.
+	/// 
+	///   - This method returns a slice (`&[u8; Self::SIZE]`) referencing the
+	///     bytes of the container contents.
+	///   - The original container value remains intact, and can still be used
+	///     afterward.
+	///   - No reallocation or copying of data occurs since it's just providing
+	///     a view into the original memory.
+	/// 
+	/// Use this method when you need to work with the byte data in a
+	/// non-destructive, read-only manner while keeping the original container
+	/// intact.
+	///
+	/// # See also
+	/// 
+	/// * [`ByteSized::from_bytes()`]
+	/// * [`ByteSized::to_bytes()`]
+	/// * [`ByteSized::to_vec()`]
+	/// * [`ByteSizedMut::as_mut_bytes()`]
+	/// * [`ByteSizedMut::into_bytes()`]
+	/// * [`ByteSizedMut::into_vec()`]
+	/// 
+	#[must_use]
+	fn as_bytes(&self) -> &[u8; SIZE];
+	
+	//		to_bytes															
+	/// Returns a copy of the container data as a fixed-length array of bytes.
+	/// 
+	/// This does not consume the container, but clones it. Following Rust's
+	/// naming conventions and idioms, this method "converts" the data content
+	/// of the container into a byte representation, in a `[u8; SIZE]`. (No
+	/// actual conversion takes place if the data is already stored internally
+	/// as a fixed array of bytes, but this is academic, so "conversion" is
+	/// implied and expected as a theoretical behaviour.) Ownership of the
+	/// cloned and converted byte data is transferred to the caller, and there
+	/// are no side effects on the internal state of the [`ByteSized`] instance.
+	/// 
+	///   - This method returns a `[u8; SIZE]` array of bytes without consuming
+	///     the container contents.
+	///   - The original container value remains intact, and can still be used
+	///     afterward.
+	///   - The container data is copied, and converted/transformed into the
+	///     output value returned.
+	/// 
+	/// Use this method when you need to obtain a copy of the container's byte
+	/// data in the form of a `[u8; SIZE]`, without consuming the container
+	/// itself. This is useful when you need to pass the byte data to a function
+	/// that expects a `[u8; SIZE]`, or when you want to modify the byte data
+	/// without affecting the original container.
+	/// 
+	/// # See also
+	/// 
+	/// * [`ByteSized::as_bytes()`]
+	/// * [`ByteSized::from_bytes()`]
+	/// * [`ByteSized::to_vec()`]
+	/// * [`ByteSizedMut::as_mut_bytes()`]
+	/// * [`ByteSizedMut::into_bytes()`]
+	/// * [`ByteSizedMut::into_vec()`]
+	/// 
+	#[must_use]
+	fn to_bytes(&self) -> [u8; SIZE];
+	
+	//		from_bytes															
+	/// Constructs a [`ByteSized`] type from an array of bytes.
+	/// 
+	/// This method consumes the input array.
+	/// 
+	/// # Parameters
+	/// 
+	/// * `bytes` - The array of bytes to convert into the [`ByteSized`] type.
+	/// 
+	/// # See also
+	/// 
+	/// * [`ByteSized::as_bytes()`]
+	/// * [`ByteSized::to_bytes()`]
+	/// * [`ByteSizedMut::as_mut_bytes()`]
+	/// * [`ByteSizedMut::into_bytes()`]
+	/// 
+	#[must_use]
+	fn from_bytes(bytes: [u8; SIZE]) -> Self;
+	
+	//		to_base64															
+	/// Returns the container data converted to a base64-encoded [`String`].
+	/// 
+	/// This does not consume the container, but clones it, as is necessary to
+	/// perform the conversion to base64.
+	/// 
+	/// # See also
+	/// 
+	/// * [`ByteSized::from_base64()`]
+	/// 
+	#[must_use]
+	fn to_base64(&self) -> String;
+	
+	//		from_base64															
+	/// Converts a base64-encoded [`String`] to a [`ByteSized`] type.
+	/// 
+	/// This method does not consume the input string, but clones it, as is
+	/// necessary to perform the conversion from [`base64`].
+	/// 
+	/// # Parameters
+	/// 
+	/// * `encoded` - The base64-encoded [`String`] to convert into a
+	///               [`ByteSized`] type.
+	/// 
+	/// # Errors
+	/// 
+	/// This method will return an error if the input string is not valid
+	/// base64. Such an error will be returned as a [`DecodeError`], which is
+	/// passed through from the [`base64`] crate.
+	/// 
+	/// Note that if the incoming data results in a [`Vec<u8>`](Vec) that is too
+	/// long to fit, it will be truncated without error or warning. If there is
+	/// not enough data, it will be padded with zeroes. If this situation needs
+	/// checking, decode from base64 manually and then use `try_from()` instead.
+	/// 
+	/// # See also
+	/// 
+	/// * [`ByteSized::to_base64()`]
+	/// 
+	fn from_base64(encoded: &str) -> Result<Self, DecodeError>;
+	
+	//		to_hex																
+	/// Returns the container data converted to a hex-encoded [`String`].
+	/// 
+	/// This does not consume the container, but clones it, as is necessary to
+	/// perform the conversion to hexadecimal representation.
+	/// 
+	/// # See also
+	/// 
+	/// * [`ByteSized::from_hex()`]
+	/// 
+	#[must_use]
+	fn to_hex(&self) -> String;
+	
+	//		from_hex															
+	/// Converts a hex-encoded [`String`] to a [`ByteSized`].
+	/// 
+	/// This method does not consume the input string, but clones it, as is
+	/// necessary to perform the conversion from hexadecimal representation.
+	/// 
+	/// # Parameters
+	/// 
+	/// * `encoded` - The hex-encoded [`String`] to convert into a [`ByteSized`]
+	///               type.
+	/// 
+	/// # Errors
+	/// 
+	/// This method will return an error if the input string is not in valid
+	/// hexadecimal format. Such an error will be returned as a
+	/// [`FromHexError`], which is passed through from the [`hex`] crate.
+	///
+	/// Note that if the incoming data results in a [`Vec<u8>`](Vec) that is too
+	/// long to fit, it will be truncated without error or warning. If there is
+	/// not enough data, it will be padded with zeroes. If this situation needs
+	/// checking, use `try_from()` instead.
+	/// 
+	/// # See also
+	/// 
+	/// * [`ByteSized::to_hex()`]
+	/// 
+	fn from_hex(encoded: &str) -> Result<Self, FromHexError>;
+	
+	//		to_vec																
+	/// Returns a copy of the container data converted to a vector of bytes.
+	/// 
+	/// This does not consume the container, but clones it. Following Rust's
+	/// naming conventions and idioms, this method converts the data content of
+	/// the container into a byte representation, in a [`Vec<u8>`](Vec).
+	/// Ownership of the cloned and converted byte data is transferred to the
+	/// caller, and there are no side effects on the internal state of the
+	/// [`ByteSized`] instance.
+	/// 
+	///   - This method returns a [`Vec<u8>`](Vec) vector of bytes without
+	///     consuming the container contents.
+	///   - The original container value remains intact, and can still be used
+	///     afterward.
+	///   - The container data is copied, and converted/transformed into the
+	///     output value returned.
+	/// 
+	/// Use this method when you need to obtain a copy of the container's byte
+	/// data in the form of a [`Vec<u8>`](Vec), without consuming the container
+	/// itself. This is useful when you need to pass the byte data to a function
+	/// that expects a [`Vec<u8>`](Vec).
+	/// 
+	/// # See also
+	/// 
+	/// * [`ByteSized::as_bytes()`]
+	/// * [`ByteSized::to_bytes()`]
+	/// * [`ByteSizedMut::as_mut_bytes()`]
+	/// * [`ByteSizedMut::into_bytes()`]
+	/// * [`ByteSizedMut::into_vec()`]
+	/// 
+	#[must_use]
+	fn to_vec(&self) -> Vec<u8>;
+}
+
+//§		ByteSizedMut															
+/// Mutating and consuming functionality for [`ByteSized`].
+/// 
+/// This trait provides methods that mutate and/or consume the underlying data
+/// type represented, expected to be a `[u8; N]`, where `N` is defined upon the
+/// implementation of the [`ByteSized`] trait — but the actual internal type is
+/// arbitrary.
+/// 
+/// Because there may or may not be control over the internal type (for instance
+/// when implementing for a third-party type), the methods that require the
+/// ability to mutate or consume the internal type are split out into this
+/// separate [`ByteSizedMut`] trait, with the read-only methods and constructors
+/// being in the main [`ByteSized`] trait.
+///
+/// # See also
+/// 
+/// * [`ByteSized`]
+/// 
+pub trait ByteSizedMut<const SIZE: usize>:
+	ByteSized<SIZE>
+	+ AsMut<[u8; SIZE]>
+{
+	//		as_mut_bytes														
+	/// Returns a mutable reference to the container's contents.
+	/// 
+	/// Provides a mutable view of the byte data within the container, without
+	/// consuming the data. The returned vector is a reference to the actual
+	/// data stored in the container, not a copy. This method is useful when you
+	/// need to work with, and modify, the bytes of the container directly,
+	/// without copying the data.
+	/// 
+	///   - This method returns a mutable array (`&mut [u8; SIZE]`) referencing
+	///     the bytes of the container contents.
+	///   - The original container value remains intact, and can still be used
+	///     afterward.
+	///   - No reallocation or copying of data occurs since it's just providing
+	///     a reference to the original memory.
+	/// 
+	/// Use this method when you need to work directly with the byte data in a
+	/// mutable manner.
+	/// 
+	/// # See also
+	/// 
+	/// * [`ByteSized::as_bytes()`]
+	/// * [`ByteSized::from_bytes()`]
+	/// * [`ByteSized::to_bytes()`]
+	/// * [`ByteSized::to_vec()`]
+	/// * [`ByteSizedMut::into_bytes()`]
+	/// * [`ByteSizedMut::into_vec()`]
+	/// 
+	fn as_mut_bytes(&mut self) -> &mut [u8; SIZE];
+	
+	//		into_bytes															
+	/// Returns the container as a fixed-length array of bytes.
+	/// 
+	/// This consumes the container, without cloning or copying, and returns a
+	/// new fixed-length array containing the bytes of the container. It
+	/// transfers ownership of the byte data from the container to the new
+	/// array. This method is useful when you need to move the byte data out of
+	/// the container, or when you want to modify the byte data in-place without
+	/// affecting the original container.
+	/// 
+	///   - This method consumes the container contents and returns a
+	///     `[u8; SIZE]` containing its bytes.
+	///   - After calling this method, the original container value is no longer
+	///     available for use, because it has been moved.
+	/// 
+	/// Use this method when you want to consume the container and obtain
+	/// ownership of its byte data in the form of a `[u8; SIZE]`. This is useful
+	/// when you need to modify or move the byte data, or when you want to pass
+	/// it to functions that expect a `[u8; SIZE]`.
+	/// 
+	/// # See also
+	/// 
+	/// * [`ByteSized::as_bytes()`]
+	/// * [`ByteSized::from_bytes()`]
+	/// * [`ByteSized::to_bytes()`]
+	/// * [`ByteSized::to_vec()`]
+	/// * [`ByteSizedMut::as_mut_bytes()`]
+	/// * [`ByteSizedMut::into_vec()`]
+	/// 
+	#[must_use]
+	fn into_bytes(self) -> [u8; SIZE];
+	
+	//		into_vec															
+	/// Returns the container as a vector of bytes.
+	/// 
+	/// This consumes the container, and returns a new vector containing the
+	/// bytes of the container. It transfers ownership of the byte data from the
+	/// container to the new vector. This method is useful when you need to move
+	/// the byte data out of the container, for example to pass it to a function
+	/// that expects a [`Vec<u8>`](Vec). Note, however, that because vectors are
+	/// heap-allocated and can grow dynamically, whereas arrays are fixed-size
+	/// and stack-allocated, there isn't a direct, zero-copy way to consume an
+	/// array into a [`Vec`], and so this process does involve copying the data.
+	/// 
+	///   - This method consumes the container contents and returns a
+	///     [`Vec<u8>`](Vec) containing its bytes.
+	///   - After calling this method, the original container value is no longer
+	///     available for use, because it has been moved.
+	///   - Transforms the container into a vector of bytes, but does copy the
+	///     data.
+	/// 
+	/// Use this method when you want to consume the container and obtain
+	/// ownership of its byte data in the form of a [`Vec<u8>`](Vec). This is
+	/// useful when you need to modify or move the byte data.
+	/// 
+	/// # See also
+	/// 
+	/// * [`ByteSized::as_bytes()`]
+	/// * [`ByteSized::to_bytes()`]
+	/// * [`ByteSized::to_vec()`]
+	/// * [`ByteSizedMut::as_mut_bytes()`]
+	/// * [`ByteSizedMut::into_bytes()`]
+	/// 
+	#[must_use]
+	fn into_vec(self) -> Vec<u8>;
 }
 
 //§		FromIntWithScale														
