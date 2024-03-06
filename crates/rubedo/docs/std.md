@@ -36,6 +36,18 @@ module, most usefully with currency values:
     Converts from a floating-point number to an integer with a specified scale.
 
 
+## ForceFrom
+
+The [`ForceFrom`](https://docs.rs/rubedo/latest/rubedo/std/trait.ForceFrom.html)
+trait is provided for situations where a lossy outcome from
+[`TryFrom`](https://doc.rust-lang.org/std/convert/trait.TryFrom.html) is
+acceptable for general use, but would not be appropriate to implement under
+[`From`](https://doc.rust-lang.org/std/convert/trait.From.html). It's designed
+to be implemented alongside [`TryFrom`](https://doc.rust-lang.org/std/convert/trait.TryFrom.html),
+so that a path to convert and catch all errors can be given along with a path to
+convert and ignore lossy errors.
+
+
 ## Iterator
 
 The [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html) trait

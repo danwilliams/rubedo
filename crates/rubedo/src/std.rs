@@ -482,6 +482,41 @@ impl_to_int_with_scale_for_decimal!(u32);
 impl_to_int_with_scale_for_decimal!(u64);
 impl_to_int_with_scale_for_decimal!(u128);
 
+//§		ForceFrom																
+/// Simple and safe forced infallible type conversion.
+/// 
+/// Rust's [`From`] trait provides an infallible (and lossless) mechanism to
+/// convert one type to another, and [`TryFrom`] provides the equivalent
+/// fallible mechanism. However, it isn't possible to implement both at the same
+/// time, because implementing [`From`] brings [`Into`] along for free for the
+/// reverse operation, and Rust implements a blanket `impl<T, U> TryFrom<U> for
+/// T, where U: Into<T>` meaning that [`TryFrom`] is available (yet infallible)
+/// for all implementations of [`From`].
+/// 
+/// Therefore, this trait exists in order to provide a non-conflicting mechanism
+/// for implementing [`From`]-style conversions in situations that *can* fail,
+/// but in which failure is not necessarily important.
+/// 
+/// A good example is that of converting a base64-encoded string into a
+/// fixed-length array of bytes: it will likely be important to deal with
+/// decoding errors, but the possible truncation may not matter. Therefore,
+/// [`TryFrom`] could be implemented for both [`String`] and [`Vec<u8>`](Vec),
+/// but additionally [`ForceFrom`] could be implemented for [`Vec<u8>`](Vec).
+/// This then ensures that all [`String`] decoding issues will be caught and
+/// thought about, but byte data can be chosen to be truncated invisibly, or
+/// handled as an error, depending on context.
+/// 
+/// Handling this as a separate, clearly-signposted approach is more idiomatic
+/// than obscuring it behind [`From`], which should always be lossless as well
+/// as needing to be infallible. [`ForceFrom`] is essentially a lossy version of
+/// [`From`] — which means it should not be used for situations of error that do
+/// not relate to loss-associated situations.
+/// 
+pub trait ForceFrom<T> {
+	/// Performs the conversion to this type from the input type.
+	fn force_from(value: T) -> Self;
+}
+
 //§		IteratorExt																
 /// This trait provides additional functionality to [`Iterator`].
 pub trait IteratorExt: Iterator {
