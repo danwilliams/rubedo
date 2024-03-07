@@ -12,6 +12,14 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.4.7 (07 March 2024)
+
+### Changed
+
+  - Locked [Chrono][] dependency to 0.4.33 due to test-breaking changes in
+    version 0.4.34 and build-breaking changes in 0.4.35
+
+
 ## 0.4.6 (15 February 2024)
 
 ### Added
