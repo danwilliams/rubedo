@@ -20,6 +20,7 @@ The modules provided are:
 
   - [std](docs/std.md)
   - [chrono](docs/chrono.md)
+  - [crypto](docs/crypto.md)
   - [http](docs/http.md)
   - [serde](docs/serde.md)
   - [sugar](docs/sugar.md)

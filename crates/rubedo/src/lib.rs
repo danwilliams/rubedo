@@ -155,9 +155,9 @@
 //		Modules
 
 pub mod chrono;
+pub mod crypto;
 pub mod http;
 pub mod serde;
-pub mod sha2;
 pub mod std;
 pub mod sugar;
 

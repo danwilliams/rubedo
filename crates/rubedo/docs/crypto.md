@@ -1,7 +1,8 @@
-# sha2
+# crypto
 
-The [`sha2`](https://docs.rs/rubedo/latest/rubedo/sha2/index.html) module
-provides extensions to the [Sha2](https://crates.io/crates/sha2) crate.
+The [`crypto`](https://docs.rs/rubedo/latest/rubedo/sha2/index.html) module
+provides extensions to the [Rust Crypto](https://github.com/RustCrypto) set of
+crates.
 
 
 ## Sha256Hash

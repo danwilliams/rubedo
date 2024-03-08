@@ -6,7 +6,7 @@
 //		Modules
 
 #[cfg(test)]
-#[path = "tests/sha2.rs"]
+#[path = "tests/crypto.rs"]
 mod tests;
 
 
