@@ -13,12 +13,23 @@ use serde_json::json;
 //		Constants
 
 const EMPTY_256_HASH:  [u8; 32] = [0; 32];
+const EMPTY_512_HASH:  [u8; 64] = [0; 64];
 const TEST_256_HASH:   [u8; 32] = [
 	0xbe, 0xef, 0x1a, 0x2b, 0x3c, 0x4d, 0x5e, 0x6f, 0x7a, 0x8b, 0x9c, 0x0d, 0x1e, 0x2f, 0x3a, 0x4b,
 	0x5c, 0x6d, 0x7e, 0x8f, 0x9a, 0x0b, 0x1c, 0x2d, 0x3e, 0x4f, 0x5a, 0x6b, 0x7c, 0x8d, 0x9e, 0x0f,
 ];
+const TEST_512_HASH:   [u8; 64] = [
+	0xbe, 0xef, 0x1a, 0x2b, 0x3c, 0x4d, 0x5e, 0x6f, 0x7a, 0x8b, 0x9c, 0x0d, 0x1e, 0x2f, 0x3a, 0x4b,
+	0x5c, 0x6d, 0x7e, 0x8f, 0x9a, 0x0b, 0x1c, 0x2d, 0x3e, 0x4f, 0x5a, 0x6b, 0x7c, 0x8d, 0x9e, 0x0f,
+	0xbe, 0xef, 0x1a, 0x2b, 0x3c, 0x4d, 0x5e, 0x6f, 0x7a, 0x8b, 0x9c, 0x0d, 0x1e, 0x2f, 0x3a, 0x4b,
+	0x5c, 0x6d, 0x7e, 0x8f, 0x9a, 0x0b, 0x1c, 0x2d, 0x3e, 0x4f, 0x5a, 0x6b, 0x7c, 0x8d, 0x9e, 0x0f,
+];
 const TEST_256_HEX:    &str     = "beef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f";
+const TEST_512_HEX:    &str     = "beef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f\
+                                   beef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f";
 const TEST_256_BASE64: &str     = "vu8aKzxNXm96i5wNHi86S1xtfo+aCxwtPk9aa3yNng8=";
+const TEST_512_BASE64: &str     = "vu8aKzxNXm96i5wNHi86S1xtfo+aCxwtPk9aa3yNng++\
+                                   7xorPE1eb3qLnA0eLzpLXG1+j5oLHC0+T1prfI2eDw==";
 
 
 
@@ -455,6 +466,443 @@ mod sha256_hash__traits {
 	fn try_from__vec_u8_ref() {
 		let hash = Sha256Hash::try_from(&TEST_256_HASH.to_vec());
 		assert_ok_eq!(hash, Sha256Hash { hash: TEST_256_HASH });
+	}
+}
+
+//		Sha512Hash																
+#[cfg(test)]
+mod sha512_hash__struct {
+	use super::*;
+	
+	//		new																	
+	#[test]
+	fn new() {
+		let hash = Sha512Hash::new(TEST_512_HASH);
+		assert_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+		
+		let hash = Sha512Hash::new(&TEST_512_HASH);
+		assert_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+}
+
+#[cfg(test)]
+mod sha512_hash__bytesized {
+	use super::*;
+	
+	//		as_bytes															
+	#[test]
+	fn as_bytes() {
+		let hash       = Sha512Hash { hash: TEST_512_HASH };
+		let byte_slice = hash.as_bytes();
+		
+		//	Ensure the byte slice matches the original hash's bytes.
+		assert_eq!(*byte_slice, TEST_512_HASH);
+		
+		//	We can't modify the byte slice due to immutability.
+		//	Uncommenting the line below would cause a compilation error:
+		//byte_slice[10] = 84;
+		
+		//	as_bytes() doesn't consume the original hash.
+		assert_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+	
+	//		as_mut_bytes														
+	#[test]
+	fn as_mut_bytes() {
+		let mut hash   = Sha512Hash { hash: TEST_512_HASH };
+		let byte_array = hash.as_mut_bytes();
+		
+		//	Ensure the byte array matches the original hash's bytes.
+		assert_eq!(*byte_array, TEST_512_HASH);
+		
+		// We can modify the byte array.
+		byte_array[10] = 84;
+		assert_ne!(*byte_array, TEST_512_HASH);
+		
+		//	as_mut_bytes() doesn't consume the original hash, but modifying
+		//	the returned array will have affected the hash's contents.
+		assert_ne!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+	
+	//		into_bytes															
+	#[test]
+	fn into_bytes() {
+		let hash           = Sha512Hash { hash: TEST_512_HASH };
+		let mut byte_array = hash.into_bytes();
+		
+		//	Ensure the byte array matches the original hash's bytes.
+		assert_eq!(byte_array, TEST_512_HASH);
+		
+		// We can modify the byte array.
+		byte_array[10]     = 84;
+		assert_ne!(byte_array, TEST_512_HASH);
+		
+		//	We can't use the original hash after calling into_bytes(), because it
+		//	has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		// assert_eq!(hash, Sha512Hash { hash: TEST_HASH });
+	}
+	
+	//		to_bytes															
+	#[test]
+	fn to_bytes() {
+		let hash           = Sha512Hash { hash: TEST_512_HASH };
+		let mut byte_clone = hash.to_bytes();
+		
+		//	Ensure the clone matches the original hash's bytes.
+		assert_eq!(byte_clone, TEST_512_HASH);
+		
+		//	We can modify the cloned byte array.
+		byte_clone[10]     = 84;
+		assert_ne!(byte_clone, TEST_512_HASH);
+		
+		//	to_bytes() doesn't consume or affect the original hash.
+		assert_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+	
+	//		from_bytes															
+	#[test]
+	fn from_bytes() {
+		let hash = Sha512Hash::from_bytes(TEST_512_HASH);
+		assert_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+	
+	//		to_string															
+	#[test]
+	fn to_string() {
+		let hash = Sha512Hash { hash: TEST_512_HASH };
+		assert_eq!(hash.to_string(), TEST_512_HEX);
+	}
+	
+	//		to_base64															
+	#[test]
+	fn to_base64() {
+		let hash = Sha512Hash { hash: TEST_512_HASH };
+		assert_eq!(hash.to_base64(), TEST_512_BASE64);
+	}
+	
+	//		from_base64															
+	#[test]
+	fn from_base64__valid() {
+		let hash = Sha512Hash::from_base64(TEST_512_BASE64).unwrap();
+		assert_eq!(hash.hash, TEST_512_HASH);
+		
+		let hash = Sha512Hash::from_base64("").unwrap();
+		assert_eq!(hash.hash, EMPTY_512_HASH);
+	}
+	#[test]
+	fn from_base64__invalid() {
+		assert_err!(Sha512Hash::from_base64("invalid@@base64"));
+	}
+	
+	//		to_hex																
+	#[test]
+	fn to_hex() {
+		let hash = Sha512Hash { hash: TEST_512_HASH };
+		assert_eq!(hash.to_hex(), TEST_512_HEX);
+	}
+	
+	//		from_hex															
+	#[test]
+	fn from_hex__valid() {
+		let hash = Sha512Hash::from_hex(TEST_512_HEX).unwrap();
+		assert_eq!(hash.hash, TEST_512_HASH);
+		
+		let hash = Sha512Hash::from_hex("").unwrap();
+		assert_eq!(hash.hash, EMPTY_512_HASH);
+	}
+	#[test]
+	fn from_hex__invalid() {
+		assert_err!(Sha512Hash::from_hex("invalid@@hex"));
+	}
+	
+	//		into_vec															
+	#[test]
+	fn into_vec() {
+		let hash         = Sha512Hash { hash: TEST_512_HASH };
+		let mut byte_vec = hash.into_vec();
+		
+		//	Ensure the byte vector matches the original hash's vec.
+		assert_eq!(byte_vec, TEST_512_HASH.to_vec());
+		
+		// We can modify the byte vector.
+		byte_vec[10]     = 84;
+		assert_ne!(byte_vec, TEST_512_HASH.to_vec());
+		
+		//	We can't use the original hash after calling into_vec(), because it
+		//	has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		// assert_eq!(hash, Sha512Hash { hash: TEST_HASH });
+	}
+	
+	//		to_vec																
+	#[test]
+	fn to_vec() {
+		let hash           = Sha512Hash { hash: TEST_512_HASH };
+		let mut byte_clone = hash.to_vec();
+		
+		//	Ensure the clone matches the original hash's vec.
+		assert_eq!(byte_clone, TEST_512_HASH.to_vec());
+		
+		//	We can modify the cloned byte vector.
+		byte_clone[10]     = 84;
+		assert_ne!(byte_clone, TEST_512_HASH.to_vec());
+		
+		//	to_vec() doesn't consume or affect the original hash.
+		assert_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+}
+
+#[cfg(test)]
+mod sha512_hash__traits {
+	use super::*;
+	
+	//		as_mut																
+	#[test]
+	fn as_mut() {
+		//	Same tests as for as_mut_bytes().
+		let mut hash   = Sha512Hash { hash: TEST_512_HASH };
+		let byte_array = hash.as_mut();
+		assert_eq!(*byte_array, TEST_512_HASH);
+		
+		byte_array[10] = 84;
+		assert_ne!(*byte_array, TEST_512_HASH);
+		assert_ne!(hash,        Sha512Hash { hash: TEST_512_HASH });
+	}
+	
+	//		as_ref																
+	#[test]
+	fn as_ref() {
+		//	Same tests as for as_bytes().
+		let hash       = Sha512Hash { hash: TEST_512_HASH };
+		let byte_slice = hash.as_ref();
+		assert_eq!(*byte_slice, TEST_512_HASH);
+		assert_eq!(hash,        Sha512Hash { hash: TEST_512_HASH });
+	}
+	
+	//		clone																
+	#[test]
+	fn clone() {
+		let mut hash   = Sha512Hash { hash: TEST_512_HASH };
+		let clone      = hash.clone();
+		assert_eq!(clone, Sha512Hash { hash: TEST_512_HASH });
+		
+		let byte_array = hash.as_mut();
+		byte_array[10] = 84;
+		assert_ne!(hash,  Sha512Hash { hash: TEST_512_HASH });
+		assert_eq!(clone, Sha512Hash { hash: TEST_512_HASH });
+	}
+	
+	//		clone_from															
+	#[test]
+	fn clone_from() {
+		let hash      = Sha512Hash { hash: TEST_512_HASH };
+		let mut clone = Sha512Hash { hash: EMPTY_512_HASH };
+		clone.clone_from(&hash);
+		assert_eq!(hash,  Sha512Hash { hash: TEST_512_HASH });
+		assert_eq!(clone, Sha512Hash { hash: TEST_512_HASH });
+	}
+	
+	//		debug																
+	#[test]
+	fn debug() {
+		let hash = Sha512Hash { hash: TEST_512_HASH };
+		assert_eq!(format!("{:?}", hash), TEST_512_HEX);
+	}
+	
+	//		default																
+	#[test]
+	fn default() {
+		let hash = Sha512Hash::default();
+		assert_eq!(hash, Sha512Hash { hash: EMPTY_512_HASH });
+	}
+	
+	//		display																
+	#[test]
+	fn display() {
+		let hash = Sha512Hash { hash: TEST_512_HASH };
+		assert_eq!(format!("{}", hash), TEST_512_HEX);
+	}
+	
+	//		from																
+	#[test]
+	fn from__fixed_length_byte_array() {
+		let hash       = Sha512Hash::from(TEST_512_HASH);
+		assert_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+	#[test]
+	fn from__fixed_length_byte_slice() {
+		let hash       = Sha512Hash::from(&TEST_512_HASH);
+		assert_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+	#[test]
+	fn from__generic_array() {
+		let array = GenericArray::from(TEST_512_HASH);
+		let hash  = Sha512Hash::from(array);
+		assert_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+	#[test]
+	fn from__generic_array_ref() {
+		let array = GenericArray::from(TEST_512_HASH);
+		let hash  = Sha512Hash::from(&array);
+		assert_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+	
+	//		from_str															
+	#[test]
+	fn from_str() {
+		assert_ok_eq!(Sha512Hash::from_str(TEST_512_HEX), Sha512Hash { hash: TEST_512_HASH });
+	}
+	#[test]
+	fn from_str__err_decoding() {
+		let err = Sha512Hash::from_str("invalid@@hex");
+		assert_err_eq!(err, ByteSizedError::InvalidHexString);
+		assert_eq!(err.unwrap_err().to_string(), s!("The supplied data is not in valid hexadecimal format"));
+	}
+	#[test]
+	fn from_str__err_too_long() {
+		let err = Sha512Hash::from_str("0102030405060708091011121314151617181920212223242526272829303132\
+		                                333435363738394041424344454647484950515253545556575859606162636465");
+		assert_err_eq!(err, ByteSizedError::DataTooLong(64));
+		assert_eq!(err.unwrap_err().to_string(), s!("The supplied data is longer than 64 bytes"));
+	}
+	#[test]
+	fn from_str__err_too_short() {
+		let err = Sha512Hash::from_str("0102030405060708091011121314151617181920212223242526272829303132\
+		                                33343536373839404142434445464748495051525354555657585960616263");
+		assert_err_eq!(err, ByteSizedError::DataTooShort(64));
+		assert_eq!(err.unwrap_err().to_string(), s!("The supplied data is shorter than 64 bytes"));
+	}
+	
+	//		force_from															
+	#[test]
+	fn force_from__byte_slice() {
+		let hash = Sha512Hash::force_from(&TEST_512_HASH[..]);
+		assert_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+		
+		let hash = Sha512Hash::force_from(&TEST_512_HASH[..31]);
+		assert_ne!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+	#[test]
+	fn force_from__vec_u8() {
+		let hash = Sha512Hash::force_from(TEST_512_HASH.to_vec());
+		assert_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+		
+		let hash = Sha512Hash::force_from(TEST_512_HASH[..31].to_vec());
+		assert_ne!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+	#[test]
+	fn force_from__vec_u8_ref() {
+		let hash = Sha512Hash::force_from(&TEST_512_HASH.to_vec());
+		assert_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+		
+		let hash = Sha512Hash::force_from(&TEST_512_HASH[..31].to_vec());
+		assert_ne!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+	
+	//		partial_eq															
+	#[test]
+	fn partial_eq() {
+		let hash = Sha512Hash { hash: TEST_512_HASH };
+		assert_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+		assert_ne!(hash, Sha512Hash { hash: EMPTY_512_HASH });
+	}
+	#[test]
+	fn partial_eq__fixed_length_byte_array() {
+		let hash = Sha512Hash { hash: TEST_512_HASH };
+		assert_eq!(hash, TEST_512_HASH);
+		assert_ne!(hash, EMPTY_512_HASH);
+	}
+	#[test]
+	fn partial_eq__fixed_length_byte_slice() {
+		let hash = Sha512Hash { hash: TEST_512_HASH };
+		assert_eq!(hash, &TEST_512_HASH);
+		assert_ne!(hash, &EMPTY_512_HASH);
+	}
+	
+	//		serialize															
+	#[test]
+	fn serialize() {
+		let hash = Sha512Hash { hash: TEST_512_HASH };
+		let json = json!(TEST_512_HEX);
+		assert_json_eq!(json!(hash), json);
+	}
+	
+	//		deserialize															
+	#[test]
+	fn deserialize() {
+		let json = r#""beef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0fbeef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f""#;
+		let hash = Sha512Hash { hash: TEST_512_HASH };
+		assert_ok_eq!(serde_json::from_str::<Sha512Hash>(&json), hash);
+	}
+	
+	//		try_from															
+	#[test]
+	fn try_from__byte_slice() {
+		let hash = Sha512Hash::try_from(&TEST_512_HASH[..]);
+		assert_ok_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+	#[test]
+	fn try_from__byte_slice__err_too_long() {
+		let array: [u8; 65] = [0; 65];
+		let err = Sha512Hash::try_from(&array[..]);
+		assert_err_eq!(err, ByteSizedError::DataTooLong(64));
+		assert_eq!(err.unwrap_err().to_string(), s!("The supplied data is longer than 64 bytes"));
+	}
+	#[test]
+	fn try_from__byte_slice__err_too_short() {
+		let err = Sha512Hash::try_from(&TEST_512_HASH[..31]);
+		assert_err_eq!(err, ByteSizedError::DataTooShort(64));
+		assert_eq!(err.unwrap_err().to_string(), s!("The supplied data is shorter than 64 bytes"));
+	}
+	#[test]
+	fn try_from__str() {
+		let hash = Sha512Hash::try_from("beef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f\
+		                                 beef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f");
+		assert_ok_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+	#[test]
+	fn try_from__str_ref() {
+		let hash = Sha512Hash::try_from(TEST_512_HEX);
+		assert_ok_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+	#[test]
+	fn try_from__string() {
+		let hash = Sha512Hash::try_from(TEST_512_HEX.to_owned());
+		assert_ok_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+	#[test]
+	fn try_from__string_ref() {
+		let hash = Sha512Hash::try_from(&TEST_512_HEX.to_owned());
+		assert_ok_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+	#[test]
+	fn try_from__box_str() {
+		let box_str = TEST_512_HEX.to_owned().into_boxed_str();
+		let hash    = Sha512Hash::try_from(box_str);
+		assert_ok_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+	#[test]
+	fn try_from__cow_borrowed() {
+		let cow: Cow<'_, str> = Cow::Borrowed(TEST_512_HEX);
+		let hash              = Sha512Hash::try_from(cow);
+		assert_ok_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+	#[test]
+	fn try_from__cow_owned() {
+		let cow: Cow<'_, str> = Cow::Owned(TEST_512_HEX.to_owned());
+		let hash              = Sha512Hash::try_from(cow);
+		assert_ok_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+	#[test]
+	fn try_from__vec_u8() {
+		let hash = Sha512Hash::try_from(TEST_512_HASH.to_vec());
+		assert_ok_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+	}
+	#[test]
+	fn try_from__vec_u8_ref() {
+		let hash = Sha512Hash::try_from(&TEST_512_HASH.to_vec());
+		assert_ok_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
 	}
 }
 
