@@ -11,6 +11,7 @@ const TEST_PUBKEY:     [u8; 32] = [
 	0xd3, 0x02, 0xf3, 0x8d, 0xde, 0xe6, 0x42, 0x72, 0xe0, 0xed, 0x93, 0x3f, 0x08, 0x96, 0xbc, 0x8e,
 ];
 const TEST_256_HEX:    &str     = "beef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f";
+const TEST_256_BASE64: &str     = "vu8aKzxNXm96i5wNHi86S1xtfo+aCxwtPk9aa3yNng8=";
 
 
 
@@ -62,6 +63,28 @@ mod signing_key__traits {
 		
 		let key = SigningKey::force_from(&TEST_256_HASH[..31]);
 		assert_ne!(key.as_bytes(), &TEST_256_HASH);
+	}
+}
+
+//§		SigningKeyExt															
+#[cfg(test)]
+mod signing_key_ext {
+	use super::*;
+	use ed25519_dalek::SigningKey;
+	use rubedo::std::ByteSized;
+	
+	//		to_base64															
+	#[test]
+	fn to_base64() {
+		let key = SigningKey::from_bytes(&TEST_256_HASH);
+		assert_eq!(key.to_base64(), TEST_256_BASE64);
+	}
+	
+	//		from_base64															
+	#[test]
+	fn from_base64__valid() {
+		let key = SigningKey::from_base64(TEST_256_BASE64).unwrap();
+		assert_eq!(key, SigningKey::from_bytes(&TEST_256_HASH));
 	}
 }
 

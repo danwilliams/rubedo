@@ -30,3 +30,10 @@ and deserialisation, which default to hexadecimal strings, although base64 is
 also supported.
 
 
+## SigningKeyExt
+
+The [`SigningKeyExt`](https://docs.rs/http/latest/sha2/signingkey/trait.SigningKeyExt.html)
+trait is provided to enhance the [`ed25519-dalek::SigningKey`](https://docs.rs/ed25519-dalek/latest/ed25519_dalek/struct.SigningKey.html)
+struct when used directly.
+
+

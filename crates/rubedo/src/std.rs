@@ -215,9 +215,15 @@ impl AsStr for str {
 /// * [`ByteSizedFull`]
 /// * [`ByteSizedMut`]
 /// 
+#[cfg_attr(    feature = "reasons",  allow(clippy::trait_duplication_in_bounds, reason = "Not actually duplicates"))]
+#[cfg_attr(not(feature = "reasons"), allow(clippy::trait_duplication_in_bounds))]
 pub trait ByteSized<const SIZE: usize>:
 	Sized
 	+ Clone
+	+ for<'a> ForceFrom<&'a [u8]>
+//	+ for<'a> ForceFrom<&'a [u8; N]>  //  Cannot specify this as a constraint due to N
+	+ ForceFrom<Vec<u8>>
+	+ for<'a> ForceFrom<&'a Vec<u8>>
 {
 	//		as_bytes															
 	/// Returns a byte slice of the container's contents.
@@ -458,10 +464,6 @@ pub trait ByteSizedFull<const SIZE: usize>:
 	+ From<[u8; SIZE]>
 	+ for<'a> From<&'a [u8; SIZE]>
 	+ FromStr
-	+ for<'a> ForceFrom<&'a [u8]>
-//	+ for<'a> ForceFrom<&'a [u8; N]>  //  Cannot specify this as a constraint due to N
-	+ ForceFrom<Vec<u8>>
-	+ for<'a> ForceFrom<&'a Vec<u8>>
 	+ Hash
 	+ PartialEq
 	+ Serialize

@@ -876,27 +876,27 @@ impl ByteSized<32> for SigningKey {
 	
 	//		to_base64															
 	fn to_base64(&self) -> String {
-		BASE64.encode(self.key.as_bytes())
+		self.key.to_base64()
 	}
 	
 	//		from_base64															
 	fn from_base64(encoded: &str) -> Result<Self, DecodeError> {
-		Ok(Self::force_from(BASE64.decode(encoded)?))
+		RealSigningKey::from_base64(encoded).map(|key| Self { key })
 	}
 	
 	//		to_hex																
 	fn to_hex(&self) -> String {
-		hex::encode(self.key.as_bytes())
+		self.key.to_hex()
 	}
 	
 	//		from_hex															
 	fn from_hex(encoded: &str) -> Result<Self, FromHexError> {
-		Ok(Self::force_from(hex::decode(encoded)?))
+		RealSigningKey::from_hex(encoded).map(|key| Self { key })
 	}
 	
 	//		to_vec																
 	fn to_vec(&self) -> Vec<u8> {
-		self.key.as_bytes().to_vec()
+		self.key.to_vec()
 	}
 }
 
@@ -1004,12 +1004,7 @@ impl ForceFrom<&[u8]> for SigningKey {
 	/// `try_from()` instead.
 	/// 
 	fn force_from(b: &[u8]) -> Self {
-		let mut array = [0_u8; 32];
-		let len       = b.len().min(32);
-		#[cfg_attr(    feature = "reasons",  allow(clippy::indexing_slicing, reason = "Infallible"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::indexing_slicing))]
-		array[..len].copy_from_slice(&b[..len]);
-		Self::from(array)
+		Self { key: RealSigningKey::force_from(b) }
 	}
 }
 
@@ -1188,6 +1183,137 @@ impl TryFrom<&Vec<u8>> for SigningKey {
 	/// Converts a [`&Vec[u8]`](Vec) to a [`SigningKey`].
 	fn try_from(v: &Vec<u8>) -> Result<Self, Self::Error> {
 		Self::try_from(v.as_slice())
+	}
+}
+
+
+
+//		Traits
+
+//§		SigningKeyExt															
+/// This trait provides additional functionality to
+/// [`ed25519_dalek::SigningKey`].
+/// 
+/// At present, this trait specifies the implementation of [`ByteSized`] to
+/// apply to [`ed25519_dalek::SigningKey`]. When wishing to use the original,
+/// "real" type, which is [`ed25519_dalek::SigningKey`], this trait can be
+/// brought into scope to extend it with the additional functionality provided.
+/// However, if the full range of functionality provided by [`ByteSizedFull`] is
+/// required, then the [`SigningKey`] type should be used instead, as this wraps
+/// the original type and provides the full range of functionality.
+/// 
+/// The conversion to and from a [`String`] defaults to using hex strings rather
+/// than base64-encoded strings, because this is more common, due to it being a
+/// fixed-length string that is easy to read, verify, and transmit without any
+/// compatibility issues. However, base64 conversion functions are also provided
+/// for convenience in case that format is preferred.
+/// 
+pub trait SigningKeyExt: ByteSized<32> {}
+
+impl SigningKeyExt for RealSigningKey {}
+
+impl ByteSized<32> for RealSigningKey {
+	//		as_bytes															
+	fn as_bytes(&self) -> &[u8; 32] {
+		self.as_bytes()
+	}
+	
+	//		to_bytes															
+	fn to_bytes(&self) -> [u8; 32] {
+		self.to_bytes()
+	}
+	
+	//		from_bytes															
+	fn from_bytes(bytes: [u8; 32]) -> Self {
+		Self::from_bytes(&bytes)
+	}
+	
+	//		to_base64															
+	fn to_base64(&self) -> String {
+		BASE64.encode(self.as_bytes())
+	}
+	
+	//		from_base64															
+	fn from_base64(encoded: &str) -> Result<Self, DecodeError> {
+		Ok(Self::force_from(BASE64.decode(encoded)?))
+	}
+	
+	//		to_hex																
+	fn to_hex(&self) -> String {
+		hex::encode(self.as_bytes())
+	}
+	
+	//		from_hex															
+	fn from_hex(encoded: &str) -> Result<Self, FromHexError> {
+		Ok(Self::force_from(hex::decode(encoded)?))
+	}
+	
+	//		to_vec																
+	fn to_vec(&self) -> Vec<u8> {
+		self.as_bytes().to_vec()
+	}
+}
+
+impl ForceFrom<&[u8]> for RealSigningKey {
+	//		force_from															
+	/// Converts a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html)
+	/// to a [`ed25519_dalek::SigningKey`].
+	/// 
+	/// Note that if the incoming `[u8]` is too long to fit, it will be
+	/// truncated without error or warning. If there is not enough data, it will
+	/// be padded with zeroes. If this situation needs checking, use
+	/// `try_from()` instead.
+	/// 
+	fn force_from(b: &[u8]) -> Self {
+		let mut array = [0_u8; 32];
+		let len       = b.len().min(32);
+		#[cfg_attr(    feature = "reasons",  allow(clippy::indexing_slicing, reason = "Infallible"))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::indexing_slicing))]
+		array[..len].copy_from_slice(&b[..len]);
+		Self::from(array)
+	}
+}
+
+impl<const N: usize> ForceFrom<&[u8; N]> for RealSigningKey {
+	//		force_from															
+	/// Converts a [`&[u8; N]`](https://doc.rust-lang.org/std/primitive.slice.html)
+	/// to a [`ed25519_dalek::SigningKey`].
+	/// 
+	/// Note that if the incoming `[u8; N]` is too long to fit, it will be
+	/// truncated without error or warning. If there is not enough data, it will
+	/// be padded with zeroes. If this situation needs checking, use
+	/// `try_from()` instead.
+	/// 
+	fn force_from(b: &[u8; N]) -> Self {
+		Self::force_from(&b[..])
+	}
+}
+
+impl ForceFrom<Vec<u8>> for RealSigningKey {
+	//		force_from															
+	/// Converts a [`Vec<u8>`](Vec) to a [`ed25519_dalek::SigningKey`].
+	/// 
+	/// Note that if the incoming [`Vec<u8>`](Vec) is too long to fit, it will
+	/// be truncated without error or warning. If there is not enough data, it
+	/// will be padded with zeroes. If this situation needs checking, use
+	/// `try_from()` instead.
+	/// 
+	fn force_from(v: Vec<u8>) -> Self {
+		Self::force_from(&*v)
+	}
+}
+
+impl ForceFrom<&Vec<u8>> for RealSigningKey {
+	//		force_from															
+	/// Converts a [`&Vec[u8]`](Vec) to a [`ed25519_dalek::SigningKey`].
+	/// 
+	/// Note that if the incoming [`Vec<u8>`](Vec) is too long to fit, it will
+	/// be truncated without error or warning. If there is not enough data, it
+	/// will be padded with zeroes. If this situation needs checking, use
+	/// `try_from()` instead.
+	/// 
+	fn force_from(v: &Vec<u8>) -> Self {
+		Self::force_from(&**v)
 	}
 }
 
