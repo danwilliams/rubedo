@@ -37,3 +37,19 @@ trait is provided to enhance the [`ed25519-dalek::SigningKey`](https://docs.rs/e
 struct when used directly.
 
 
+## VerifyingKey
+
+The [`VerifyingKey`](https://docs.rs/http/latest/sha2/verifyingkey/struct.VerifyingKey.html)
+struct is a wrapper type provided to formalise the handling of [ed25519-dalek](https://crates.io/crates/ed25519-dalek)
+verifying keys. It converts to and from common formats, including
+serialisation and deserialisation, which default to hexadecimal strings,
+although base64 is also supported.
+
+
+## VerifyingKeyExt
+
+The [`VerifyingKeyExt`](https://docs.rs/http/latest/sha2/verifyingkey/trait.VerifyingKeyExt.html)
+trait is provided to enhance the [`ed25519-dalek::VerifyingKey`](https://docs.rs/ed25519-dalek/latest/ed25519_dalek/struct.VerifyingKey.html)
+struct when used directly.
+
+

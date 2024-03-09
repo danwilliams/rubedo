@@ -26,12 +26,18 @@ const TEST_512_HASH:   [u8; 64] = [
 	0xbe, 0xef, 0x1a, 0x2b, 0x3c, 0x4d, 0x5e, 0x6f, 0x7a, 0x8b, 0x9c, 0x0d, 0x1e, 0x2f, 0x3a, 0x4b,
 	0x5c, 0x6d, 0x7e, 0x8f, 0x9a, 0x0b, 0x1c, 0x2d, 0x3e, 0x4f, 0x5a, 0x6b, 0x7c, 0x8d, 0x9e, 0x0f,
 ];
+const TEST_PUBKEY:     [u8; 32] = [
+	0x9f, 0xd7, 0xb9, 0xe7, 0x28, 0xde, 0x47, 0xab, 0x7d, 0x9d, 0x81, 0x6e, 0x70, 0x57, 0x60, 0x6d,
+	0xd3, 0x02, 0xf3, 0x8d, 0xde, 0xe6, 0x42, 0x72, 0xe0, 0xed, 0x93, 0x3f, 0x08, 0x96, 0xbc, 0x8e,
+];
 const TEST_256_HEX:    &str     = "beef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f";
 const TEST_512_HEX:    &str     = "beef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f\
                                    beef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f";
+const TEST_PUBKEY_HEX: &str     = "9fd7b9e728de47ab7d9d816e7057606dd302f38ddee64272e0ed933f0896bc8e";
 const TEST_256_BASE64: &str     = "vu8aKzxNXm96i5wNHi86S1xtfo+aCxwtPk9aa3yNng8=";
 const TEST_512_BASE64: &str     = "vu8aKzxNXm96i5wNHi86S1xtfo+aCxwtPk9aa3yNng++\
                                    7xorPE1eb3qLnA0eLzpLXG1+j5oLHC0+T1prfI2eDw==";
+const TEST_PUBKEY_B64: &str     = "n9e55yjeR6t9nYFucFdgbdMC843e5kJy4O2TPwiWvI4=";
 
 
 
@@ -928,6 +934,14 @@ mod signing_key__struct {
 		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
 		assert_eq!(key.into_inner(), RealSigningKey::from_bytes(&TEST_256_HASH));
 	}
+	
+	//		verifying_key														
+	#[test]
+	fn verifying_key() {
+		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
+		assert_eq!(key.verifying_key(),            VerifyingKey::from_bytes(TEST_PUBKEY));
+		assert_eq!(key.verifying_key().as_bytes(), &TEST_PUBKEY);
+	}
 }
 
 #[cfg(test)]
@@ -1096,9 +1110,13 @@ mod signing_key__traits {
 		assert_eq!(&*key,       &RealSigningKey::from_bytes(&TEST_256_HASH));
 	}
 	#[test]
-	fn deref__verifying_key() {
-		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
-		assert_eq!(key.verifying_key(), RealSigningKey::from_bytes(&TEST_256_HASH).verifying_key());
+	fn deref__to_keypair_bytes() {
+		let key      = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
+		let mut pair = vec![];
+		pair.extend_from_slice(&TEST_256_HASH);
+		pair.extend_from_slice(&TEST_PUBKEY);
+		assert_eq!(key.to_keypair_bytes(), RealSigningKey::from_bytes(&TEST_256_HASH).to_keypair_bytes());
+		assert_eq!(key.to_keypair_bytes(), &pair[..]);
 	}
 	
 	//		display																
@@ -1419,6 +1437,512 @@ mod signing_key_ext__traits {
 		
 		let key = RealSigningKey::force_from(&TEST_256_HASH[..31].to_vec());
 		assert_ne!(key, RealSigningKey::from_bytes(&TEST_256_HASH));
+	}
+}
+
+//		VerifyingKey															
+#[cfg(test)]
+mod verifying_key__struct {
+	use super::*;
+	
+	//		into_inner															
+	#[test]
+	fn into_inner() {
+		let key = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
+		assert_eq!(key.into_inner(), RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+	}
+}
+
+#[cfg(test)]
+mod verifying_key__bytesized {
+	use super::*;
+	
+	//		as_bytes															
+	#[test]
+	fn as_bytes() {
+		let key        = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
+		let byte_slice = key.as_bytes();
+		
+		//	Ensure the byte slice matches the original key's bytes.
+		assert_eq!(*byte_slice, TEST_PUBKEY);
+		
+		//	We can't modify the byte slice due to immutability.
+		//	Uncommenting the line below would cause a compilation error:
+		//byte_slice[10] = 84;
+		
+		//	as_bytes() doesn't consume the original key.
+		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+	
+	//		to_bytes															
+	#[test]
+	fn to_bytes() {
+		let key            = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
+		let mut byte_clone = key.to_bytes();
+		
+		//	Ensure the clone matches the original key's bytes.
+		assert_eq!(byte_clone, TEST_PUBKEY);
+		
+		//	We can modify the cloned byte array.
+		byte_clone[10]     = 84;
+		assert_ne!(byte_clone, TEST_PUBKEY);
+		
+		//	to_bytes() doesn't consume or affect the original key.
+		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+	
+	//		from_bytes															
+	#[test]
+	fn from_bytes() {
+		let key = VerifyingKey::from_bytes(TEST_PUBKEY);
+		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+	
+	//		to_string															
+	#[test]
+	fn to_string() {
+		let key = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
+		assert_eq!(key.to_string(), TEST_PUBKEY_HEX);
+	}
+	
+	//		to_base64															
+	#[test]
+	fn to_base64() {
+		let key = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
+		assert_eq!(key.to_base64(), TEST_PUBKEY_B64);
+	}
+	
+	//		from_base64															
+	#[test]
+	fn from_base64__valid() {
+		let key = VerifyingKey::from_base64(TEST_PUBKEY_B64).unwrap();
+		assert_eq!(key.key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		
+		let key = VerifyingKey::from_base64("").unwrap();
+		assert_eq!(key.key, RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap());
+	}
+	#[test]
+	fn from_base64__invalid() {
+		assert_err!(VerifyingKey::from_base64("invalid@@base64"));
+	}
+	
+	//		to_hex																
+	#[test]
+	fn to_hex() {
+		let key = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
+		assert_eq!(key.to_hex(), TEST_PUBKEY_HEX);
+	}
+	
+	//		from_hex															
+	#[test]
+	fn from_hex__valid() {
+		let key = VerifyingKey::from_hex(TEST_PUBKEY_HEX).unwrap();
+		assert_eq!(key.key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		
+		let key = VerifyingKey::from_hex("").unwrap();
+		assert_eq!(key.key, RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap());
+	}
+	#[test]
+	fn from_hex__invalid() {
+		assert_err!(VerifyingKey::from_hex("invalid@@hex"));
+	}
+	
+	//		to_vec																
+	#[test]
+	fn to_vec() {
+		let key            = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
+		let mut byte_clone = key.to_vec();
+		
+		//	Ensure the clone matches the original key's vec.
+		assert_eq!(byte_clone, TEST_PUBKEY.to_vec());
+		
+		//	We can modify the cloned byte vector.
+		byte_clone[10]     = 84;
+		assert_ne!(byte_clone, TEST_PUBKEY.to_vec());
+		
+		//	to_vec() doesn't consume or affect the original key.
+		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+}
+
+#[cfg(test)]
+mod verifying_key__traits {
+	use super::*;
+	
+	//		as_ref																
+	#[test]
+	fn as_ref() {
+		//	Same tests as for as_bytes().
+		let key        = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
+		let byte_slice = key.as_ref();
+		assert_eq!(*byte_slice, TEST_PUBKEY);
+		assert_eq!(key,         VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+	
+	//		clone																
+	#[test]
+	fn clone() {
+		let key   = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
+		let clone = key.clone();
+		assert_eq!(clone, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+	
+	//		clone_from															
+	#[test]
+	fn clone_from() {
+		let key       = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
+		let mut clone = VerifyingKey { key: RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap() };
+		clone.clone_from(&key);
+		assert_eq!(key,   VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+		assert_eq!(clone, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+	
+	//		debug																
+	#[test]
+	fn debug() {
+		let key = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
+		assert_eq!(format!("{:?}", key), TEST_PUBKEY_HEX);
+	}
+	
+	//		default																
+	#[test]
+	fn default() {
+		let key = VerifyingKey::default();
+		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap() });
+	}
+	
+	//		deref																
+	#[test]
+	fn deref() {
+		let key = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
+		assert_eq!(key.deref(), &RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		assert_eq!(&*key,       &RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+	}
+	
+	//		display																
+	#[test]
+	fn display() {
+		let key = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
+		assert_eq!(format!("{}", key), TEST_PUBKEY_HEX);
+	}
+	
+	//		from																
+	#[test]
+	fn from__real_verifying_key() {
+		let key = VerifyingKey::from(RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+	#[test]
+	fn from__real_verifying_key_ref() {
+		let key = VerifyingKey::from(&RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+	#[test]
+	fn from__fixed_length_byte_array() {
+		let key = VerifyingKey::from(TEST_PUBKEY);
+		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+	#[test]
+	fn from__fixed_length_byte_slice() {
+		let key = VerifyingKey::from(&TEST_PUBKEY);
+		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+	
+	//		from_str															
+	#[test]
+	fn from_str() {
+		assert_ok_eq!(VerifyingKey::from_str(TEST_PUBKEY_HEX), VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+	#[test]
+	fn from_str__err_decoding() {
+		let err = VerifyingKey::from_str("invalid@@hex");
+		assert_err_eq!(err, ByteSizedError::InvalidHexString);
+		assert_eq!(err.unwrap_err().to_string(), s!("The supplied data is not in valid hexadecimal format"));
+	}
+	#[test]
+	fn from_str__err_too_long() {
+		let err = VerifyingKey::from_str("010203040506070809101112131415161718192021222324252627282930313233");
+		assert_err_eq!(err, ByteSizedError::DataTooLong(32));
+		assert_eq!(err.unwrap_err().to_string(), s!("The supplied data is longer than 32 bytes"));
+	}
+	#[test]
+	fn from_str__err_too_short() {
+		let err = VerifyingKey::from_str("01020304050607080910111213141516171819202122232425262728293031");
+		assert_err_eq!(err, ByteSizedError::DataTooShort(32));
+		assert_eq!(err.unwrap_err().to_string(), s!("The supplied data is shorter than 32 bytes"));
+	}
+	
+	//		force_from															
+	#[test]
+	fn force_from__byte_slice() {
+		let key = VerifyingKey::force_from(&TEST_PUBKEY[..]);
+		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+		
+		let key = VerifyingKey::force_from(&TEST_PUBKEY[..31]);
+		assert_ne!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap() });
+	}
+	#[test]
+	fn force_from__vec_u8() {
+		let key = VerifyingKey::force_from(TEST_PUBKEY.to_vec());
+		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+		
+		let key = VerifyingKey::force_from(TEST_PUBKEY[..31].to_vec());
+		assert_ne!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap() });
+	}
+	#[test]
+	fn force_from__vec_u8_ref() {
+		let key = VerifyingKey::force_from(&TEST_PUBKEY.to_vec());
+		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+		
+		let key = VerifyingKey::force_from(&TEST_PUBKEY[..31].to_vec());
+		assert_ne!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap() });
+	}
+	
+	//		hash																
+	#[test]
+	fn hash() {
+		let key1        = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
+		let key2        = VerifyingKey { key: RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap() };
+		let mut hasher1 = DefaultHasher::new();
+		let mut hasher2 = DefaultHasher::new();
+		key1.hash(&mut hasher1);
+		key2.hash(&mut hasher2);
+		assert_ne!(hasher1.finish(), hasher2.finish());
+	}
+	
+	//		partial_eq															
+	#[test]
+	fn partial_eq() {
+		let key = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
+		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+		assert_ne!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap() });
+	}
+	
+	//		serialize															
+	#[test]
+	fn serialize() {
+		let key  = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
+		let json = json!(TEST_PUBKEY_HEX);
+		assert_json_eq!(json!(key), json);
+	}
+	
+	//		deserialize															
+	#[test]
+	fn deserialize() {
+		let json = r#""9fd7b9e728de47ab7d9d816e7057606dd302f38ddee64272e0ed933f0896bc8e""#;
+		let key  = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
+		assert_ok_eq!(serde_json::from_str::<VerifyingKey>(&json), key);
+	}
+	
+	//		try_from															
+	#[test]
+	fn try_from__byte_slice() {
+		let key = VerifyingKey::try_from(&TEST_PUBKEY[..]);
+		assert_ok_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+	#[test]
+	fn try_from__byte_slice__err_too_long() {
+		let array: [u8; 33] = [0; 33];
+		let err = VerifyingKey::try_from(&array[..]);
+		assert_err_eq!(err, ByteSizedError::DataTooLong(32));
+		assert_eq!(err.unwrap_err().to_string(), s!("The supplied data is longer than 32 bytes"));
+	}
+	#[test]
+	fn try_from__byte_slice__err_too_short() {
+		let err = VerifyingKey::try_from(&TEST_PUBKEY[..31]);
+		assert_err_eq!(err, ByteSizedError::DataTooShort(32));
+		assert_eq!(err.unwrap_err().to_string(), s!("The supplied data is shorter than 32 bytes"));
+	}
+	#[test]
+	fn try_from__str() {
+		let key = VerifyingKey::try_from("9fd7b9e728de47ab7d9d816e7057606dd302f38ddee64272e0ed933f0896bc8e");
+		assert_ok_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+	#[test]
+	fn try_from__str_ref() {
+		let key = VerifyingKey::try_from(TEST_PUBKEY_HEX);
+		assert_ok_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+	#[test]
+	fn try_from__string() {
+		let key = VerifyingKey::try_from(TEST_PUBKEY_HEX.to_owned());
+		assert_ok_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+	#[test]
+	fn try_from__string_ref() {
+		let key = VerifyingKey::try_from(&TEST_PUBKEY_HEX.to_owned());
+		assert_ok_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+	#[test]
+	fn try_from__box_str() {
+		let box_str = TEST_PUBKEY_HEX.to_owned().into_boxed_str();
+		let key     = VerifyingKey::try_from(box_str);
+		assert_ok_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+	#[test]
+	fn try_from__cow_borrowed() {
+		let cow: Cow<'_, str> = Cow::Borrowed(TEST_PUBKEY_HEX);
+		let key               = VerifyingKey::try_from(cow);
+		assert_ok_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+	#[test]
+	fn try_from__cow_owned() {
+		let cow: Cow<'_, str> = Cow::Owned(TEST_PUBKEY_HEX.to_owned());
+		let key               = VerifyingKey::try_from(cow);
+		assert_ok_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+	#[test]
+	fn try_from__vec_u8() {
+		let key = VerifyingKey::try_from(TEST_PUBKEY.to_vec());
+		assert_ok_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+	#[test]
+	fn try_from__vec_u8_ref() {
+		let key = VerifyingKey::try_from(&TEST_PUBKEY.to_vec());
+		assert_ok_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+	}
+}
+
+//§		VerifyingKeyExt															
+#[cfg(test)]
+mod verifying_key_ext__bytesized {
+	use super::*;
+	
+	//		as_bytes															
+	#[test]
+	fn as_bytes() {
+		let key        = RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap();
+		let byte_slice = ByteSized::as_bytes(&key);
+		
+		//	Ensure the byte slice matches the original key's bytes.
+		assert_eq!(*byte_slice, TEST_PUBKEY);
+		
+		//	We can't modify the byte slice due to immutability.
+		//	Uncommenting the line below would cause a compilation error:
+		//byte_slice[10] = 84;
+		
+		//	as_bytes() doesn't consume the original key.
+		assert_eq!(key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+	}
+	
+	//		to_bytes															
+	#[test]
+	fn to_bytes() {
+		let key            = RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap();
+		let mut byte_clone = ByteSized::to_bytes(&key);
+		
+		//	Ensure the clone matches the original key's bytes.
+		assert_eq!(byte_clone, TEST_PUBKEY);
+		
+		//	We can modify the cloned byte array.
+		byte_clone[10]     = 84;
+		assert_ne!(byte_clone, TEST_PUBKEY);
+		
+		//	to_bytes() doesn't consume or affect the original key.
+		assert_eq!(key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+	}
+	
+	//		from_bytes															
+	#[test]
+	fn from_bytes() {
+		let key = <RealVerifyingKey as ByteSized<32>>::from_bytes(TEST_PUBKEY);
+		assert_eq!(key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+	}
+	
+	//		to_base64															
+	#[test]
+	fn to_base64() {
+		let key = RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap();
+		assert_eq!(key.to_base64(), TEST_PUBKEY_B64);
+	}
+	
+	//		from_base64															
+	#[test]
+	fn from_base64__valid() {
+		let key = RealVerifyingKey::from_base64(TEST_PUBKEY_B64).unwrap();
+		assert_eq!(key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		
+		let key = RealVerifyingKey::from_base64("").unwrap();
+		assert_eq!(key, RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap());
+	}
+	#[test]
+	fn from_base64__invalid() {
+		assert_err!(RealVerifyingKey::from_base64("invalid@@base64"));
+	}
+	
+	//		to_hex																
+	#[test]
+	fn to_hex() {
+		let key = RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap();
+		assert_eq!(key.to_hex(), TEST_PUBKEY_HEX);
+	}
+	
+	//		from_hex															
+	#[test]
+	fn from_hex__valid() {
+		let key = RealVerifyingKey::from_hex(TEST_PUBKEY_HEX).unwrap();
+		assert_eq!(key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		
+		let key = RealVerifyingKey::from_hex("").unwrap();
+		assert_eq!(key, RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap());
+	}
+	#[test]
+	fn from_hex__invalid() {
+		assert_err!(RealVerifyingKey::from_hex("invalid@@hex"));
+	}
+	
+	//		to_vec																
+	#[test]
+	fn to_vec() {
+		let key            = RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap();
+		let mut byte_clone = key.to_vec();
+		
+		//	Ensure the clone matches the original key's vec.
+		assert_eq!(byte_clone, TEST_PUBKEY.to_vec());
+		
+		//	We can modify the cloned byte vector.
+		byte_clone[10]     = 84;
+		assert_ne!(byte_clone, TEST_PUBKEY.to_vec());
+		
+		//	to_vec() doesn't consume or affect the original key.
+		assert_eq!(key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+	}
+}
+
+#[cfg(test)]
+mod verifying_key_ext__traits {
+	use super::*;
+	
+	//		force_from															
+	#[test]
+	fn force_from__byte_slice() {
+		let key = RealVerifyingKey::force_from(&TEST_PUBKEY[..]);
+		assert_eq!(key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		
+		let key = RealVerifyingKey::force_from(&TEST_PUBKEY[..31]);
+		assert_ne!(key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		assert_eq!(key, RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap());
+	}
+	#[test]
+	fn force_from__vec_u8() {
+		let key = RealVerifyingKey::force_from(TEST_PUBKEY.to_vec());
+		assert_eq!(key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		
+		let key = RealVerifyingKey::force_from(TEST_PUBKEY[..31].to_vec());
+		assert_ne!(key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		assert_eq!(key, RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap());
+	}
+	#[test]
+	fn force_from__vec_u8_ref() {
+		let key = RealVerifyingKey::force_from(&TEST_PUBKEY.to_vec());
+		assert_eq!(key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		
+		let key = RealVerifyingKey::force_from(&TEST_PUBKEY[..31].to_vec());
+		assert_ne!(key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		assert_eq!(key, RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap());
 	}
 }
 

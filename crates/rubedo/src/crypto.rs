@@ -23,7 +23,7 @@ use core::{
 	ops::Deref,
 	str::FromStr,
 };
-use ed25519_dalek::SigningKey as RealSigningKey;
+use ed25519_dalek::{SigningKey as RealSigningKey, VerifyingKey as RealVerifyingKey};
 use generic_array::{
 	GenericArray,
 	typenum::{U32, U64},
@@ -856,6 +856,17 @@ impl SigningKey {
 	pub fn into_inner(self) -> RealSigningKey {
 		self.key
 	}
+	
+	//		verifying_key														
+	/// Returns the [`VerifyingKey`] for this [`SigningKey`].
+	/// 
+	/// This function exists to return the wrapper type [`VerifyingKey`] rather
+	/// than the inner type [`ed25519_dalek::VerifyingKey`].
+	/// 
+	#[must_use]
+	pub fn verifying_key(&self) -> VerifyingKey {
+		VerifyingKey::from(&self.key.verifying_key())
+	}
 }
 
 impl ByteSized<32> for SigningKey {
@@ -1186,6 +1197,379 @@ impl TryFrom<&Vec<u8>> for SigningKey {
 	}
 }
 
+//		VerifyingKey															
+/// An ed25519 verifying key which can be used to produce signatures.
+/// 
+/// This is a wrapper around [`ed25519_dalek::VerifyingKey`], which provides
+/// additional functionality, including serialisation and deserialisation using
+/// [Serde](https://crates.io/crates/serde), via the implementation of the
+/// [`ByteSized`] and [`ByteSizedFull`] traits.
+/// 
+/// # See also
+/// 
+/// * [`ed25519_dalek::VerifyingKey`]
+/// 
+#[derive(Copy, Clone, Eq, PartialEq)]
+pub struct VerifyingKey {
+	//		Private properties													
+	/// The actual verifying key.
+	key: RealVerifyingKey,
+}
+
+impl VerifyingKey {
+	//		into_inner															
+	/// Consumes the [`VerifyingKey`] and returns the inner
+	/// [`ed25519_dalek::VerifyingKey`].
+	#[must_use]
+	pub const fn into_inner(self) -> RealVerifyingKey {
+		self.key
+	}
+}
+
+impl ByteSized<32> for VerifyingKey {
+	//		as_bytes															
+	fn as_bytes(&self) -> &[u8; 32] {
+		self.key.as_bytes()
+	}
+	
+	//		to_bytes															
+	fn to_bytes(&self) -> [u8; 32] {
+		self.key.to_bytes()
+	}
+	
+	//		from_bytes															
+	/// Converts a `[u8; 32]` to a [`VerifyingKey`].
+	/// 
+	/// Note that this is a direct conversion, and does not check the validity
+	/// of the bytes. If the bytes are not a valid verifying key, the key will
+	/// be created as empty. To check the validity of the bytes, use
+	/// [`VerifyingKey::from_bytes()`](RealVerifyingKey::from_bytes()) instead.
+	/// 
+	fn from_bytes(bytes: [u8; 32]) -> Self {
+		#[cfg_attr(    feature = "reasons",  allow(clippy::option_if_let_else,
+			reason = "Using map_or_else() here would not be as clear, and no more concise"
+		))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::option_if_let_else))]
+		match RealVerifyingKey::from_bytes(&bytes) {
+			Ok(key) => Self { key },
+			Err(_)  => Self::default(),
+		}
+	}
+	
+	//		to_base64															
+	fn to_base64(&self) -> String {
+		self.key.to_base64()
+	}
+	
+	//		from_base64															
+	fn from_base64(encoded: &str) -> Result<Self, DecodeError> {
+		RealVerifyingKey::from_base64(encoded).map(|key| Self { key })
+	}
+	
+	//		to_hex																
+	fn to_hex(&self) -> String {
+		self.key.to_hex()
+	}
+	
+	//		from_hex															
+	fn from_hex(encoded: &str) -> Result<Self, FromHexError> {
+		RealVerifyingKey::from_hex(encoded).map(|key| Self { key })
+	}
+	
+	//		to_vec																
+	fn to_vec(&self) -> Vec<u8> {
+		self.key.to_vec()
+	}
+}
+
+impl ByteSizedFull<32> for VerifyingKey {}
+
+impl AsRef<[u8; 32]> for VerifyingKey {
+	//		as_ref																
+	fn as_ref(&self) -> &[u8; 32] {
+		self.as_bytes()
+	}
+}
+
+impl Debug for VerifyingKey {
+	//		fmt																	
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		write!(f, "{}", self.to_hex())
+	}
+}
+
+impl Default for VerifyingKey {
+	//		default																
+	fn default() -> Self {
+		#[cfg_attr(    feature = "reasons",  allow(clippy::unwrap_used, reason = "Infallible"))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::unwrap_used))]
+		Self { key: RealVerifyingKey::from_bytes(&[0; 32]).unwrap() }
+	}
+}
+
+impl Deref for VerifyingKey {
+    type Target = RealVerifyingKey;
+
+	//		deref																
+    fn deref(&self) -> &Self::Target {
+        &self.key
+    }
+}
+
+impl Display for VerifyingKey {
+	//		fmt																	
+	/// Formats the verifying key for display.
+	///
+	/// This method serialises the verifying key into hexadecimal string
+	/// representation.
+	/// 
+	/// # See also
+	/// 
+	/// * [`VerifyingKey::serialize()`]
+	/// * [`VerifyingKey::to_base64()`]
+	/// 
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		write!(f, "{}", self.to_hex())
+	}
+}
+
+impl From<RealVerifyingKey> for VerifyingKey {
+	//		from																
+	/// Converts a [`ed25519_dalek::VerifyingKey`] to a [`VerifyingKey`].
+	fn from(key: RealVerifyingKey) -> Self {
+		Self { key }
+	}
+}
+
+impl From<&RealVerifyingKey> for VerifyingKey {
+	//		from																
+	/// Converts a [`&ed25519_dalek::VerifyingKey`](ed25519_dalek::VerifyingKey)
+	/// to a [`VerifyingKey`].
+	fn from(key: &RealVerifyingKey) -> Self {
+		Self { key: *key }
+	}
+}
+
+impl From<[u8; 32]> for VerifyingKey {
+	//		from																
+	/// Converts a [`[u8; 32]`](https://doc.rust-lang.org/std/primitive.slice.html)
+	/// to a [`VerifyingKey`].
+	fn from(b: [u8; 32]) -> Self {
+		Self::from_bytes(b)
+	}
+}
+
+impl From<&[u8; 32]> for VerifyingKey {
+	//		from																
+	/// Converts a [`&[u8; 32]`](https://doc.rust-lang.org/std/primitive.slice.html)
+	/// to a [`VerifyingKey`].
+	fn from(b: &[u8; 32]) -> Self {
+		Self::from_bytes(*b)
+	}
+}
+
+impl FromStr for VerifyingKey {
+	type Err = ByteSizedError;
+	
+	//		from_str															
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		Self::try_from(s)
+	}
+}
+
+impl ForceFrom<&[u8]> for VerifyingKey {
+	//		force_from															
+	/// Converts a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html)
+	/// to a [`VerifyingKey`].
+	/// 
+	/// Note that if the incoming `[u8]` is too long to fit, it will be
+	/// truncated without error or warning. If there is not enough data, it will
+	/// be padded with zeroes. If this situation needs checking, use
+	/// `try_from()` instead.
+	/// 
+	fn force_from(b: &[u8]) -> Self {
+		Self { key: RealVerifyingKey::force_from(b) }
+	}
+}
+
+impl<const N: usize> ForceFrom<&[u8; N]> for VerifyingKey {
+	//		force_from															
+	/// Converts a [`&[u8; N]`](https://doc.rust-lang.org/std/primitive.slice.html)
+	/// to a [`VerifyingKey`].
+	/// 
+	/// Note that if the incoming `[u8; N]` is too long to fit, it will be
+	/// truncated without error or warning. If there is not enough data, it will
+	/// be padded with zeroes. If this situation needs checking, use
+	/// `try_from()` instead.
+	/// 
+	fn force_from(b: &[u8; N]) -> Self {
+		Self::force_from(&b[..])
+	}
+}
+
+impl ForceFrom<Vec<u8>> for VerifyingKey {
+	//		force_from															
+	/// Converts a [`Vec<u8>`](Vec) to a [`VerifyingKey`].
+	/// 
+	/// Note that if the incoming [`Vec<u8>`](Vec) is too long to fit, it will
+	/// be truncated without error or warning. If there is not enough data, it
+	/// will be padded with zeroes. If this situation needs checking, use
+	/// `try_from()` instead.
+	/// 
+	fn force_from(v: Vec<u8>) -> Self {
+		Self::force_from(&*v)
+	}
+}
+
+impl ForceFrom<&Vec<u8>> for VerifyingKey {
+	//		force_from															
+	/// Converts a [`&Vec[u8]`](Vec) to a [`VerifyingKey`].
+	/// 
+	/// Note that if the incoming [`Vec<u8>`](Vec) is too long to fit, it will
+	/// be truncated without error or warning. If there is not enough data, it
+	/// will be padded with zeroes. If this situation needs checking, use
+	/// `try_from()` instead.
+	/// 
+	fn force_from(v: &Vec<u8>) -> Self {
+		Self::force_from(&**v)
+	}
+}
+
+impl Hash for VerifyingKey {
+	//		hash																
+	fn hash<H: Hasher>(&self, state: &mut H) {
+		self.key.as_bytes().hash(state);
+	}
+}
+
+impl Serialize for VerifyingKey {
+	//		serialize															
+	/// Serialises the verifying key to a [`String`].
+	/// 
+	/// This method serialises the verifying key into hexadecimal string
+	/// representation.
+	/// 
+	/// # See also
+	/// 
+	/// * [`VerifyingKey::deserialize()`]
+	/// * [`VerifyingKey::<Display>fmt()`]
+	/// * [`VerifyingKey::to_base64()`]
+	/// 
+	fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+	where
+		S: Serializer,
+	{
+		serializer.serialize_str(&self.to_string())
+	}
+}
+
+impl<'de> Deserialize<'de> for VerifyingKey {
+	//		deserialize															
+	/// Deserialises the verifying key from a [`String`].
+	/// 
+	/// This method deserialises the verifying key from hexadecimal string
+	/// representation.
+	/// 
+	/// # See also
+	///
+	/// * [`VerifyingKey::deserialize()`]
+	/// * [`VerifyingKey::from_base64()`]
+	///
+	fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+	where
+		D: Deserializer<'de>,
+	{
+		let string = String::deserialize(deserializer)?;
+		Self::from_hex(&string).map_err(D::Error::custom)
+	}
+}
+
+impl TryFrom<&[u8]> for VerifyingKey {
+	type Error = ByteSizedError;
+	
+	//		try_from															
+	/// Converts a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html)
+	/// to a [`VerifyingKey`].
+	fn try_from(b: &[u8]) -> Result<Self, Self::Error> {
+		match b.len().cmp(&32) {
+			Ordering::Greater => return Err(ByteSizedError::DataTooLong(32)),
+			Ordering::Less    => return Err(ByteSizedError::DataTooShort(32)),
+			Ordering::Equal   => {},
+		}
+		Ok(Self::force_from(b))
+	}
+}
+
+impl TryFrom<&str> for VerifyingKey {
+	type Error = ByteSizedError;
+	
+	//		try_from															
+	/// Converts a [`&str`](str) to a [`VerifyingKey`].
+	fn try_from(s: &str) -> Result<Self, Self::Error> {
+		Self::try_from(hex::decode(s).map_err(|_err| ByteSizedError::InvalidHexString)?)
+	}
+}
+
+impl TryFrom<String> for VerifyingKey {
+	type Error = ByteSizedError;
+	
+	//		try_from															
+	/// Converts a [`String`] to a [`VerifyingKey`].
+	fn try_from(s: String) -> Result<Self, Self::Error> {
+		Self::try_from(s.as_str())
+	}
+}
+
+impl TryFrom<&String> for VerifyingKey {
+	type Error = ByteSizedError;
+	
+	//		try_from															
+	/// Converts a [`&String`](String) to a [`VerifyingKey`].
+	fn try_from(s: &String) -> Result<Self, Self::Error> {
+		Self::try_from(s.as_str())
+	}
+}
+
+impl TryFrom<Box<str>> for VerifyingKey {
+	type Error = ByteSizedError;
+	
+	//		try_from															
+	/// Converts a [boxed](Box) [string](str) slice to a [`VerifyingKey`].
+	fn try_from(s: Box<str>) -> Result<Self, Self::Error> {
+		Self::try_from(&*s)
+	}
+}
+
+impl<'a> TryFrom<Cow<'a, str>> for VerifyingKey {
+	type Error = ByteSizedError;
+	
+	//		try_from															
+	/// Converts a [clone-on-write](Cow) [string](str) to a [`VerifyingKey`].
+	fn try_from(s: Cow<'a, str>) -> Result<Self, Self::Error> {
+		Self::try_from(s.as_ref())
+	}
+}
+
+impl TryFrom<Vec<u8>> for VerifyingKey {
+	type Error = ByteSizedError;
+	
+	//		try_from															
+	/// Converts a [`Vec<u8>`](Vec) to a [`VerifyingKey`].
+	fn try_from(v: Vec<u8>) -> Result<Self, Self::Error> {
+		Self::try_from(&*v)
+	}
+}
+
+impl TryFrom<&Vec<u8>> for VerifyingKey {
+	type Error = ByteSizedError;
+	
+	//		try_from															
+	/// Converts a [`&Vec[u8]`](Vec) to a [`VerifyingKey`].
+	fn try_from(v: &Vec<u8>) -> Result<Self, Self::Error> {
+		Self::try_from(v.as_slice())
+	}
+}
+
 
 
 //		Traits
@@ -1306,6 +1690,151 @@ impl ForceFrom<Vec<u8>> for RealSigningKey {
 impl ForceFrom<&Vec<u8>> for RealSigningKey {
 	//		force_from															
 	/// Converts a [`&Vec[u8]`](Vec) to a [`ed25519_dalek::SigningKey`].
+	/// 
+	/// Note that if the incoming [`Vec<u8>`](Vec) is too long to fit, it will
+	/// be truncated without error or warning. If there is not enough data, it
+	/// will be padded with zeroes. If this situation needs checking, use
+	/// `try_from()` instead.
+	/// 
+	fn force_from(v: &Vec<u8>) -> Self {
+		Self::force_from(&**v)
+	}
+}
+
+//§		VerifyingKeyExt															
+/// This trait provides additional functionality to
+/// [`ed25519_dalek::VerifyingKey`].
+/// 
+/// At present, this trait specifies the implementation of [`ByteSized`] to
+/// apply to [`ed25519_dalek::VerifyingKey`]. When wishing to use the original,
+/// "real" type, which is [`ed25519_dalek::VerifyingKey`], this trait can be
+/// brought into scope to extend it with the additional functionality provided.
+/// However, if the full range of functionality provided by [`ByteSizedFull`] is
+/// required, then the [`VerifyingKey`] type should be used instead, as this wraps
+/// the original type and provides the full range of functionality.
+/// 
+/// The conversion to and from a [`String`] defaults to using hex strings rather
+/// than base64-encoded strings, because this is more common, due to it being a
+/// fixed-length string that is easy to read, verify, and transmit without any
+/// compatibility issues. However, base64 conversion functions are also provided
+/// for convenience in case that format is preferred.
+/// 
+pub trait VerifyingKeyExt: ByteSized<32> {}
+
+impl VerifyingKeyExt for RealVerifyingKey {}
+
+impl ByteSized<32> for RealVerifyingKey {
+	//		as_bytes															
+	fn as_bytes(&self) -> &[u8; 32] {
+		self.as_bytes()
+	}
+	
+	//		to_bytes															
+	fn to_bytes(&self) -> [u8; 32] {
+		self.to_bytes()
+	}
+	
+	//		from_bytes															
+	/// Converts a `[u8; 32]` to a [`ed25519_dalek::VerifyingKey`](RealVerifyingKey).
+	/// 
+	/// Note that this is a direct conversion, and does not check the validity
+	/// of the bytes. If the bytes are not a valid verifying key, the key will
+	/// be created as empty. To check the validity of the bytes, use
+	/// [`VerifyingKey::from_bytes()`](RealVerifyingKey::from_bytes) instead
+	/// (which will be default unless this method is specifically called).
+	/// 
+	fn from_bytes(bytes: [u8; 32]) -> Self {
+		#[cfg_attr(    feature = "reasons",  allow(clippy::unwrap_used, reason = "Infallible"))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::unwrap_used))]
+		Self::from_bytes(&bytes).unwrap_or_else(|_| Self::from_bytes(&[0_u8; 32]).unwrap())
+	}
+	
+	//		to_base64															
+	fn to_base64(&self) -> String {
+		BASE64.encode(self.as_bytes())
+	}
+	
+	//		from_base64															
+	fn from_base64(encoded: &str) -> Result<Self, DecodeError> {
+		Ok(Self::force_from(BASE64.decode(encoded)?))
+	}
+	
+	//		to_hex																
+	fn to_hex(&self) -> String {
+		hex::encode(self.as_bytes())
+	}
+	
+	//		from_hex															
+	fn from_hex(encoded: &str) -> Result<Self, FromHexError> {
+		Ok(Self::force_from(hex::decode(encoded)?))
+	}
+	
+	//		to_vec																
+	fn to_vec(&self) -> Vec<u8> {
+		self.as_bytes().to_vec()
+	}
+}
+
+impl ForceFrom<&[u8]> for RealVerifyingKey {
+	//		force_from															
+	/// Converts a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html)
+	/// to a [`ed25519_dalek::VerifyingKey`].
+	/// 
+	/// Note that if the incoming `[u8]` is too long to fit, it will be
+	/// truncated without error or warning. If there is not enough data, it will
+	/// be padded with zeroes. If this situation needs checking, use
+	/// `try_from()` instead.
+	/// 
+	/// Note that this is a direct conversion, and does not check the validity
+	/// of the bytes. If the bytes are not a valid verifying key, the key will
+	/// be created as empty. To check the validity of the bytes, use
+	/// [`VerifyingKey::from_bytes()`](RealVerifyingKey::from_bytes) instead
+	/// (which will be default unless this method is specifically called).
+	/// 
+	fn force_from(b: &[u8]) -> Self {
+		let mut array = [0_u8; 32];
+		let len       = b.len().min(32);
+		#[cfg_attr(    feature = "reasons",  allow(clippy::indexing_slicing, reason = "Infallible"))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::indexing_slicing))]
+		array[..len].copy_from_slice(&b[..len]);
+		#[cfg_attr(    feature = "reasons",  allow(clippy::unwrap_used, reason = "Infallible"))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::unwrap_used))]
+		Self::from_bytes(&array).unwrap_or_else(|_| Self::from_bytes(&[0_u8; 32]).unwrap())
+	}
+}
+
+impl<const N: usize> ForceFrom<&[u8; N]> for RealVerifyingKey {
+	//		force_from															
+	/// Converts a [`&[u8; N]`](https://doc.rust-lang.org/std/primitive.slice.html)
+	/// to a [`ed25519_dalek::VerifyingKey`].
+	/// 
+	/// Note that if the incoming `[u8; N]` is too long to fit, it will be
+	/// truncated without error or warning. If there is not enough data, it will
+	/// be padded with zeroes. If this situation needs checking, use
+	/// `try_from()` instead.
+	/// 
+	fn force_from(b: &[u8; N]) -> Self {
+		Self::force_from(&b[..])
+	}
+}
+
+impl ForceFrom<Vec<u8>> for RealVerifyingKey {
+	//		force_from															
+	/// Converts a [`Vec<u8>`](Vec) to a [`ed25519_dalek::VerifyingKey`].
+	/// 
+	/// Note that if the incoming [`Vec<u8>`](Vec) is too long to fit, it will
+	/// be truncated without error or warning. If there is not enough data, it
+	/// will be padded with zeroes. If this situation needs checking, use
+	/// `try_from()` instead.
+	/// 
+	fn force_from(v: Vec<u8>) -> Self {
+		Self::force_from(&*v)
+	}
+}
+
+impl ForceFrom<&Vec<u8>> for RealVerifyingKey {
+	//		force_from															
+	/// Converts a [`&Vec[u8]`](Vec) to a [`ed25519_dalek::VerifyingKey`].
 	/// 
 	/// Note that if the incoming [`Vec<u8>`](Vec) is too long to fit, it will
 	/// be truncated without error or warning. If there is not enough data, it
