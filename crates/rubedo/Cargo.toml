@@ -17,7 +17,7 @@ reasons = []
 
 [dependencies]
 base64 = "0.22.0"
-chrono = { version = "=0.4.34", features = ["alloc", "clock", "std"] }
+chrono = { version = "0.4.35", features = ["alloc", "clock", "std"] }
 ed25519-dalek = { version = "2.1.1", features = ["rand_core"] }
 futures = "0.3.30"
 generic-array = "0.14.7" # Cannot move to 1.0.0 until the digest crate does

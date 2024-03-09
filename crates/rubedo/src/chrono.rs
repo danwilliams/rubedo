@@ -314,11 +314,11 @@ impl DurationExt for Duration {
 		if (i128::from(Self::MIN_NANOSECONDS)..=i128::from(Self::MAX_NANOSECONDS)).contains(&nanoseconds) {
 			Some(Self::nanoseconds(nanoseconds as i64))
 		} else if nanoseconds < 0 {
-			Self::seconds(         nanoseconds.abs().div_euclid(1_000_000_000_i128).neg() as i64).checked_sub(
+			Self::try_seconds(     nanoseconds.abs().div_euclid(1_000_000_000_i128).neg() as i64)?.checked_sub(
 				&Self::nanoseconds(nanoseconds.abs().rem_euclid(1_000_000_000_i128)       as i64)
 			)
 		} else {
-			Self::seconds(         nanoseconds.div_euclid(1_000_000_000_i128) as i64).checked_add(
+			Self::try_seconds(     nanoseconds.div_euclid(1_000_000_000_i128) as i64)?.checked_add(
 				&Self::nanoseconds(nanoseconds.rem_euclid(1_000_000_000_i128) as i64)
 			)
 		}
@@ -334,11 +334,11 @@ impl DurationExt for Duration {
 		if (i128::from(Self::MIN_MICROSECONDS)..=i128::from(Self::MAX_MICROSECONDS)).contains(&microseconds) {
 			Some(Self::microseconds(microseconds as i64))
 		} else if microseconds < 0 {
-			Self::seconds(          microseconds.abs().div_euclid(1_000_000_i128).neg() as i64).checked_sub(
+			Self::try_seconds(      microseconds.abs().div_euclid(1_000_000_i128).neg() as i64)?.checked_sub(
 				&Self::microseconds(microseconds.abs().rem_euclid(1_000_000_i128)       as i64)
 			)
 		} else {
-			Self::seconds(          microseconds.div_euclid(1_000_000_i128) as i64).checked_add(
+			Self::try_seconds(      microseconds.div_euclid(1_000_000_i128) as i64)?.checked_add(
 				&Self::microseconds(microseconds.rem_euclid(1_000_000_i128) as i64)
 			)
 		}
