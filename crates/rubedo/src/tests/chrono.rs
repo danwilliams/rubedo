@@ -73,7 +73,7 @@ mod duration_ext {
 		assert_eq!(Duration::seconds(Duration::MAX_SECONDS).num_seconds(), Duration::MAX_SECONDS);
 	}
 	#[test]
-	#[should_panic(expected = "Duration::seconds out of bounds")]
+	#[should_panic(expected = "TimeDelta::seconds out of bounds")]
 	fn max_seconds__overflow_construction() {
 		let _ = Duration::seconds(Duration::MAX_SECONDS + 1);
 	}
@@ -88,7 +88,7 @@ mod duration_ext {
 		assert_eq!(Duration::minutes(Duration::MAX_MINUTES).num_minutes(), Duration::MAX_MINUTES);
 	}
 	#[test]
-	#[should_panic(expected = "Duration::minutes out of bounds")]
+	#[should_panic(expected = "TimeDelta::minutes out of bounds")]
 	fn max_minutes__overflow_construction() {
 		let _ = Duration::minutes(Duration::MAX_MINUTES + 1);
 	}
@@ -103,7 +103,7 @@ mod duration_ext {
 		assert_eq!(Duration::hours(Duration::MAX_HOURS).num_hours(), Duration::MAX_HOURS);
 	}
 	#[test]
-	#[should_panic(expected = "Duration::hours out of bounds")]
+	#[should_panic(expected = "TimeDelta::hours out of bounds")]
 	fn max_hours__overflow_construction() {
 		let _ = Duration::hours(Duration::MAX_HOURS + 1);
 	}
@@ -118,7 +118,7 @@ mod duration_ext {
 		assert_eq!(Duration::days(Duration::MAX_DAYS).num_days(), Duration::MAX_DAYS);
 	}
 	#[test]
-	#[should_panic(expected = "Duration::days out of bounds")]
+	#[should_panic(expected = "TimeDelta::days out of bounds")]
 	fn max_days__overflow_construction() {
 		let _ = Duration::days(Duration::MAX_DAYS + 1);
 	}
@@ -133,7 +133,7 @@ mod duration_ext {
 		assert_eq!(Duration::weeks(Duration::MAX_WEEKS).num_weeks(), Duration::MAX_WEEKS);
 	}
 	#[test]
-	#[should_panic(expected = "Duration::weeks out of bounds")]
+	#[should_panic(expected = "TimeDelta::weeks out of bounds")]
 	fn max_weeks__overflow_construction() {
 		let _ = Duration::weeks(Duration::MAX_WEEKS + 1);
 	}
@@ -200,7 +200,7 @@ mod duration_ext {
 		assert_eq!(Duration::seconds(Duration::MIN_SECONDS).num_seconds(), Duration::MIN_SECONDS);
 	}
 	#[test]
-	#[should_panic(expected = "Duration::seconds out of bounds")]
+	#[should_panic(expected = "TimeDelta::seconds out of bounds")]
 	fn min_seconds__overflow_construction() {
 		let _ = Duration::seconds(Duration::MIN_SECONDS - 1);
 	}
@@ -215,7 +215,7 @@ mod duration_ext {
 		assert_eq!(Duration::minutes(Duration::MIN_MINUTES).num_minutes(), Duration::MIN_MINUTES);
 	}
 	#[test]
-	#[should_panic(expected = "Duration::minutes out of bounds")]
+	#[should_panic(expected = "TimeDelta::minutes out of bounds")]
 	fn min_minutes__overflow_construction() {
 		let _ = Duration::minutes(Duration::MIN_MINUTES - 1);
 	}
@@ -230,7 +230,7 @@ mod duration_ext {
 		assert_eq!(Duration::hours(Duration::MIN_HOURS).num_hours(), Duration::MIN_HOURS);
 	}
 	#[test]
-	#[should_panic(expected = "Duration::hours out of bounds")]
+	#[should_panic(expected = "TimeDelta::hours out of bounds")]
 	fn min_hours__overflow_construction() {
 		let _ = Duration::hours(Duration::MIN_HOURS - 1);
 	}
@@ -245,7 +245,7 @@ mod duration_ext {
 		assert_eq!(Duration::days(Duration::MIN_DAYS).num_days(), Duration::MIN_DAYS);
 	}
 	#[test]
-	#[should_panic(expected = "Duration::days out of bounds")]
+	#[should_panic(expected = "TimeDelta::days out of bounds")]
 	fn min_days__overflow_construction() {
 		let _ = Duration::days(Duration::MIN_DAYS - 1);
 	}
@@ -260,7 +260,7 @@ mod duration_ext {
 		assert_eq!(Duration::weeks(Duration::MIN_WEEKS).num_weeks(), Duration::MIN_WEEKS);
 	}
 	#[test]
-	#[should_panic(expected = "Duration::weeks out of bounds")]
+	#[should_panic(expected = "TimeDelta::weeks out of bounds")]
 	fn min_weeks__overflow_construction() {
 		let _ = Duration::weeks(Duration::MIN_WEEKS - 1);
 	}
