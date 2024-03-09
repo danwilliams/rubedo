@@ -17,6 +17,7 @@ use base64::DecodeError;
 use core::{
 	convert::TryFrom,
 	fmt::{Debug, Display, self},
+	hash::Hash,
 	str::FromStr,
 };
 use hex::FromHexError;
@@ -186,8 +187,14 @@ impl AsStr for str {
 /// Fixed-size byte container functionality.
 /// 
 /// This trait provides a formalised representation of a fixed-size byte array,
-/// with support for common conversions, including serialisation and
-/// deserialisation using [Serde](https://crates.io/crates/serde).
+/// with support for common conversions, including to and from hex and base64
+/// formats.
+/// 
+/// Notably, it is defined in a way that allows implementation onto third-party
+/// types, i.e. those from other libraries, boosting their functionality with
+/// additional methods. Meanwhile, if applying to an owned type, whether an
+/// original or a wrapper, the full range of trait implementations for various
+/// conversions and similar is available via the [`ByteSizedFull`] trait.
 /// 
 /// The container is expected to be stored internally as `[u8; N]`, where `N` is
 /// defined upon the implementation of this trait — but the actual internal type
@@ -205,33 +212,12 @@ impl AsStr for str {
 /// 
 /// # See also
 /// 
+/// * [`ByteSizedFull`]
 /// * [`ByteSizedMut`]
 /// 
-#[cfg_attr(    feature = "reasons",  allow(clippy::trait_duplication_in_bounds, reason = "Not actually duplicates"))]
-#[cfg_attr(not(feature = "reasons"), allow(clippy::trait_duplication_in_bounds))]
 pub trait ByteSized<const SIZE: usize>:
 	Sized
-	+ AsRef<[u8; SIZE]>
 	+ Clone
-	+ Debug
-	+ Display
-	+ From<[u8; SIZE]>
-	+ for<'a> From<&'a [u8; SIZE]>
-	+ FromStr
-	+ for<'a> ForceFrom<&'a [u8]>
-//	+ for<'a> ForceFrom<&'a [u8; N]>  //  Cannot specify this as a constraint due to N
-	+ ForceFrom<Vec<u8>>
-	+ for<'a> ForceFrom<&'a Vec<u8>>
-	+ Serialize
-	+ for<'de> Deserialize<'de>
-	+ for<'a> TryFrom<&'a [u8]>
-	+ for<'a> TryFrom<&'a str>
-	+ TryFrom<String>
-	+ for<'a> TryFrom<&'a String>
-	+ TryFrom<Box<str>>
-	+ for<'a> TryFrom<Cow<'a, str>>
-	+ TryFrom<Vec<u8>>
-	+ for<'a> TryFrom<&'a Vec<u8>>
 {
 	//		as_bytes															
 	/// Returns a byte slice of the container's contents.
@@ -440,6 +426,56 @@ pub trait ByteSized<const SIZE: usize>:
 	fn to_vec(&self) -> Vec<u8>;
 }
 
+//§		ByteSizedFull															
+/// Full conversion functionality for [`ByteSized`]-based types.
+/// 
+/// This trait provides no methods, but establishes required trait
+/// implementations that should be present for a full implementation of
+/// [`ByteSized`] functionality onto an owned type or wrapper. This includes
+/// support for common conversions, including serialisation and deserialisation
+/// using [Serde](https://crates.io/crates/serde). The traits that cannot be
+/// implemented for third-party types due to the orphan rule are therefore
+/// listed under this trait as constraints.
+/// 
+/// Because there may or may not be control over the internal type (for instance
+/// when implementing onto a third-party type, or for a wrapper), the
+/// implementations that require the ability to mutate or consume the internal
+/// type are specified in the separate [`ByteSizedMut`] trait.
+/// 
+/// # See also
+/// 
+/// * [`ByteSized`]
+/// * [`ByteSizedMut`]
+/// 
+#[cfg_attr(    feature = "reasons",  allow(clippy::trait_duplication_in_bounds, reason = "Not actually duplicates"))]
+#[cfg_attr(not(feature = "reasons"), allow(clippy::trait_duplication_in_bounds))]
+pub trait ByteSizedFull<const SIZE: usize>:
+	ByteSized<SIZE>
+	+ AsRef<[u8; SIZE]>
+	+ Debug
+	+ Default
+	+ Display
+	+ From<[u8; SIZE]>
+	+ for<'a> From<&'a [u8; SIZE]>
+	+ FromStr
+	+ for<'a> ForceFrom<&'a [u8]>
+//	+ for<'a> ForceFrom<&'a [u8; N]>  //  Cannot specify this as a constraint due to N
+	+ ForceFrom<Vec<u8>>
+	+ for<'a> ForceFrom<&'a Vec<u8>>
+	+ Hash
+	+ PartialEq
+	+ Serialize
+	+ for<'de> Deserialize<'de>
+	+ for<'a> TryFrom<&'a [u8]>
+	+ for<'a> TryFrom<&'a str>
+	+ TryFrom<String>
+	+ for<'a> TryFrom<&'a String>
+	+ TryFrom<Box<str>>
+	+ for<'a> TryFrom<Cow<'a, str>>
+	+ TryFrom<Vec<u8>>
+	+ for<'a> TryFrom<&'a Vec<u8>>
+{}
+
 //§		ByteSizedMut															
 /// Mutating and consuming functionality for [`ByteSized`].
 /// 
@@ -452,11 +488,14 @@ pub trait ByteSized<const SIZE: usize>:
 /// when implementing for a third-party type), the methods that require the
 /// ability to mutate or consume the internal type are split out into this
 /// separate [`ByteSizedMut`] trait, with the read-only methods and constructors
-/// being in the main [`ByteSized`] trait.
-///
+/// being in the main [`ByteSized`] trait, and the traits that cannot be
+/// implemented for third-party types due to the orphan rule being specified
+/// under the [`ByteSizedFull`] trait.
+/// 
 /// # See also
 /// 
 /// * [`ByteSized`]
+/// * [`ByteSizedFull`]
 /// 
 pub trait ByteSizedMut<const SIZE: usize>:
 	ByteSized<SIZE>

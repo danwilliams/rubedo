@@ -20,14 +20,16 @@ module, most usefully with enums:
     Provides a string slice representation of the type.
 
 
-## ByteSized and ByteSizedMut
+## ByteSized, ByteSizedFull, and ByteSizedMut
 
 The [`ByteSized`](https://docs.rs/rubedo/latest/rubedo/std/trait.ByteSized.html)
 trait formalises the behaviour of fixed-size byte arrays, for the purpose of
 storage and conversion, primarily aimed at use with hashes and keys. For those
-types that there is control over, [`ByteSizedMut`](https://docs.rs/rubedo/latest/rubedo/std/trait.ByteSizedMut.html)
+types that there is control over, [`ByteSizedFull`](https://docs.rs/rubedo/latest/rubedo/std/trait.ByteSizedFull.html)
+and [`ByteSizedMut`](https://docs.rs/rubedo/latest/rubedo/std/trait.ByteSizedMut.html)
 can be applied as well. For third-party types, inner mutation/consumption is not
-possible, hence the split.
+possible, and neither is application of external traits due to the orphan rule,
+hence the split.
 
 
 ## FromIntWithScale and ToIntWithScale
