@@ -21,3 +21,12 @@ and from common formats, including serialisation and deserialisation, which
 default to hexadecimal strings, although base64 is also supported.
 
 
+## SigningKey
+
+The [`SigningKey`](https://docs.rs/http/latest/sha2/signingkey/struct.SigningKey.html)
+struct is a wrapper type provided to formalise the handling of [ed25519-dalek](https://crates.io/crates/ed25519-dalek)
+signing keys. It converts to and from common formats, including serialisation
+and deserialisation, which default to hexadecimal strings, although base64 is
+also supported.
+
+

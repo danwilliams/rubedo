@@ -13,19 +13,23 @@ mod tests;
 
 //		Packages
 
-use crate::std::{ByteSized, ByteSizedError, ByteSizedMut, ForceFrom};
+use crate::std::{ByteSized, ByteSizedError, ByteSizedFull, ByteSizedMut, ForceFrom};
 use base64::{DecodeError, engine::{Engine as _, general_purpose::STANDARD as BASE64}};
 use core::{
 	cmp::Ordering,
 	convert::TryFrom,
 	fmt::{Debug, Display, self},
+	hash::{Hash, Hasher},
+	ops::Deref,
 	str::FromStr,
 };
+use ed25519_dalek::SigningKey as RealSigningKey;
 use generic_array::{
 	GenericArray,
 	typenum::{U32, U64},
 };
 use hex::{FromHexError, self};
+use rand_core::CryptoRngCore;
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as DeError};
 use std::borrow::Cow;
 
@@ -809,6 +813,379 @@ impl TryFrom<&Vec<u8>> for Sha512Hash {
 	
 	//		try_from															
 	/// Converts a [`&Vec[u8]`](Vec) to a [`Sha512Hash`].
+	fn try_from(v: &Vec<u8>) -> Result<Self, Self::Error> {
+		Self::try_from(v.as_slice())
+	}
+}
+
+//		SigningKey																
+/// An ed25519 signing key which can be used to produce signatures.
+/// 
+/// This is a wrapper around [`ed25519_dalek::SigningKey`], which provides
+/// additional functionality, including serialisation and deserialisation using
+/// [Serde](https://crates.io/crates/serde), via the implementation of the
+/// [`ByteSized`] and [`ByteSizedFull`] traits.
+/// 
+/// # See also
+/// 
+/// * [`ed25519_dalek::SigningKey`]
+/// 
+#[derive(Clone, Eq, PartialEq)]
+pub struct SigningKey {
+	//		Private properties													
+	/// The actual signing key.
+	key: RealSigningKey,
+}
+
+impl SigningKey {
+	//		generate															
+	/// Generates an ed25519 [`SigningKey`].
+	/// 
+	/// This function exists to return the wrapper type [`SigningKey`] rather
+	/// than the inner type [`ed25519_dalek::SigningKey`].
+	/// 
+	#[must_use]
+	pub fn generate<R: CryptoRngCore + ?Sized>(csprng: &mut R) -> Self {
+		Self::from(RealSigningKey::generate(csprng))
+	}
+	
+	//		into_inner															
+	/// Consumes the [`SigningKey`] and returns the inner
+	/// [`ed25519_dalek::SigningKey`].
+	#[must_use]
+	pub fn into_inner(self) -> RealSigningKey {
+		self.key
+	}
+}
+
+impl ByteSized<32> for SigningKey {
+	//		as_bytes															
+	fn as_bytes(&self) -> &[u8; 32] {
+		self.key.as_bytes()
+	}
+	
+	//		to_bytes															
+	fn to_bytes(&self) -> [u8; 32] {
+		self.key.to_bytes()
+	}
+	
+	//		from_bytes															
+	fn from_bytes(bytes: [u8; 32]) -> Self {
+		Self { key: RealSigningKey::from_bytes(&bytes) }
+	}
+	
+	//		to_base64															
+	fn to_base64(&self) -> String {
+		BASE64.encode(self.key.as_bytes())
+	}
+	
+	//		from_base64															
+	fn from_base64(encoded: &str) -> Result<Self, DecodeError> {
+		Ok(Self::force_from(BASE64.decode(encoded)?))
+	}
+	
+	//		to_hex																
+	fn to_hex(&self) -> String {
+		hex::encode(self.key.as_bytes())
+	}
+	
+	//		from_hex															
+	fn from_hex(encoded: &str) -> Result<Self, FromHexError> {
+		Ok(Self::force_from(hex::decode(encoded)?))
+	}
+	
+	//		to_vec																
+	fn to_vec(&self) -> Vec<u8> {
+		self.key.as_bytes().to_vec()
+	}
+}
+
+impl ByteSizedFull<32> for SigningKey {}
+
+impl AsRef<[u8; 32]> for SigningKey {
+	//		as_ref																
+	fn as_ref(&self) -> &[u8; 32] {
+		self.as_bytes()
+	}
+}
+
+impl Debug for SigningKey {
+	//		fmt																	
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		write!(f, "{}", self.to_hex())
+	}
+}
+
+impl Default for SigningKey {
+	//		default																
+	fn default() -> Self {
+		Self { key: RealSigningKey::from_bytes(&[0; 32]) }
+	}
+}
+
+impl Deref for SigningKey {
+    type Target = RealSigningKey;
+
+	//		deref																
+    fn deref(&self) -> &Self::Target {
+        &self.key
+    }
+}
+
+impl Display for SigningKey {
+	//		fmt																	
+	/// Formats the signing key for display.
+	///
+	/// This method serialises the signing key into hexadecimal string
+	/// representation.
+	/// 
+	/// # See also
+	/// 
+	/// * [`SigningKey::serialize()`]
+	/// * [`SigningKey::to_base64()`]
+	/// 
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		write!(f, "{}", self.to_hex())
+	}
+}
+
+impl From<RealSigningKey> for SigningKey {
+	//		from																
+	/// Converts a [`ed25519_dalek::SigningKey`] to a [`SigningKey`].
+	fn from(key: RealSigningKey) -> Self {
+		Self { key }
+	}
+}
+
+impl From<&RealSigningKey> for SigningKey {
+	//		from																
+	/// Converts a [`&ed25519_dalek::SigningKey`](ed25519_dalek::SigningKey) to
+	/// a [`SigningKey`].
+	fn from(key: &RealSigningKey) -> Self {
+		Self { key: key.clone() }
+	}
+}
+
+impl From<[u8; 32]> for SigningKey {
+	//		from																
+	/// Converts a [`[u8; 32]`](https://doc.rust-lang.org/std/primitive.slice.html)
+	/// to a [`SigningKey`].
+	fn from(b: [u8; 32]) -> Self {
+		Self::from_bytes(b)
+	}
+}
+
+impl From<&[u8; 32]> for SigningKey {
+	//		from																
+	/// Converts a [`&[u8; 32]`](https://doc.rust-lang.org/std/primitive.slice.html)
+	/// to a [`SigningKey`].
+	fn from(b: &[u8; 32]) -> Self {
+		Self::from_bytes(*b)
+	}
+}
+
+impl FromStr for SigningKey {
+	type Err = ByteSizedError;
+	
+	//		from_str															
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		Self::try_from(s)
+	}
+}
+
+impl ForceFrom<&[u8]> for SigningKey {
+	//		force_from															
+	/// Converts a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html)
+	/// to a [`SigningKey`].
+	/// 
+	/// Note that if the incoming `[u8]` is too long to fit, it will be
+	/// truncated without error or warning. If there is not enough data, it will
+	/// be padded with zeroes. If this situation needs checking, use
+	/// `try_from()` instead.
+	/// 
+	fn force_from(b: &[u8]) -> Self {
+		let mut array = [0_u8; 32];
+		let len       = b.len().min(32);
+		#[cfg_attr(    feature = "reasons",  allow(clippy::indexing_slicing, reason = "Infallible"))]
+		#[cfg_attr(not(feature = "reasons"), allow(clippy::indexing_slicing))]
+		array[..len].copy_from_slice(&b[..len]);
+		Self::from(array)
+	}
+}
+
+impl<const N: usize> ForceFrom<&[u8; N]> for SigningKey {
+	//		force_from															
+	/// Converts a [`&[u8; N]`](https://doc.rust-lang.org/std/primitive.slice.html)
+	/// to a [`SigningKey`].
+	/// 
+	/// Note that if the incoming `[u8; N]` is too long to fit, it will be
+	/// truncated without error or warning. If there is not enough data, it will
+	/// be padded with zeroes. If this situation needs checking, use
+	/// `try_from()` instead.
+	/// 
+	fn force_from(b: &[u8; N]) -> Self {
+		Self::force_from(&b[..])
+	}
+}
+
+impl ForceFrom<Vec<u8>> for SigningKey {
+	//		force_from															
+	/// Converts a [`Vec<u8>`](Vec) to a [`SigningKey`].
+	/// 
+	/// Note that if the incoming [`Vec<u8>`](Vec) is too long to fit, it will
+	/// be truncated without error or warning. If there is not enough data, it
+	/// will be padded with zeroes. If this situation needs checking, use
+	/// `try_from()` instead.
+	/// 
+	fn force_from(v: Vec<u8>) -> Self {
+		Self::force_from(&*v)
+	}
+}
+
+impl ForceFrom<&Vec<u8>> for SigningKey {
+	//		force_from															
+	/// Converts a [`&Vec[u8]`](Vec) to a [`SigningKey`].
+	/// 
+	/// Note that if the incoming [`Vec<u8>`](Vec) is too long to fit, it will
+	/// be truncated without error or warning. If there is not enough data, it
+	/// will be padded with zeroes. If this situation needs checking, use
+	/// `try_from()` instead.
+	/// 
+	fn force_from(v: &Vec<u8>) -> Self {
+		Self::force_from(&**v)
+	}
+}
+
+impl Hash for SigningKey {
+	//		hash																
+	fn hash<H: Hasher>(&self, state: &mut H) {
+		self.key.as_bytes().hash(state);
+	}
+}
+
+impl Serialize for SigningKey {
+	//		serialize															
+	/// Serialises the signing key to a [`String`].
+	/// 
+	/// This method serialises the signing key into hexadecimal string
+	/// representation.
+	/// 
+	/// # See also
+	/// 
+	/// * [`SigningKey::deserialize()`]
+	/// * [`SigningKey::<Display>fmt()`]
+	/// * [`SigningKey::to_base64()`]
+	/// 
+	fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+	where
+		S: Serializer,
+	{
+		serializer.serialize_str(&self.to_string())
+	}
+}
+
+impl<'de> Deserialize<'de> for SigningKey {
+	//		deserialize															
+	/// Deserialises the signing key from a [`String`].
+	/// 
+	/// This method deserialises the signing key from hexadecimal string
+	/// representation.
+	/// 
+	/// # See also
+	///
+	/// * [`SigningKey::deserialize()`]
+	/// * [`SigningKey::from_base64()`]
+	///
+	fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+	where
+		D: Deserializer<'de>,
+	{
+		let string = String::deserialize(deserializer)?;
+		Self::from_hex(&string).map_err(D::Error::custom)
+	}
+}
+
+impl TryFrom<&[u8]> for SigningKey {
+	type Error = ByteSizedError;
+	
+	//		try_from															
+	/// Converts a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html)
+	/// to a [`SigningKey`].
+	fn try_from(b: &[u8]) -> Result<Self, Self::Error> {
+		match b.len().cmp(&32) {
+			Ordering::Greater => return Err(ByteSizedError::DataTooLong(32)),
+			Ordering::Less    => return Err(ByteSizedError::DataTooShort(32)),
+			Ordering::Equal   => {},
+		}
+		Ok(Self::force_from(b))
+	}
+}
+
+impl TryFrom<&str> for SigningKey {
+	type Error = ByteSizedError;
+	
+	//		try_from															
+	/// Converts a [`&str`](str) to a [`SigningKey`].
+	fn try_from(s: &str) -> Result<Self, Self::Error> {
+		Self::try_from(hex::decode(s).map_err(|_err| ByteSizedError::InvalidHexString)?)
+	}
+}
+
+impl TryFrom<String> for SigningKey {
+	type Error = ByteSizedError;
+	
+	//		try_from															
+	/// Converts a [`String`] to a [`SigningKey`].
+	fn try_from(s: String) -> Result<Self, Self::Error> {
+		Self::try_from(s.as_str())
+	}
+}
+
+impl TryFrom<&String> for SigningKey {
+	type Error = ByteSizedError;
+	
+	//		try_from															
+	/// Converts a [`&String`](String) to a [`SigningKey`].
+	fn try_from(s: &String) -> Result<Self, Self::Error> {
+		Self::try_from(s.as_str())
+	}
+}
+
+impl TryFrom<Box<str>> for SigningKey {
+	type Error = ByteSizedError;
+	
+	//		try_from															
+	/// Converts a [boxed](Box) [string](str) slice to a [`SigningKey`].
+	fn try_from(s: Box<str>) -> Result<Self, Self::Error> {
+		Self::try_from(&*s)
+	}
+}
+
+impl<'a> TryFrom<Cow<'a, str>> for SigningKey {
+	type Error = ByteSizedError;
+	
+	//		try_from															
+	/// Converts a [clone-on-write](Cow) [string](str) to a [`SigningKey`].
+	fn try_from(s: Cow<'a, str>) -> Result<Self, Self::Error> {
+		Self::try_from(s.as_ref())
+	}
+}
+
+impl TryFrom<Vec<u8>> for SigningKey {
+	type Error = ByteSizedError;
+	
+	//		try_from															
+	/// Converts a [`Vec<u8>`](Vec) to a [`SigningKey`].
+	fn try_from(v: Vec<u8>) -> Result<Self, Self::Error> {
+		Self::try_from(&*v)
+	}
+}
+
+impl TryFrom<&Vec<u8>> for SigningKey {
+	type Error = ByteSizedError;
+	
+	//		try_from															
+	/// Converts a [`&Vec[u8]`](Vec) to a [`SigningKey`].
 	fn try_from(v: &Vec<u8>) -> Result<Self, Self::Error> {
 		Self::try_from(v.as_slice())
 	}

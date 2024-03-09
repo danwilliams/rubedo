@@ -18,13 +18,14 @@ reasons = []
 [dependencies]
 base64 = "0.22.0"
 chrono = { version = "=0.4.33", features = ["alloc", "clock", "std"] }
-crypto-common = "0.1.6"
+ed25519-dalek = { version = "2.1.1", features = ["rand_core"] }
 futures = "0.3.30"
 generic-array = "0.14.7" # Cannot move to 1.0.0 until the digest crate does
 hex = "0.4.3"
 http = "0.2.11"
 http-body = "0.4.6"
 hyper = "0.14.28"
+rand_core = "0.6.4"
 rubedo-macros = { path = "../rubedo-macros", version = "0.4.7" }
 rust_decimal = "1.34.1"
 serde = { version = "1.0.197", features = ["derive"] }
@@ -34,4 +35,5 @@ serde_json = { version = "1.0.113", features = ["preserve_order"] }
 assert-json-diff = "2.0.2"
 axum = "0.6.20"
 claims = "0.7.1"
+rand = "0.8.5"
 serde_assert = "0.6.0"
