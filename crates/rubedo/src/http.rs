@@ -79,6 +79,7 @@ pub enum ResponseError {
 	ConversionError(Box<dyn Error>),
 }
 
+//󰭅		Display																	
 impl Display for ResponseError {
 	//		fmt																	
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -91,6 +92,7 @@ impl Display for ResponseError {
 	}
 }
 
+//󰭅		Error																	
 impl Error for ResponseError {}
 
 
@@ -167,6 +169,7 @@ pub struct UnpackedResponse {
 	pub body:    UnpackedResponseBody,
 }
 
+//󰭅		UnpackedResponse														
 impl UnpackedResponse {
 	//		new																	
 	/// Creates a new unpacked response instance.
@@ -221,6 +224,7 @@ impl UnpackedResponse {
 	}
 }
 
+//󰭅		PartialEq																
 impl PartialEq for UnpackedResponse {
 	//		eq																	
     fn eq(&self, other: &Self) -> bool {
@@ -254,6 +258,7 @@ pub struct UnpackedResponseHeader {
 	pub value: String,
 }
 
+//󰭅		UnpackedResponseHeader													
 impl UnpackedResponseHeader {
 	//		new																	
 	/// Creates a new response header instance.
@@ -272,6 +277,7 @@ impl UnpackedResponseHeader {
 	}
 }
 
+//󰭅		PartialEq																
 impl PartialEq for UnpackedResponseHeader {
 	//		eq																	
 	fn eq(&self, other: &Self) -> bool {
@@ -340,6 +346,7 @@ pub struct UnpackedResponseBody {
 	content_type: ContentType,
 }
 
+//󰭅		UnpackedResponseBody													
 impl UnpackedResponseBody {
 	//		new																	
 	/// Creates a new response body instance.
@@ -760,6 +767,7 @@ impl UnpackedResponseBody {
 	}
 }
 
+//󰭅		Add &[u8]																
 impl Add<&[u8]> for UnpackedResponseBody {
 	type Output = Self;
 	
@@ -772,6 +780,7 @@ impl Add<&[u8]> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		Add &[u8; N]															
 impl<const N: usize> Add<&[u8; N]> for UnpackedResponseBody {
 	type Output = Self;
 	
@@ -784,6 +793,7 @@ impl<const N: usize> Add<&[u8; N]> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		Add char																
 impl Add<char> for UnpackedResponseBody {
 	type Output = Self;
 	
@@ -795,6 +805,7 @@ impl Add<char> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		Add &char																
 impl Add<&char> for UnpackedResponseBody {
 	type Output = Self;
 	
@@ -806,6 +817,7 @@ impl Add<&char> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		Add &str																
 impl Add<&str> for UnpackedResponseBody {
 	type Output = Self;
 	
@@ -817,6 +829,7 @@ impl Add<&str> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		Add String																
 impl Add<String> for UnpackedResponseBody {
 	type Output = Self;
 	
@@ -828,6 +841,7 @@ impl Add<String> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		Add &String																
 impl Add<&String> for UnpackedResponseBody {
 	type Output = Self;
 	
@@ -839,6 +853,7 @@ impl Add<&String> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		Add Box<str>															
 impl Add<Box<str>> for UnpackedResponseBody {
 	type Output = Self;
 	
@@ -850,6 +865,7 @@ impl Add<Box<str>> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		Add Cow<str>															
 impl<'a> Add<Cow<'a, str>> for UnpackedResponseBody {
 	type Output = Self;
 	
@@ -862,6 +878,7 @@ impl<'a> Add<Cow<'a, str>> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		Add u8																	
 impl Add<u8> for UnpackedResponseBody {
 	type Output = Self;
 	
@@ -873,6 +890,7 @@ impl Add<u8> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		Add Vec<u8>																
 impl Add<Vec<u8>> for UnpackedResponseBody {
 	type Output = Self;
 	
@@ -884,6 +902,7 @@ impl Add<Vec<u8>> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		Add &Vec<u8>															
 impl Add<&Vec<u8>> for UnpackedResponseBody {
 	type Output = Self;
 	
@@ -895,6 +914,7 @@ impl Add<&Vec<u8>> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		Add Self																
 impl Add<Self> for UnpackedResponseBody {
 	type Output = Self;
 	
@@ -906,6 +926,7 @@ impl Add<Self> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		Add &Self																
 impl Add<&Self> for UnpackedResponseBody {
 	type Output = Self;
 	
@@ -918,6 +939,7 @@ impl Add<&Self> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		AddAssign &[u8]															
 impl AddAssign<&[u8]> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html) to
@@ -927,6 +949,7 @@ impl AddAssign<&[u8]> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		AddAssign &[u8; N]														
 impl<const N: usize> AddAssign<&[u8; N]> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [`&[u8; N]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -936,6 +959,7 @@ impl<const N: usize> AddAssign<&[u8; N]> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		AddAssign char															
 impl AddAssign<char> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [`char`] to an [`UnpackedResponseBody`].
@@ -944,6 +968,7 @@ impl AddAssign<char> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		AddAssign &char															
 impl AddAssign<&char> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [`&char`](char) to an [`UnpackedResponseBody`].
@@ -952,6 +977,7 @@ impl AddAssign<&char> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		AddAssign &str															
 impl AddAssign<&str> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [`&str`](str) to an [`UnpackedResponseBody`].
@@ -960,6 +986,7 @@ impl AddAssign<&str> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		AddAssign String														
 impl AddAssign<String> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [`String`] to an [`UnpackedResponseBody`].
@@ -968,6 +995,7 @@ impl AddAssign<String> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		AddAssign &String														
 impl AddAssign<&String> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [`&String`](String) to an [`UnpackedResponseBody`].
@@ -976,6 +1004,7 @@ impl AddAssign<&String> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		AddAssign Box<str>														
 impl AddAssign<Box<str>> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [boxed](Box) [string](str) slice to an [`UnpackedResponseBody`].
@@ -984,6 +1013,7 @@ impl AddAssign<Box<str>> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		AddAssign Cow<str>														
 impl<'a> AddAssign<Cow<'a, str>> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [clone-on-write](Cow) [string](str) to an
@@ -993,6 +1023,7 @@ impl<'a> AddAssign<Cow<'a, str>> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		AddAssign u8															
 impl AddAssign<u8> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [`u8`] to an [`UnpackedResponseBody`].
@@ -1001,6 +1032,7 @@ impl AddAssign<u8> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		AddAssign Vec<u8>														
 impl AddAssign<Vec<u8>> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [`Vec[u8]`](Vec) to an [`UnpackedResponseBody`].
@@ -1009,6 +1041,7 @@ impl AddAssign<Vec<u8>> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		AddAssign &Vec<u8>														
 impl AddAssign<&Vec<u8>> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [`&Vec[u8]`](Vec) to an [`UnpackedResponseBody`].
@@ -1017,6 +1050,7 @@ impl AddAssign<&Vec<u8>> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		AddAssign Self															
 impl AddAssign<Self> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds an [`UnpackedResponseBody`] to an [`UnpackedResponseBody`].
@@ -1025,6 +1059,7 @@ impl AddAssign<Self> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		AddAssign &Self															
 impl AddAssign<&Self> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds an [`&UnpackedResponseBody`](UnpackedResponseBody) to an
@@ -1034,6 +1069,7 @@ impl AddAssign<&Self> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		AsMut [u8]																
 impl AsMut<[u8]> for UnpackedResponseBody {
 	//		as_mut																
 	fn as_mut(&mut self) -> &mut [u8] {
@@ -1041,6 +1077,7 @@ impl AsMut<[u8]> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		AsRef [u8]																
 impl AsRef<[u8]> for UnpackedResponseBody {
 	//		as_ref																
 	fn as_ref(&self) -> &[u8] {
@@ -1048,6 +1085,7 @@ impl AsRef<[u8]> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		Clone																	
 impl Clone for UnpackedResponseBody {
 	//		clone																
 	fn clone(&self) -> Self {
@@ -1060,6 +1098,7 @@ impl Clone for UnpackedResponseBody {
 	}
 }
 
+//󰭅		Debug																	
 impl Debug for UnpackedResponseBody {
 	//		fmt																	
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -1070,6 +1109,7 @@ impl Debug for UnpackedResponseBody {
 	}
 }
 
+//󰭅		Display																	
 impl Display for UnpackedResponseBody {
 	//		fmt																	
 	/// Formats the response body for display.
@@ -1101,6 +1141,7 @@ impl Display for UnpackedResponseBody {
 	}
 }
 
+//󰭅		From &[u8]																
 impl From<&[u8]> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -1110,6 +1151,7 @@ impl From<&[u8]> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		From &[u8; N]															
 impl<const N: usize> From<&[u8; N]> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`&[u8; N]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -1119,6 +1161,7 @@ impl<const N: usize> From<&[u8; N]> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		From char																
 impl From<char> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`char`] to an [`UnpackedResponseBody`].
@@ -1156,6 +1199,7 @@ impl From<char> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		From &char																
 impl From<&char> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`&char`](char) to an [`UnpackedResponseBody`].
@@ -1164,6 +1208,7 @@ impl From<&char> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		From Json																
 impl From<Json> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`serde_json::Value`] to an [`UnpackedResponseBody`].
@@ -1172,6 +1217,7 @@ impl From<Json> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		From &Json																
 impl From<&Json> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`&serde_json::Value`](serde_json::Value) to an
@@ -1181,6 +1227,7 @@ impl From<&Json> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		From HyperBody															
 impl From<HyperBody> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`UnsyncBoxBody<Bytes, E>`](UnsyncBoxBody) to an
@@ -1192,6 +1239,7 @@ impl From<HyperBody> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		From &str																
 impl From<&str> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`&str`](str) to an [`UnpackedResponseBody`].
@@ -1200,6 +1248,7 @@ impl From<&str> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		From &mut str															
 impl From<&mut str> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`&mut str`](str) to an [`UnpackedResponseBody`].
@@ -1208,6 +1257,7 @@ impl From<&mut str> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		From String																
 impl From<String> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`String`] to an [`UnpackedResponseBody`].
@@ -1216,6 +1266,7 @@ impl From<String> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		From &String															
 impl From<&String> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`&String`](String) to an [`UnpackedResponseBody`].
@@ -1224,6 +1275,7 @@ impl From<&String> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		From Box<str>															
 impl From<Box<str>> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [boxed](Box) [string](str) slice to an
@@ -1233,6 +1285,7 @@ impl From<Box<str>> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		From Cow<str>															
 impl<'a> From<Cow<'a, str>> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [clone-on-write](Cow) [string](str) to an
@@ -1242,6 +1295,7 @@ impl<'a> From<Cow<'a, str>> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		From UnsyncBoxBody<Bytes>												
 impl<E> From<UnsyncBoxBody<Bytes, E>> for UnpackedResponseBody
 where
 	E: Error + 'static,
@@ -1256,6 +1310,7 @@ where
 	}
 }
 
+//󰭅		From u8																	
 impl From<u8> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`u8`] to an [`UnpackedResponseBody`].
@@ -1264,6 +1319,7 @@ impl From<u8> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		From Vec<u8>															
 impl From<Vec<u8>> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`Vec[u8]`](Vec) to an [`UnpackedResponseBody`].
@@ -1272,6 +1328,7 @@ impl From<Vec<u8>> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		From &Vec<u8>															
 impl From<&Vec<u8>> for UnpackedResponseBody {
 	//		from																
 	/// Converts a [`&Vec[u8]`](Vec) to an [`UnpackedResponseBody`].
@@ -1280,6 +1337,7 @@ impl From<&Vec<u8>> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		FromStr																	
 impl FromStr for UnpackedResponseBody {
 	type Err = Infallible;
 	
@@ -1289,6 +1347,7 @@ impl FromStr for UnpackedResponseBody {
 	}
 }
 
+//󰭅		PartialEq																
 impl PartialEq for UnpackedResponseBody {
 	//		eq																	
 	fn eq(&self, other: &Self) -> bool {
@@ -1296,6 +1355,7 @@ impl PartialEq for UnpackedResponseBody {
 	}
 }
 
+//󰭅		Serialize																
 impl Serialize for UnpackedResponseBody {
 	//		serialize															
 	/// Serialises the response body to a [`String`].
@@ -1327,6 +1387,7 @@ impl Serialize for UnpackedResponseBody {
 	}
 }
 
+//󰭅		Deserialize																
 impl <'de> Deserialize<'de> for UnpackedResponseBody {
 	//		deserialize															
 	/// Deserialises the response body from a [`String`].
@@ -1367,6 +1428,7 @@ impl <'de> Deserialize<'de> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		Write																	
 impl Write for UnpackedResponseBody {
 	//		write_str															
 	fn write_str(&mut self, s: &str) -> fmt::Result {
@@ -1423,6 +1485,7 @@ pub trait ResponseExt {
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError>;
 }
 
+//󰭅		Response<()>															
 impl ResponseExt for Response<()> {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
@@ -1430,6 +1493,7 @@ impl ResponseExt for Response<()> {
 	}
 }
 
+//󰭅		Response<UnsyncBoxBody<Bytes>>											
 impl<E> ResponseExt for Response<UnsyncBoxBody<Bytes, E>>
 where
 	E: Error + 'static,
@@ -1444,6 +1508,7 @@ where
 	}
 }
 
+//󰭅		Response<HyperBody>														
 impl ResponseExt for Response<HyperBody> {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
@@ -1455,6 +1520,7 @@ impl ResponseExt for Response<HyperBody> {
 	}
 }
 
+//󰭅		Response<String>														
 impl ResponseExt for Response<String> {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {

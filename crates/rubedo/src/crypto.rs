@@ -59,6 +59,7 @@ pub struct Sha256Hash {
 	hash: [u8; 32],
 }
 
+//󰭅		Sha256Hash																
 impl Sha256Hash {
 	//		new																	
 	/// Creates a new SHA256 hash instance.
@@ -77,6 +78,7 @@ impl Sha256Hash {
 	}
 }
 
+//󰭅		ByteSized																
 impl ByteSized<32> for Sha256Hash {
 	//		as_bytes															
 	fn as_bytes(&self) -> &[u8; 32] {
@@ -119,6 +121,7 @@ impl ByteSized<32> for Sha256Hash {
 	}
 }
 
+//󰭅		ByteSizedMut															
 impl ByteSizedMut<32> for Sha256Hash {
 	//		as_mut_bytes														
 	fn as_mut_bytes(&mut self) -> &mut [u8; 32] {
@@ -136,6 +139,7 @@ impl ByteSizedMut<32> for Sha256Hash {
 	}
 }
 
+//󰭅		AsMut [u8; 32]															
 impl AsMut<[u8; 32]> for Sha256Hash {
 	//		as_mut																
 	fn as_mut(&mut self) -> &mut [u8; 32] {
@@ -143,6 +147,7 @@ impl AsMut<[u8; 32]> for Sha256Hash {
 	}
 }
 
+//󰭅		AsRef [u8; 32]															
 impl AsRef<[u8; 32]> for Sha256Hash {
 	//		as_ref																
 	fn as_ref(&self) -> &[u8; 32] {
@@ -150,6 +155,7 @@ impl AsRef<[u8; 32]> for Sha256Hash {
 	}
 }
 
+//󰭅		Debug																	
 impl Debug for Sha256Hash {
 	//		fmt																	
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -157,6 +163,7 @@ impl Debug for Sha256Hash {
 	}
 }
 
+//󰭅		Display																	
 impl Display for Sha256Hash {
 	//		fmt																	
 	/// Formats the SHA256 hash for display.
@@ -174,6 +181,7 @@ impl Display for Sha256Hash {
 	}
 }
 
+//󰭅		From [u8; 32]															
 impl From<[u8; 32]> for Sha256Hash {
 	//		from																
 	/// Converts a [`[u8; 32]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -183,6 +191,7 @@ impl From<[u8; 32]> for Sha256Hash {
 	}
 }
 
+//󰭅		From &[u8; 32]															
 impl From<&[u8; 32]> for Sha256Hash {
 	//		from																
 	/// Converts a [`&[u8; 32]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -192,6 +201,7 @@ impl From<&[u8; 32]> for Sha256Hash {
 	}
 }
 
+//󰭅		From GenericArray<u8, U32>												
 impl From<GenericArray<u8, U32>> for Sha256Hash {
 	//		from																
 	/// Converts a [`GenericArray<u8, U32>`](GenericArray) to a [`Sha256Hash`].
@@ -200,6 +210,7 @@ impl From<GenericArray<u8, U32>> for Sha256Hash {
 	}
 }
 
+//󰭅		From &GenericArray<u8, U32>												
 impl From<&GenericArray<u8, U32>> for Sha256Hash {
 	//		from																
 	/// Converts a [`GenericArray<u8, U32>`](GenericArray) to a [`Sha256Hash`].
@@ -210,6 +221,7 @@ impl From<&GenericArray<u8, U32>> for Sha256Hash {
 	}
 }
 
+//󰭅		FromStr																	
 impl FromStr for Sha256Hash {
 	type Err = ByteSizedError;
 	
@@ -219,6 +231,7 @@ impl FromStr for Sha256Hash {
 	}
 }
 
+//󰭅		ForceFrom &[u8]															
 impl ForceFrom<&[u8]> for Sha256Hash {
 	//		force_from															
 	/// Converts a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -239,6 +252,7 @@ impl ForceFrom<&[u8]> for Sha256Hash {
 	}
 }
 
+//󰭅		ForceFrom &[u8; N]														
 impl<const N: usize> ForceFrom<&[u8; N]> for Sha256Hash {
 	//		force_from															
 	/// Converts a [`&[u8; N]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -254,6 +268,7 @@ impl<const N: usize> ForceFrom<&[u8; N]> for Sha256Hash {
 	}
 }
 
+//󰭅		ForceFrom Vec<u8>														
 impl ForceFrom<Vec<u8>> for Sha256Hash {
 	//		force_from															
 	/// Converts a [`Vec<u8>`](Vec) to a [`Sha256Hash`].
@@ -268,6 +283,7 @@ impl ForceFrom<Vec<u8>> for Sha256Hash {
 	}
 }
 
+//󰭅		ForceFrom &Vec<u8>														
 impl ForceFrom<&Vec<u8>> for Sha256Hash {
 	//		force_from															
 	/// Converts a [`&Vec[u8]`](Vec) to a [`Sha256Hash`].
@@ -282,6 +298,7 @@ impl ForceFrom<&Vec<u8>> for Sha256Hash {
 	}
 }
 
+//󰭅		PartialEq [u8; 32]														
 impl PartialEq<[u8; 32]> for Sha256Hash {
 	//		eq																	
 	fn eq(&self, other: &[u8; 32]) -> bool {
@@ -289,6 +306,7 @@ impl PartialEq<[u8; 32]> for Sha256Hash {
 	}
 }
 
+//󰭅		PartialEq &[u8; 32]														
 impl PartialEq<&[u8; 32]> for Sha256Hash {
 	//		eq																	
 	fn eq(&self, other: &&[u8; 32]) -> bool {
@@ -296,6 +314,7 @@ impl PartialEq<&[u8; 32]> for Sha256Hash {
 	}
 }
 
+//󰭅		Serialize																
 impl Serialize for Sha256Hash {
 	//		serialize															
 	/// Serialises the SHA256 hash to a [`String`].
@@ -317,6 +336,7 @@ impl Serialize for Sha256Hash {
 	}
 }
 
+//󰭅		Deserialize																
 impl<'de> Deserialize<'de> for Sha256Hash {
 	//		deserialize															
 	/// Deserialises the SHA256 hash from a [`String`].
@@ -338,6 +358,7 @@ impl<'de> Deserialize<'de> for Sha256Hash {
 	}
 }
 
+//󰭅		TryFrom &[u8]															
 impl TryFrom<&[u8]> for Sha256Hash {
 	type Error = ByteSizedError;
 	
@@ -354,6 +375,7 @@ impl TryFrom<&[u8]> for Sha256Hash {
 	}
 }
 
+//󰭅		TryFrom &str															
 impl TryFrom<&str> for Sha256Hash {
 	type Error = ByteSizedError;
 	
@@ -364,6 +386,7 @@ impl TryFrom<&str> for Sha256Hash {
 	}
 }
 
+//󰭅		TryFrom String															
 impl TryFrom<String> for Sha256Hash {
 	type Error = ByteSizedError;
 	
@@ -374,6 +397,7 @@ impl TryFrom<String> for Sha256Hash {
 	}
 }
 
+//󰭅		TryFrom &String															
 impl TryFrom<&String> for Sha256Hash {
 	type Error = ByteSizedError;
 	
@@ -384,6 +408,7 @@ impl TryFrom<&String> for Sha256Hash {
 	}
 }
 
+//󰭅		TryFrom Box<str>														
 impl TryFrom<Box<str>> for Sha256Hash {
 	type Error = ByteSizedError;
 	
@@ -394,6 +419,7 @@ impl TryFrom<Box<str>> for Sha256Hash {
 	}
 }
 
+//󰭅		TryFrom Cow<str>														
 impl<'a> TryFrom<Cow<'a, str>> for Sha256Hash {
 	type Error = ByteSizedError;
 	
@@ -404,6 +430,7 @@ impl<'a> TryFrom<Cow<'a, str>> for Sha256Hash {
 	}
 }
 
+//󰭅		TryFrom Vec<u8>>														
 impl TryFrom<Vec<u8>> for Sha256Hash {
 	type Error = ByteSizedError;
 	
@@ -414,6 +441,7 @@ impl TryFrom<Vec<u8>> for Sha256Hash {
 	}
 }
 
+//󰭅		TryFrom &Vec<u8>														
 impl TryFrom<&Vec<u8>> for Sha256Hash {
 	type Error = ByteSizedError;
 	
@@ -446,6 +474,7 @@ pub struct Sha512Hash {
 	hash: [u8; 64],
 }
 
+//󰭅		Sha512Hash																
 impl Sha512Hash {
 	//		new																	
 	/// Creates a new SHA512 hash instance.
@@ -464,6 +493,7 @@ impl Sha512Hash {
 	}
 }
 
+//󰭅		ByteSized																
 impl ByteSized<64> for Sha512Hash {
 	//		as_bytes															
 	fn as_bytes(&self) -> &[u8; 64] {
@@ -506,6 +536,7 @@ impl ByteSized<64> for Sha512Hash {
 	}
 }
 
+//󰭅		ByteSizedMut															
 impl ByteSizedMut<64> for Sha512Hash {
 	//		as_mut_bytes														
 	fn as_mut_bytes(&mut self) -> &mut [u8; 64] {
@@ -523,6 +554,7 @@ impl ByteSizedMut<64> for Sha512Hash {
 	}
 }
 
+//󰭅		AsMut [u8; 64]															
 impl AsMut<[u8; 64]> for Sha512Hash {
 	//		as_mut																
 	fn as_mut(&mut self) -> &mut [u8; 64] {
@@ -530,6 +562,7 @@ impl AsMut<[u8; 64]> for Sha512Hash {
 	}
 }
 
+//󰭅		AsRef [u8; 64]															
 impl AsRef<[u8; 64]> for Sha512Hash {
 	//		as_ref																
 	fn as_ref(&self) -> &[u8; 64] {
@@ -537,6 +570,7 @@ impl AsRef<[u8; 64]> for Sha512Hash {
 	}
 }
 
+//󰭅		Debug																	
 impl Debug for Sha512Hash {
 	//		fmt																	
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -544,6 +578,7 @@ impl Debug for Sha512Hash {
 	}
 }
 
+//󰭅		Default																	
 impl Default for Sha512Hash {
 	//		default																
 	fn default() -> Self {
@@ -551,6 +586,7 @@ impl Default for Sha512Hash {
 	}
 }
 
+//󰭅		Display																	
 impl Display for Sha512Hash {
 	//		fmt																	
 	/// Formats the SHA512 hash for display.
@@ -568,6 +604,7 @@ impl Display for Sha512Hash {
 	}
 }
 
+//󰭅		From [u8; 64]															
 impl From<[u8; 64]> for Sha512Hash {
 	//		from																
 	/// Converts a [`[u8; 64]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -577,6 +614,7 @@ impl From<[u8; 64]> for Sha512Hash {
 	}
 }
 
+//󰭅		From &[u8; 64]															
 impl From<&[u8; 64]> for Sha512Hash {
 	//		from																
 	/// Converts a [`&[u8; 64]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -586,6 +624,7 @@ impl From<&[u8; 64]> for Sha512Hash {
 	}
 }
 
+//󰭅		From GenericArray<u8, U64>												
 impl From<GenericArray<u8, U64>> for Sha512Hash {
 	//		from																
 	/// Converts a [`GenericArray<u8, U64>`](GenericArray) to a [`Sha512Hash`].
@@ -594,6 +633,7 @@ impl From<GenericArray<u8, U64>> for Sha512Hash {
 	}
 }
 
+//󰭅		From &GenericArray<u8, U64>												
 impl From<&GenericArray<u8, U64>> for Sha512Hash {
 	//		from																
 	/// Converts a [`GenericArray<u8, U64>`](GenericArray) to a [`Sha512Hash`].
@@ -604,6 +644,7 @@ impl From<&GenericArray<u8, U64>> for Sha512Hash {
 	}
 }
 
+//󰭅		FromStr																	
 impl FromStr for Sha512Hash {
 	type Err = ByteSizedError;
 	
@@ -613,6 +654,7 @@ impl FromStr for Sha512Hash {
 	}
 }
 
+//󰭅		ForceFrom &[u8]															
 impl ForceFrom<&[u8]> for Sha512Hash {
 	//		force_from															
 	/// Converts a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -633,6 +675,7 @@ impl ForceFrom<&[u8]> for Sha512Hash {
 	}
 }
 
+//󰭅		ForceFrom &[u8; N]														
 impl<const N: usize> ForceFrom<&[u8; N]> for Sha512Hash {
 	//		force_from															
 	/// Converts a [`&[u8; N]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -648,6 +691,7 @@ impl<const N: usize> ForceFrom<&[u8; N]> for Sha512Hash {
 	}
 }
 
+//󰭅		ForceFrom Vec<u8>														
 impl ForceFrom<Vec<u8>> for Sha512Hash {
 	//		force_from															
 	/// Converts a [`Vec<u8>`](Vec) to a [`Sha512Hash`].
@@ -662,6 +706,7 @@ impl ForceFrom<Vec<u8>> for Sha512Hash {
 	}
 }
 
+//󰭅		ForceFrom &Vec<u8>														
 impl ForceFrom<&Vec<u8>> for Sha512Hash {
 	//		force_from															
 	/// Converts a [`&Vec[u8]`](Vec) to a [`Sha512Hash`].
@@ -676,6 +721,7 @@ impl ForceFrom<&Vec<u8>> for Sha512Hash {
 	}
 }
 
+//󰭅		PartialEq [u8; 64]														
 impl PartialEq<[u8; 64]> for Sha512Hash {
 	//		eq																	
 	fn eq(&self, other: &[u8; 64]) -> bool {
@@ -683,6 +729,7 @@ impl PartialEq<[u8; 64]> for Sha512Hash {
 	}
 }
 
+//󰭅		PartialEq &[u8; 64]														
 impl PartialEq<&[u8; 64]> for Sha512Hash {
 	//		eq																	
 	fn eq(&self, other: &&[u8; 64]) -> bool {
@@ -690,6 +737,7 @@ impl PartialEq<&[u8; 64]> for Sha512Hash {
 	}
 }
 
+//󰭅		Serialize																
 impl Serialize for Sha512Hash {
 	//		serialize															
 	/// Serialises the SHA512 hash to a [`String`].
@@ -711,6 +759,7 @@ impl Serialize for Sha512Hash {
 	}
 }
 
+//󰭅		Deserialize																
 impl<'de> Deserialize<'de> for Sha512Hash {
 	//		deserialize															
 	/// Deserialises the SHA512 hash from a [`String`].
@@ -732,6 +781,7 @@ impl<'de> Deserialize<'de> for Sha512Hash {
 	}
 }
 
+//󰭅		TryFrom &[u8]															
 impl TryFrom<&[u8]> for Sha512Hash {
 	type Error = ByteSizedError;
 	
@@ -748,6 +798,7 @@ impl TryFrom<&[u8]> for Sha512Hash {
 	}
 }
 
+//󰭅		TryFrom &str															
 impl TryFrom<&str> for Sha512Hash {
 	type Error = ByteSizedError;
 	
@@ -758,6 +809,7 @@ impl TryFrom<&str> for Sha512Hash {
 	}
 }
 
+//󰭅		TryFrom String 															
 impl TryFrom<String> for Sha512Hash {
 	type Error = ByteSizedError;
 	
@@ -768,6 +820,7 @@ impl TryFrom<String> for Sha512Hash {
 	}
 }
 
+//󰭅		TryFrom &String															
 impl TryFrom<&String> for Sha512Hash {
 	type Error = ByteSizedError;
 	
@@ -778,6 +831,7 @@ impl TryFrom<&String> for Sha512Hash {
 	}
 }
 
+//󰭅		TryFrom Box<str>														
 impl TryFrom<Box<str>> for Sha512Hash {
 	type Error = ByteSizedError;
 	
@@ -788,6 +842,7 @@ impl TryFrom<Box<str>> for Sha512Hash {
 	}
 }
 
+//󰭅		TryFrom Cow<str>														
 impl<'a> TryFrom<Cow<'a, str>> for Sha512Hash {
 	type Error = ByteSizedError;
 	
@@ -798,6 +853,7 @@ impl<'a> TryFrom<Cow<'a, str>> for Sha512Hash {
 	}
 }
 
+//󰭅		TryFrom Vec<u8>															
 impl TryFrom<Vec<u8>> for Sha512Hash {
 	type Error = ByteSizedError;
 	
@@ -808,6 +864,7 @@ impl TryFrom<Vec<u8>> for Sha512Hash {
 	}
 }
 
+//󰭅		TryFrom &Vec<u8>														
 impl TryFrom<&Vec<u8>> for Sha512Hash {
 	type Error = ByteSizedError;
 	
@@ -837,6 +894,7 @@ pub struct SigningKey {
 	key: RealSigningKey,
 }
 
+//󰭅		SigningKey																
 impl SigningKey {
 	//		generate															
 	/// Generates an ed25519 [`SigningKey`].
@@ -869,6 +927,7 @@ impl SigningKey {
 	}
 }
 
+//󰭅		ByteSized																
 impl ByteSized<32> for SigningKey {
 	//		as_bytes															
 	fn as_bytes(&self) -> &[u8; 32] {
@@ -911,8 +970,10 @@ impl ByteSized<32> for SigningKey {
 	}
 }
 
+//󰭅		ByteSizedFull															
 impl ByteSizedFull<32> for SigningKey {}
 
+//󰭅		AsRef [u8; 32]															
 impl AsRef<[u8; 32]> for SigningKey {
 	//		as_ref																
 	fn as_ref(&self) -> &[u8; 32] {
@@ -920,6 +981,7 @@ impl AsRef<[u8; 32]> for SigningKey {
 	}
 }
 
+//󰭅		Debug																	
 impl Debug for SigningKey {
 	//		fmt																	
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -927,6 +989,7 @@ impl Debug for SigningKey {
 	}
 }
 
+//󰭅		Default																	
 impl Default for SigningKey {
 	//		default																
 	fn default() -> Self {
@@ -934,6 +997,7 @@ impl Default for SigningKey {
 	}
 }
 
+//󰭅		Deref																	
 impl Deref for SigningKey {
     type Target = RealSigningKey;
 
@@ -943,6 +1007,7 @@ impl Deref for SigningKey {
     }
 }
 
+//󰭅		Display																	
 impl Display for SigningKey {
 	//		fmt																	
 	/// Formats the signing key for display.
@@ -960,6 +1025,7 @@ impl Display for SigningKey {
 	}
 }
 
+//󰭅		From RealSigningKey														
 impl From<RealSigningKey> for SigningKey {
 	//		from																
 	/// Converts a [`ed25519_dalek::SigningKey`] to a [`SigningKey`].
@@ -968,6 +1034,7 @@ impl From<RealSigningKey> for SigningKey {
 	}
 }
 
+//󰭅		From &RealSigningKey													
 impl From<&RealSigningKey> for SigningKey {
 	//		from																
 	/// Converts a [`&ed25519_dalek::SigningKey`](ed25519_dalek::SigningKey) to
@@ -977,6 +1044,7 @@ impl From<&RealSigningKey> for SigningKey {
 	}
 }
 
+//󰭅		From [u8; 32]															
 impl From<[u8; 32]> for SigningKey {
 	//		from																
 	/// Converts a [`[u8; 32]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -986,6 +1054,7 @@ impl From<[u8; 32]> for SigningKey {
 	}
 }
 
+//󰭅		From &[u8; 32]															
 impl From<&[u8; 32]> for SigningKey {
 	//		from																
 	/// Converts a [`&[u8; 32]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -995,6 +1064,7 @@ impl From<&[u8; 32]> for SigningKey {
 	}
 }
 
+//󰭅		FromStr																	
 impl FromStr for SigningKey {
 	type Err = ByteSizedError;
 	
@@ -1004,6 +1074,7 @@ impl FromStr for SigningKey {
 	}
 }
 
+//󰭅		ForceFrom &[u8]															
 impl ForceFrom<&[u8]> for SigningKey {
 	//		force_from															
 	/// Converts a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -1019,6 +1090,7 @@ impl ForceFrom<&[u8]> for SigningKey {
 	}
 }
 
+//󰭅		ForceFrom &[u8; N]														
 impl<const N: usize> ForceFrom<&[u8; N]> for SigningKey {
 	//		force_from															
 	/// Converts a [`&[u8; N]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -1034,6 +1106,7 @@ impl<const N: usize> ForceFrom<&[u8; N]> for SigningKey {
 	}
 }
 
+//󰭅		ForceFrom Vec<u8>														
 impl ForceFrom<Vec<u8>> for SigningKey {
 	//		force_from															
 	/// Converts a [`Vec<u8>`](Vec) to a [`SigningKey`].
@@ -1048,6 +1121,7 @@ impl ForceFrom<Vec<u8>> for SigningKey {
 	}
 }
 
+//󰭅		ForceFrom &Vec<u8>														
 impl ForceFrom<&Vec<u8>> for SigningKey {
 	//		force_from															
 	/// Converts a [`&Vec[u8]`](Vec) to a [`SigningKey`].
@@ -1062,6 +1136,7 @@ impl ForceFrom<&Vec<u8>> for SigningKey {
 	}
 }
 
+//󰭅		Hash																	
 impl Hash for SigningKey {
 	//		hash																
 	fn hash<H: Hasher>(&self, state: &mut H) {
@@ -1069,6 +1144,7 @@ impl Hash for SigningKey {
 	}
 }
 
+//󰭅		Serialize																
 impl Serialize for SigningKey {
 	//		serialize															
 	/// Serialises the signing key to a [`String`].
@@ -1090,6 +1166,7 @@ impl Serialize for SigningKey {
 	}
 }
 
+//󰭅		Deserialize																
 impl<'de> Deserialize<'de> for SigningKey {
 	//		deserialize															
 	/// Deserialises the signing key from a [`String`].
@@ -1111,6 +1188,7 @@ impl<'de> Deserialize<'de> for SigningKey {
 	}
 }
 
+//󰭅		TryFrom &[u8]															
 impl TryFrom<&[u8]> for SigningKey {
 	type Error = ByteSizedError;
 	
@@ -1127,6 +1205,7 @@ impl TryFrom<&[u8]> for SigningKey {
 	}
 }
 
+//󰭅		TryFrom &str															
 impl TryFrom<&str> for SigningKey {
 	type Error = ByteSizedError;
 	
@@ -1137,6 +1216,7 @@ impl TryFrom<&str> for SigningKey {
 	}
 }
 
+//󰭅		TryFrom String															
 impl TryFrom<String> for SigningKey {
 	type Error = ByteSizedError;
 	
@@ -1147,6 +1227,7 @@ impl TryFrom<String> for SigningKey {
 	}
 }
 
+//󰭅		TryFrom &String															
 impl TryFrom<&String> for SigningKey {
 	type Error = ByteSizedError;
 	
@@ -1157,6 +1238,7 @@ impl TryFrom<&String> for SigningKey {
 	}
 }
 
+//󰭅		TryFrom Box<str>														
 impl TryFrom<Box<str>> for SigningKey {
 	type Error = ByteSizedError;
 	
@@ -1167,6 +1249,7 @@ impl TryFrom<Box<str>> for SigningKey {
 	}
 }
 
+//󰭅		TryFrom Cow<str>														
 impl<'a> TryFrom<Cow<'a, str>> for SigningKey {
 	type Error = ByteSizedError;
 	
@@ -1177,6 +1260,7 @@ impl<'a> TryFrom<Cow<'a, str>> for SigningKey {
 	}
 }
 
+//󰭅		TryFrom Vec<u8>															
 impl TryFrom<Vec<u8>> for SigningKey {
 	type Error = ByteSizedError;
 	
@@ -1187,6 +1271,7 @@ impl TryFrom<Vec<u8>> for SigningKey {
 	}
 }
 
+//󰭅		TryFrom &Vec<u8>														
 impl TryFrom<&Vec<u8>> for SigningKey {
 	type Error = ByteSizedError;
 	
@@ -1216,6 +1301,7 @@ pub struct VerifyingKey {
 	key: RealVerifyingKey,
 }
 
+//󰭅		VerifyingKey															
 impl VerifyingKey {
 	//		into_inner															
 	/// Consumes the [`VerifyingKey`] and returns the inner
@@ -1226,6 +1312,7 @@ impl VerifyingKey {
 	}
 }
 
+//󰭅		ByteSized																
 impl ByteSized<32> for VerifyingKey {
 	//		as_bytes															
 	fn as_bytes(&self) -> &[u8; 32] {
@@ -1282,8 +1369,10 @@ impl ByteSized<32> for VerifyingKey {
 	}
 }
 
+//󰭅		ByteSizedFull															
 impl ByteSizedFull<32> for VerifyingKey {}
 
+//󰭅		AsRef [u8; 32]															
 impl AsRef<[u8; 32]> for VerifyingKey {
 	//		as_ref																
 	fn as_ref(&self) -> &[u8; 32] {
@@ -1291,6 +1380,7 @@ impl AsRef<[u8; 32]> for VerifyingKey {
 	}
 }
 
+//󰭅		Debug																	
 impl Debug for VerifyingKey {
 	//		fmt																	
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -1298,6 +1388,7 @@ impl Debug for VerifyingKey {
 	}
 }
 
+//󰭅		Default																	
 impl Default for VerifyingKey {
 	//		default																
 	fn default() -> Self {
@@ -1307,6 +1398,7 @@ impl Default for VerifyingKey {
 	}
 }
 
+//󰭅		Deref																	
 impl Deref for VerifyingKey {
     type Target = RealVerifyingKey;
 
@@ -1316,6 +1408,7 @@ impl Deref for VerifyingKey {
     }
 }
 
+//󰭅		Display																	
 impl Display for VerifyingKey {
 	//		fmt																	
 	/// Formats the verifying key for display.
@@ -1333,6 +1426,7 @@ impl Display for VerifyingKey {
 	}
 }
 
+//󰭅		From RealVerifyingKey													
 impl From<RealVerifyingKey> for VerifyingKey {
 	//		from																
 	/// Converts a [`ed25519_dalek::VerifyingKey`] to a [`VerifyingKey`].
@@ -1341,6 +1435,7 @@ impl From<RealVerifyingKey> for VerifyingKey {
 	}
 }
 
+//󰭅		From &RealVerifyingKey													
 impl From<&RealVerifyingKey> for VerifyingKey {
 	//		from																
 	/// Converts a [`&ed25519_dalek::VerifyingKey`](ed25519_dalek::VerifyingKey)
@@ -1350,6 +1445,7 @@ impl From<&RealVerifyingKey> for VerifyingKey {
 	}
 }
 
+//󰭅		From [u8; 32]															
 impl From<[u8; 32]> for VerifyingKey {
 	//		from																
 	/// Converts a [`[u8; 32]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -1359,6 +1455,7 @@ impl From<[u8; 32]> for VerifyingKey {
 	}
 }
 
+//󰭅		From &[u8; 32]															
 impl From<&[u8; 32]> for VerifyingKey {
 	//		from																
 	/// Converts a [`&[u8; 32]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -1368,6 +1465,7 @@ impl From<&[u8; 32]> for VerifyingKey {
 	}
 }
 
+//󰭅		FromStr																	
 impl FromStr for VerifyingKey {
 	type Err = ByteSizedError;
 	
@@ -1377,6 +1475,7 @@ impl FromStr for VerifyingKey {
 	}
 }
 
+//󰭅		ForceFrom &[u8]															
 impl ForceFrom<&[u8]> for VerifyingKey {
 	//		force_from															
 	/// Converts a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -1392,6 +1491,7 @@ impl ForceFrom<&[u8]> for VerifyingKey {
 	}
 }
 
+//󰭅		ForceFrom &[u8; N]														
 impl<const N: usize> ForceFrom<&[u8; N]> for VerifyingKey {
 	//		force_from															
 	/// Converts a [`&[u8; N]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -1407,6 +1507,7 @@ impl<const N: usize> ForceFrom<&[u8; N]> for VerifyingKey {
 	}
 }
 
+//󰭅		ForceFrom Vec<u8>														
 impl ForceFrom<Vec<u8>> for VerifyingKey {
 	//		force_from															
 	/// Converts a [`Vec<u8>`](Vec) to a [`VerifyingKey`].
@@ -1421,6 +1522,7 @@ impl ForceFrom<Vec<u8>> for VerifyingKey {
 	}
 }
 
+//󰭅		ForceFrom &Vec<u8>														
 impl ForceFrom<&Vec<u8>> for VerifyingKey {
 	//		force_from															
 	/// Converts a [`&Vec[u8]`](Vec) to a [`VerifyingKey`].
@@ -1435,6 +1537,7 @@ impl ForceFrom<&Vec<u8>> for VerifyingKey {
 	}
 }
 
+//󰭅		Hash																	
 impl Hash for VerifyingKey {
 	//		hash																
 	fn hash<H: Hasher>(&self, state: &mut H) {
@@ -1442,6 +1545,7 @@ impl Hash for VerifyingKey {
 	}
 }
 
+//󰭅		Serialize																
 impl Serialize for VerifyingKey {
 	//		serialize															
 	/// Serialises the verifying key to a [`String`].
@@ -1463,6 +1567,7 @@ impl Serialize for VerifyingKey {
 	}
 }
 
+//󰭅		Deserialize																
 impl<'de> Deserialize<'de> for VerifyingKey {
 	//		deserialize															
 	/// Deserialises the verifying key from a [`String`].
@@ -1484,6 +1589,7 @@ impl<'de> Deserialize<'de> for VerifyingKey {
 	}
 }
 
+//󰭅		TryFrom &[u8]															
 impl TryFrom<&[u8]> for VerifyingKey {
 	type Error = ByteSizedError;
 	
@@ -1500,6 +1606,7 @@ impl TryFrom<&[u8]> for VerifyingKey {
 	}
 }
 
+//󰭅		TryFrom &str															
 impl TryFrom<&str> for VerifyingKey {
 	type Error = ByteSizedError;
 	
@@ -1510,6 +1617,7 @@ impl TryFrom<&str> for VerifyingKey {
 	}
 }
 
+//󰭅		TryFrom String															
 impl TryFrom<String> for VerifyingKey {
 	type Error = ByteSizedError;
 	
@@ -1520,6 +1628,7 @@ impl TryFrom<String> for VerifyingKey {
 	}
 }
 
+//󰭅		TryFrom &String															
 impl TryFrom<&String> for VerifyingKey {
 	type Error = ByteSizedError;
 	
@@ -1530,6 +1639,7 @@ impl TryFrom<&String> for VerifyingKey {
 	}
 }
 
+//󰭅		TryFrom Box<str>														
 impl TryFrom<Box<str>> for VerifyingKey {
 	type Error = ByteSizedError;
 	
@@ -1540,6 +1650,7 @@ impl TryFrom<Box<str>> for VerifyingKey {
 	}
 }
 
+//󰭅		TryFrom Cow<str>														
 impl<'a> TryFrom<Cow<'a, str>> for VerifyingKey {
 	type Error = ByteSizedError;
 	
@@ -1550,6 +1661,7 @@ impl<'a> TryFrom<Cow<'a, str>> for VerifyingKey {
 	}
 }
 
+//󰭅		TryFrom Vec<u8>															
 impl TryFrom<Vec<u8>> for VerifyingKey {
 	type Error = ByteSizedError;
 	
@@ -1560,6 +1672,7 @@ impl TryFrom<Vec<u8>> for VerifyingKey {
 	}
 }
 
+//󰭅		TryFrom &Vec<u8>														
 impl TryFrom<&Vec<u8>> for VerifyingKey {
 	type Error = ByteSizedError;
 	
@@ -1594,8 +1707,10 @@ impl TryFrom<&Vec<u8>> for VerifyingKey {
 /// 
 pub trait SigningKeyExt: ByteSized<32> {}
 
+//󰭅		SigningKeyExt															
 impl SigningKeyExt for RealSigningKey {}
 
+//󰭅		ByteSized																
 impl ByteSized<32> for RealSigningKey {
 	//		as_bytes															
 	fn as_bytes(&self) -> &[u8; 32] {
@@ -1638,6 +1753,7 @@ impl ByteSized<32> for RealSigningKey {
 	}
 }
 
+//󰭅		ForceFrom &[u8]															
 impl ForceFrom<&[u8]> for RealSigningKey {
 	//		force_from															
 	/// Converts a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -1658,6 +1774,7 @@ impl ForceFrom<&[u8]> for RealSigningKey {
 	}
 }
 
+//󰭅		ForceFrom &[u8; N]														
 impl<const N: usize> ForceFrom<&[u8; N]> for RealSigningKey {
 	//		force_from															
 	/// Converts a [`&[u8; N]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -1673,6 +1790,7 @@ impl<const N: usize> ForceFrom<&[u8; N]> for RealSigningKey {
 	}
 }
 
+//󰭅		ForceFrom Vec<u8>														
 impl ForceFrom<Vec<u8>> for RealSigningKey {
 	//		force_from															
 	/// Converts a [`Vec<u8>`](Vec) to a [`ed25519_dalek::SigningKey`].
@@ -1687,6 +1805,7 @@ impl ForceFrom<Vec<u8>> for RealSigningKey {
 	}
 }
 
+//󰭅		ForceFrom &Vec<u8>														
 impl ForceFrom<&Vec<u8>> for RealSigningKey {
 	//		force_from															
 	/// Converts a [`&Vec[u8]`](Vec) to a [`ed25519_dalek::SigningKey`].
@@ -1721,8 +1840,10 @@ impl ForceFrom<&Vec<u8>> for RealSigningKey {
 /// 
 pub trait VerifyingKeyExt: ByteSized<32> {}
 
+//󰭅		VerifyingKeyExt															
 impl VerifyingKeyExt for RealVerifyingKey {}
 
+//󰭅		ByteSized																
 impl ByteSized<32> for RealVerifyingKey {
 	//		as_bytes															
 	fn as_bytes(&self) -> &[u8; 32] {
@@ -1775,6 +1896,7 @@ impl ByteSized<32> for RealVerifyingKey {
 	}
 }
 
+//󰭅		ForceFrom &[u8]															
 impl ForceFrom<&[u8]> for RealVerifyingKey {
 	//		force_from															
 	/// Converts a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -1803,6 +1925,7 @@ impl ForceFrom<&[u8]> for RealVerifyingKey {
 	}
 }
 
+//󰭅		ForceFrom &[u8; N]														
 impl<const N: usize> ForceFrom<&[u8; N]> for RealVerifyingKey {
 	//		force_from															
 	/// Converts a [`&[u8; N]`](https://doc.rust-lang.org/std/primitive.slice.html)
@@ -1818,6 +1941,7 @@ impl<const N: usize> ForceFrom<&[u8; N]> for RealVerifyingKey {
 	}
 }
 
+//󰭅		ForceFrom Vec<u8>														
 impl ForceFrom<Vec<u8>> for RealVerifyingKey {
 	//		force_from															
 	/// Converts a [`Vec<u8>`](Vec) to a [`ed25519_dalek::VerifyingKey`].
@@ -1832,6 +1956,7 @@ impl ForceFrom<Vec<u8>> for RealVerifyingKey {
 	}
 }
 
+//󰭅		ForceFrom &Vec<u8>														
 impl ForceFrom<&Vec<u8>> for RealVerifyingKey {
 	//		force_from															
 	/// Converts a [`&Vec[u8]`](Vec) to a [`ed25519_dalek::VerifyingKey`].

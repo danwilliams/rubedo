@@ -283,6 +283,7 @@ pub trait DurationExt {
 	fn num_microseconds_full(&self) -> i128;
 }
 
+//󰭅		Duration																
 impl DurationExt for Duration {
 	//		humanize															
 	fn humanize(&self) -> String {
@@ -416,6 +417,7 @@ pub trait MonthsExt {
 	fn num_years(&self) -> u32;
 }
 
+//󰭅		Months																	
 impl MonthsExt for Months {
 	//		months																
 	fn months(months: u32) -> Self {
@@ -678,6 +680,7 @@ pub trait NaiveDateExt {
 	fn end_of_year_opt(year: i32) -> Option<NaiveDate>;
 }
 
+//󰭅		NaiveDate																
 impl NaiveDateExt for NaiveDate {
 	//		today																
 	fn today() -> Self {

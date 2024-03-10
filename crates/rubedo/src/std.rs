@@ -56,6 +56,7 @@ pub enum ByteSizedError {
 	InvalidHexString,
 }
 
+//󰭅		Display																	
 impl Display for ByteSizedError {
 	//		fmt																	
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -69,6 +70,7 @@ impl Display for ByteSizedError {
 	}
 }
 
+//󰭅		Error																	
 impl Error for ByteSizedError {}
 
 
@@ -98,6 +100,7 @@ pub struct LimitIterator<I> {
 	count: usize,
 }
 
+//󰭅		Iterator																
 impl<I: Iterator> Iterator for LimitIterator<I> {
 	type Item = I::Item;
 	
@@ -165,6 +168,7 @@ pub trait AsStr {
 	fn as_str(&self) -> &str;
 }
 
+//󰭅		String																	
 impl AsStr for String {
 	//		as_str																
 	fn as_str(&self) -> &str {
@@ -174,6 +178,7 @@ impl AsStr for String {
 	}
 }
 
+//󰭅		str																		
 impl AsStr for str {
 	//		as_str																
 	fn as_str(&self) -> &str {
@@ -666,6 +671,7 @@ pub trait FromIntWithScale<T>: Sized {
 /// Implements the [`FromIntWithScale`] trait for floating-point types.
 macro_rules! impl_from_int_with_scale_for_float {
 	($t:ty, f32) => {
+		//󰭅		Integer for f32													
 		impl FromIntWithScale<$t> for f32 {
 			//		from_int_with_scale											
 			fn from_int_with_scale(value: $t, scale: u8) -> Option<Self> {
@@ -690,6 +696,7 @@ macro_rules! impl_from_int_with_scale_for_float {
 		}
 	};
 	($t:ty, f64) => {
+		//󰭅		Integer for f64													
 		impl FromIntWithScale<$t> for f64 {
 			//		from_int_with_scale											
 			fn from_int_with_scale(value: $t, scale: u8) -> Option<Self> {
@@ -740,6 +747,7 @@ impl_from_int_with_scale_for_float!(u128, f64);
 /// Implements the [`FromIntWithScale`] trait for the [`Decimal`] type.
 macro_rules! impl_from_int_with_scale_for_decimal {
 	(i128) => {
+		//󰭅		i128 for Decimal												
 		impl FromIntWithScale<i128> for Decimal {
 			//		from_int_with_scale											
 			fn from_int_with_scale(value: i128, scale: u8) -> Option<Self> {
@@ -755,6 +763,7 @@ macro_rules! impl_from_int_with_scale_for_decimal {
 		}
 	};
 	(u128) => {
+		//󰭅		u128 for Decimal												
 		impl FromIntWithScale<u128> for Decimal {
 			//		from_int_with_scale											
 			fn from_int_with_scale(value: u128, scale: u8) -> Option<Self> {
@@ -772,6 +781,7 @@ macro_rules! impl_from_int_with_scale_for_decimal {
 		}
 	};
 	($t:ty) => {
+		//󰭅		Integer for Decimal												
 		impl FromIntWithScale<$t> for Decimal {
 			//		from_int_with_scale											
 			fn from_int_with_scale(value: $t, scale: u8) -> Option<Self> {
@@ -856,6 +866,7 @@ pub trait ToIntWithScale<T>: Sized {
 /// Implements the [`ToIntWithScale`] trait for floating-point types.
 macro_rules! impl_to_int_with_scale_for_float {
 	($t:ty, $f:ty) => {
+		//󰭅		Integer for Float												
 		impl ToIntWithScale<$t> for $f {
 			//		to_int_with_scale											
 			fn to_int_with_scale(&self, scale: u8) -> Option<$t> {
@@ -896,6 +907,7 @@ impl_to_int_with_scale_for_float!(u128, f64);
 /// Implements the [`ToIntWithScale`] trait for the [`Decimal`] type.
 macro_rules! impl_to_int_with_scale_for_decimal {
 	(i128) => {
+		//󰭅		i128 for Decimal												
 		impl ToIntWithScale<i128> for Decimal {
 			fn to_int_with_scale(&self, scale: u8) -> Option<i128> {
 				//	The integer range of the Decimal type is less than that of an i128, but
@@ -909,6 +921,7 @@ macro_rules! impl_to_int_with_scale_for_decimal {
 		}
 	};
 	(u128) => {
+		//󰭅		u128 for Decimal												
 		impl ToIntWithScale<u128> for Decimal {
 			fn to_int_with_scale(&self, scale: u8) -> Option<u128> {
 				//	The integer range of the Decimal type is less than that of an i128, but
@@ -922,6 +935,7 @@ macro_rules! impl_to_int_with_scale_for_decimal {
 		}
 	};
 	($t:ty) => {
+		//󰭅		Integer for Decimal												
 		impl ToIntWithScale<$t> for Decimal {
 			fn to_int_with_scale(&self, scale: u8) -> Option<$t> {
 				let factor = 10_u64.checked_pow(scale as u32)?;
@@ -1005,6 +1019,7 @@ pub trait IteratorExt: Iterator {
 	}
 }
 
+//󰭅		Iterator																
 impl<I: Iterator> IteratorExt for I {}
 
 //§		PathExt																	
@@ -1190,6 +1205,7 @@ pub trait PathExt {
 	fn strip_root(&self) -> PathBuf;
 }
 
+//󰭅		Path																	
 impl PathExt for Path {
 	//		append																
 	fn append<P: AsRef<Self>>(&self, suffix: P) -> PathBuf {
