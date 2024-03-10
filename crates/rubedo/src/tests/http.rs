@@ -10,8 +10,7 @@ use claims::{assert_err, assert_ok, assert_ok_eq};
 use serde_assert::{
 	Deserializer as TestDeserializer,
 	Serializer as TestSerializer,
-	Token,
-	Tokens,
+	token::Token,
 };
 use serde_json::json;
 use std::str::from_utf8;
@@ -1483,16 +1482,13 @@ mod functions {
 		let status_code = StatusCode::OK;
 		let serializer  = TestSerializer::builder().build();
 		let result      = serialize_status_code(&status_code, &serializer);
-		assert_ok_eq!(result, Tokens(vec![Token::U16(200)]));
+		assert_ok_eq!(result, vec![Token::U16(200)]);
 	}
 	
 	//		deserialize_status_code												
 	#[test]
 	fn deserialize_status_code__basic() {
-		let mut deserializer = TestDeserializer::builder()
-			.tokens(Tokens(vec![Token::U16(200)]))
-			.build()
-		;
+		let mut deserializer = TestDeserializer::builder(vec![Token::U16(200)]).build();
 		let result           = deserialize_status_code(&mut deserializer);
 		assert_ok_eq!(result, StatusCode::OK);
 	}
