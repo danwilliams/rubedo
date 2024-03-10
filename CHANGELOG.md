@@ -12,6 +12,45 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.5.0 (10 March 2024)
+
+### Added
+
+  - Extended the `std` module
+      - Added `ByteSized` trait
+          - Added `ByteSized::from_base64()`
+          - Added `ByteSized::from_bytes()`
+          - Added `ByteSized::from_hex()`
+          - Added `ByteSized.as_bytes()`
+          - Added `ByteSized.to_base64()`
+          - Added `ByteSized.to_bytes()`
+          - Added `ByteSized.to_hex()`
+          - Added `ByteSized.to_vec()`
+      - Added `ByteSizedFull` trait
+      - Added `ByteSizedMut` trait
+          - Added `ByteSizedMut.as_mut_bytes()`
+          - Added `ByteSizedMut.into_bytes()`
+          - Added `ByteSizedMut.into_vec()`
+      - Added `ForceFrom` trait
+          - Added `ForceFrom::force_from()`
+  - Added `crypto` module to provide formal handling of hashes and keys
+      - Added `Sha256Hash` struct
+      - Added `Sha512Hash` struct
+      - Added `SigningKeyExt` trait
+      - Added `SigningKey` wrapper type
+          - Added `SigningKey.generate()`
+          - Added `SigningKey.into_inner()`
+          - Added `SigningKey.verifying_key()`
+      - Added `VerifyingKeyExt` trait
+      - Added `VerifyingKey` wrapper type
+          - Added `VerifyingKey.into_inner()`
+
+### Changed
+
+  - Updated lint configuration
+  - Updated crate dependencies
+
+
 ## 0.4.7 (07 March 2024)
 
 ### Changed
