@@ -4,7 +4,9 @@ The [`std`](https://docs.rs/rubedo/latest/rubedo/std/index.html) module provides
 extensions to the [Rust standard library](https://doc.rust-lang.org/std/).
 
   - [`AsStr`](#asstr)
+  - [`ByteSized`, `ByteSizedFull`, and `ByteSizedMut`](#bytesized-bytesizedfull-and-bytesizedmut)
   - [`FileExt` and `AsyncFileExt`](#fileext-and-asyncfileext)
+  - [`ForceFrom`](#forcefrom)
   - [`FromIntWithScale` and `ToIntWithScale`](#fromintwithscale-and-tointwithscale)
   - [`Iterator`](#iterator)
   - [`Path`](#path)
