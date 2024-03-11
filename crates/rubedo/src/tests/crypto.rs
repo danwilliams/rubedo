@@ -14,15 +14,20 @@ use std::hash::DefaultHasher;
 
 //		Constants
 
+const HASH_INPUT:      &str     = "This is a test";
 const EMPTY_256_HASH:  [u8; 32] = [0; 32];
 const EMPTY_512_HASH:  [u8; 64] = [0; 64];
 const TEST_256_HASH:   [u8; 32] = [
-	0xbe, 0xef, 0x1a, 0x2b, 0x3c, 0x4d, 0x5e, 0x6f, 0x7a, 0x8b, 0x9c, 0x0d, 0x1e, 0x2f, 0x3a, 0x4b,
-	0x5c, 0x6d, 0x7e, 0x8f, 0x9a, 0x0b, 0x1c, 0x2d, 0x3e, 0x4f, 0x5a, 0x6b, 0x7c, 0x8d, 0x9e, 0x0f,
+	0xc7, 0xbe, 0x1e, 0xd9, 0x02, 0xfb, 0x8d, 0xd4, 0xd4, 0x89, 0x97, 0xc6, 0x45, 0x2f, 0x5d, 0x7e,
+	0x50, 0x9f, 0xbc, 0xdb, 0xe2, 0x80, 0x8b, 0x16, 0xbc, 0xf4, 0xed, 0xce, 0x4c, 0x07, 0xd1, 0x4e,
 ];
 const TEST_512_HASH:   [u8; 64] = [
-	0xbe, 0xef, 0x1a, 0x2b, 0x3c, 0x4d, 0x5e, 0x6f, 0x7a, 0x8b, 0x9c, 0x0d, 0x1e, 0x2f, 0x3a, 0x4b,
-	0x5c, 0x6d, 0x7e, 0x8f, 0x9a, 0x0b, 0x1c, 0x2d, 0x3e, 0x4f, 0x5a, 0x6b, 0x7c, 0x8d, 0x9e, 0x0f,
+	0xa0, 0x28, 0xd4, 0xf7, 0x4b, 0x60, 0x2b, 0xa4, 0x5e, 0xb0, 0xa9, 0x3c, 0x9a, 0x46, 0x77, 0x24,
+	0x0d, 0xcf, 0x28, 0x1a, 0x1a, 0x93, 0x22, 0xf1, 0x83, 0xbd, 0x32, 0xf0, 0xbe, 0xd8, 0x2e, 0xc7,
+	0x2d, 0xe9, 0xc3, 0x95, 0x7b, 0x2f, 0x4c, 0x9a, 0x1c, 0xcf, 0x7e, 0xd1, 0x4f, 0x85, 0xd7, 0x34,
+	0x98, 0xdf, 0x38, 0x01, 0x7e, 0x70, 0x3d, 0x47, 0xeb, 0xb9, 0xf0, 0xb3, 0xbf, 0x11, 0x6f, 0x69,
+];
+const TEST_PRVKEY:     [u8; 32] = [
 	0xbe, 0xef, 0x1a, 0x2b, 0x3c, 0x4d, 0x5e, 0x6f, 0x7a, 0x8b, 0x9c, 0x0d, 0x1e, 0x2f, 0x3a, 0x4b,
 	0x5c, 0x6d, 0x7e, 0x8f, 0x9a, 0x0b, 0x1c, 0x2d, 0x3e, 0x4f, 0x5a, 0x6b, 0x7c, 0x8d, 0x9e, 0x0f,
 ];
@@ -30,13 +35,15 @@ const TEST_PUBKEY:     [u8; 32] = [
 	0x9f, 0xd7, 0xb9, 0xe7, 0x28, 0xde, 0x47, 0xab, 0x7d, 0x9d, 0x81, 0x6e, 0x70, 0x57, 0x60, 0x6d,
 	0xd3, 0x02, 0xf3, 0x8d, 0xde, 0xe6, 0x42, 0x72, 0xe0, 0xed, 0x93, 0x3f, 0x08, 0x96, 0xbc, 0x8e,
 ];
-const TEST_256_HEX:    &str     = "beef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f";
-const TEST_512_HEX:    &str     = "beef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f\
-                                   beef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f";
+const TEST_256_HEX:    &str     = "c7be1ed902fb8dd4d48997c6452f5d7e509fbcdbe2808b16bcf4edce4c07d14e";
+const TEST_512_HEX:    &str     = "a028d4f74b602ba45eb0a93c9a4677240dcf281a1a9322f183bd32f0bed82ec7\
+                                   2de9c3957b2f4c9a1ccf7ed14f85d73498df38017e703d47ebb9f0b3bf116f69";
+const TEST_PRVKEY_HEX: &str     = "beef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f";
 const TEST_PUBKEY_HEX: &str     = "9fd7b9e728de47ab7d9d816e7057606dd302f38ddee64272e0ed933f0896bc8e";
-const TEST_256_BASE64: &str     = "vu8aKzxNXm96i5wNHi86S1xtfo+aCxwtPk9aa3yNng8=";
-const TEST_512_BASE64: &str     = "vu8aKzxNXm96i5wNHi86S1xtfo+aCxwtPk9aa3yNng++\
-                                   7xorPE1eb3qLnA0eLzpLXG1+j5oLHC0+T1prfI2eDw==";
+const TEST_256_BASE64: &str     = "x74e2QL7jdTUiZfGRS9dflCfvNvigIsWvPTtzkwH0U4=";
+const TEST_512_BASE64: &str     = "oCjU90tgK6ResKk8mkZ3JA3PKBoakyLxg70y8L7YLsct\
+                                   6cOVey9MmhzPftFPhdc0mN84AX5wPUfrufCzvxFvaQ==";
+const TEST_PRVKEY_B64: &str     = "vu8aKzxNXm96i5wNHi86S1xtfo+aCxwtPk9aa3yNng8=";
 const TEST_PUBKEY_B64: &str     = "n9e55yjeR6t9nYFucFdgbdMC843e5kJy4O2TPwiWvI4=";
 
 
@@ -372,6 +379,14 @@ mod sha256_hash__traits {
 		assert_ne!(hash, Sha256Hash { hash: TEST_256_HASH });
 	}
 	
+	//		hashed																
+	#[test]
+	fn from_digest() {
+		let mut hasher = Sha256::new();
+		hasher.update(HASH_INPUT);
+		assert_eq!(Sha256Hash::from_digest(hasher.finalize()), Sha256Hash { hash: TEST_256_HASH });
+	}
+	
 	//		partial_eq															
 	#[test]
 	fn partial_eq() {
@@ -403,7 +418,7 @@ mod sha256_hash__traits {
 	//		deserialize															
 	#[test]
 	fn deserialize() {
-		let json = r#""beef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f""#;
+		let json = format!(r#""{TEST_256_HEX}""#);
 		let hash = Sha256Hash { hash: TEST_256_HASH };
 		assert_ok_eq!(serde_json::from_str::<Sha256Hash>(&json), hash);
 	}
@@ -429,7 +444,7 @@ mod sha256_hash__traits {
 	}
 	#[test]
 	fn try_from__str() {
-		let hash = Sha256Hash::try_from("beef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f");
+		let hash = Sha256Hash::try_from("c7be1ed902fb8dd4d48997c6452f5d7e509fbcdbe2808b16bcf4edce4c07d14e");
 		assert_ok_eq!(hash, Sha256Hash { hash: TEST_256_HASH });
 	}
 	#[test]
@@ -808,6 +823,14 @@ mod sha512_hash__traits {
 		assert_ne!(hash, Sha512Hash { hash: TEST_512_HASH });
 	}
 	
+	//		hashed																
+	#[test]
+	fn from_digest() {
+		let mut hasher = Sha512::new();
+		hasher.update(HASH_INPUT);
+		assert_eq!(Sha512Hash::from_digest(hasher.finalize()), Sha512Hash { hash: TEST_512_HASH });
+	}
+	
 	//		partial_eq															
 	#[test]
 	fn partial_eq() {
@@ -839,7 +862,7 @@ mod sha512_hash__traits {
 	//		deserialize															
 	#[test]
 	fn deserialize() {
-		let json = r#""beef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0fbeef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f""#;
+		let json = format!(r#""{TEST_512_HEX}""#);
 		let hash = Sha512Hash { hash: TEST_512_HASH };
 		assert_ok_eq!(serde_json::from_str::<Sha512Hash>(&json), hash);
 	}
@@ -865,8 +888,8 @@ mod sha512_hash__traits {
 	}
 	#[test]
 	fn try_from__str() {
-		let hash = Sha512Hash::try_from("beef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f\
-		                                 beef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f");
+		let hash = Sha512Hash::try_from("a028d4f74b602ba45eb0a93c9a4677240dcf281a1a9322f183bd32f0bed82ec7\
+                                         2de9c3957b2f4c9a1ccf7ed14f85d73498df38017e703d47ebb9f0b3bf116f69");
 		assert_ok_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
 	}
 	#[test]
@@ -931,14 +954,14 @@ mod signing_key__struct {
 	//		into_inner															
 	#[test]
 	fn into_inner() {
-		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
-		assert_eq!(key.into_inner(), RealSigningKey::from_bytes(&TEST_256_HASH));
+		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
+		assert_eq!(key.into_inner(), RealSigningKey::from_bytes(&TEST_PRVKEY));
 	}
 	
 	//		verifying_key														
 	#[test]
 	fn verifying_key() {
-		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
+		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
 		assert_eq!(key.verifying_key(),            VerifyingKey::from_bytes(TEST_PUBKEY));
 		assert_eq!(key.verifying_key().as_bytes(), &TEST_PUBKEY);
 	}
@@ -951,63 +974,63 @@ mod signing_key__bytesized {
 	//		as_bytes															
 	#[test]
 	fn as_bytes() {
-		let key        = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
+		let key        = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
 		let byte_slice = key.as_bytes();
 		
 		//	Ensure the byte slice matches the original key's bytes.
-		assert_eq!(*byte_slice, TEST_256_HASH);
+		assert_eq!(*byte_slice, TEST_PRVKEY);
 		
 		//	We can't modify the byte slice due to immutability.
 		//	Uncommenting the line below would cause a compilation error:
 		//byte_slice[10] = 84;
 		
 		//	as_bytes() doesn't consume the original key.
-		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	
 	//		to_bytes															
 	#[test]
 	fn to_bytes() {
-		let key            = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
+		let key            = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
 		let mut byte_clone = key.to_bytes();
 		
 		//	Ensure the clone matches the original key's bytes.
-		assert_eq!(byte_clone, TEST_256_HASH);
+		assert_eq!(byte_clone, TEST_PRVKEY);
 		
 		//	We can modify the cloned byte array.
 		byte_clone[10]     = 84;
-		assert_ne!(byte_clone, TEST_256_HASH);
+		assert_ne!(byte_clone, TEST_PRVKEY);
 		
 		//	to_bytes() doesn't consume or affect the original key.
-		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	
 	//		from_bytes															
 	#[test]
 	fn from_bytes() {
-		let key = SigningKey::from_bytes(TEST_256_HASH);
-		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		let key = SigningKey::from_bytes(TEST_PRVKEY);
+		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	
 	//		to_string															
 	#[test]
 	fn to_string() {
-		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
-		assert_eq!(key.to_string(), TEST_256_HEX);
+		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
+		assert_eq!(key.to_string(), TEST_PRVKEY_HEX);
 	}
 	
 	//		to_base64															
 	#[test]
 	fn to_base64() {
-		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
-		assert_eq!(key.to_base64(), TEST_256_BASE64);
+		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
+		assert_eq!(key.to_base64(), TEST_PRVKEY_B64);
 	}
 	
 	//		from_base64															
 	#[test]
 	fn from_base64__valid() {
-		let key = SigningKey::from_base64(TEST_256_BASE64).unwrap();
-		assert_eq!(key.key, RealSigningKey::from_bytes(&TEST_256_HASH));
+		let key = SigningKey::from_base64(TEST_PRVKEY_B64).unwrap();
+		assert_eq!(key.key, RealSigningKey::from_bytes(&TEST_PRVKEY));
 		
 		let key = SigningKey::from_base64("").unwrap();
 		assert_eq!(key.key, RealSigningKey::from_bytes(&EMPTY_256_HASH));
@@ -1020,15 +1043,15 @@ mod signing_key__bytesized {
 	//		to_hex																
 	#[test]
 	fn to_hex() {
-		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
-		assert_eq!(key.to_hex(), TEST_256_HEX);
+		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
+		assert_eq!(key.to_hex(), TEST_PRVKEY_HEX);
 	}
 	
 	//		from_hex															
 	#[test]
 	fn from_hex__valid() {
-		let key = SigningKey::from_hex(TEST_256_HEX).unwrap();
-		assert_eq!(key.key, RealSigningKey::from_bytes(&TEST_256_HASH));
+		let key = SigningKey::from_hex(TEST_PRVKEY_HEX).unwrap();
+		assert_eq!(key.key, RealSigningKey::from_bytes(&TEST_PRVKEY));
 		
 		let key = SigningKey::from_hex("").unwrap();
 		assert_eq!(key.key, RealSigningKey::from_bytes(&EMPTY_256_HASH));
@@ -1041,18 +1064,18 @@ mod signing_key__bytesized {
 	//		to_vec																
 	#[test]
 	fn to_vec() {
-		let key            = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
+		let key            = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
 		let mut byte_clone = key.to_vec();
 		
 		//	Ensure the clone matches the original key's vec.
-		assert_eq!(byte_clone, TEST_256_HASH.to_vec());
+		assert_eq!(byte_clone, TEST_PRVKEY.to_vec());
 		
 		//	We can modify the cloned byte vector.
 		byte_clone[10]     = 84;
-		assert_ne!(byte_clone, TEST_256_HASH.to_vec());
+		assert_ne!(byte_clone, TEST_PRVKEY.to_vec());
 		
 		//	to_vec() doesn't consume or affect the original key.
-		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 }
 
@@ -1064,35 +1087,35 @@ mod signing_key__traits {
 	#[test]
 	fn as_ref() {
 		//	Same tests as for as_bytes().
-		let key        = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
+		let key        = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
 		let byte_slice = key.as_ref();
-		assert_eq!(*byte_slice, TEST_256_HASH);
-		assert_eq!(key,         SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		assert_eq!(*byte_slice, TEST_PRVKEY);
+		assert_eq!(key,         SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	
 	//		clone																
 	#[test]
 	fn clone() {
-		let key   = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
+		let key   = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
 		let clone = key.clone();
-		assert_eq!(clone, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		assert_eq!(clone, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	
 	//		clone_from															
 	#[test]
 	fn clone_from() {
-		let key       = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
+		let key       = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
 		let mut clone = SigningKey { key: RealSigningKey::from_bytes(&EMPTY_256_HASH) };
 		clone.clone_from(&key);
-		assert_eq!(key,   SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
-		assert_eq!(clone, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		assert_eq!(key,   SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
+		assert_eq!(clone, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	
 	//		debug																
 	#[test]
 	fn debug() {
-		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
-		assert_eq!(format!("{:?}", key), TEST_256_HEX);
+		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
+		assert_eq!(format!("{:?}", key), TEST_PRVKEY_HEX);
 	}
 	
 	//		default																
@@ -1105,53 +1128,53 @@ mod signing_key__traits {
 	//		deref																
 	#[test]
 	fn deref() {
-		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
-		assert_eq!(key.deref(), &RealSigningKey::from_bytes(&TEST_256_HASH));
-		assert_eq!(&*key,       &RealSigningKey::from_bytes(&TEST_256_HASH));
+		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
+		assert_eq!(key.deref(), &RealSigningKey::from_bytes(&TEST_PRVKEY));
+		assert_eq!(&*key,       &RealSigningKey::from_bytes(&TEST_PRVKEY));
 	}
 	#[test]
 	fn deref__to_keypair_bytes() {
-		let key      = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
+		let key      = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
 		let mut pair = vec![];
-		pair.extend_from_slice(&TEST_256_HASH);
+		pair.extend_from_slice(&TEST_PRVKEY);
 		pair.extend_from_slice(&TEST_PUBKEY);
-		assert_eq!(key.to_keypair_bytes(), RealSigningKey::from_bytes(&TEST_256_HASH).to_keypair_bytes());
+		assert_eq!(key.to_keypair_bytes(), RealSigningKey::from_bytes(&TEST_PRVKEY).to_keypair_bytes());
 		assert_eq!(key.to_keypair_bytes(), &pair[..]);
 	}
 	
 	//		display																
 	#[test]
 	fn display() {
-		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
-		assert_eq!(format!("{}", key), TEST_256_HEX);
+		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
+		assert_eq!(format!("{}", key), TEST_PRVKEY_HEX);
 	}
 	
 	//		from																
 	#[test]
 	fn from__real_signing_key() {
-		let key = SigningKey::from(RealSigningKey::from_bytes(&TEST_256_HASH));
-		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		let key = SigningKey::from(RealSigningKey::from_bytes(&TEST_PRVKEY));
+		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	#[test]
 	fn from__real_signing_key_ref() {
-		let key = SigningKey::from(&RealSigningKey::from_bytes(&TEST_256_HASH));
-		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		let key = SigningKey::from(&RealSigningKey::from_bytes(&TEST_PRVKEY));
+		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	#[test]
 	fn from__fixed_length_byte_array() {
-		let key = SigningKey::from(TEST_256_HASH);
-		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		let key = SigningKey::from(TEST_PRVKEY);
+		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	#[test]
 	fn from__fixed_length_byte_slice() {
-		let key = SigningKey::from(&TEST_256_HASH);
-		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		let key = SigningKey::from(&TEST_PRVKEY);
+		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	
 	//		from_str															
 	#[test]
 	fn from_str() {
-		assert_ok_eq!(SigningKey::from_str(TEST_256_HEX), SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		assert_ok_eq!(SigningKey::from_str(TEST_PRVKEY_HEX), SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	#[test]
 	fn from_str__err_decoding() {
@@ -1175,33 +1198,33 @@ mod signing_key__traits {
 	//		force_from															
 	#[test]
 	fn force_from__byte_slice() {
-		let key = SigningKey::force_from(&TEST_256_HASH[..]);
-		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		let key = SigningKey::force_from(&TEST_PRVKEY[..]);
+		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 		
-		let key = SigningKey::force_from(&TEST_256_HASH[..31]);
-		assert_ne!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		let key = SigningKey::force_from(&TEST_PRVKEY[..31]);
+		assert_ne!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	#[test]
 	fn force_from__vec_u8() {
-		let key = SigningKey::force_from(TEST_256_HASH.to_vec());
-		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		let key = SigningKey::force_from(TEST_PRVKEY.to_vec());
+		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 		
-		let key = SigningKey::force_from(TEST_256_HASH[..31].to_vec());
-		assert_ne!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		let key = SigningKey::force_from(TEST_PRVKEY[..31].to_vec());
+		assert_ne!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	#[test]
 	fn force_from__vec_u8_ref() {
-		let key = SigningKey::force_from(&TEST_256_HASH.to_vec());
-		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		let key = SigningKey::force_from(&TEST_PRVKEY.to_vec());
+		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 		
-		let key = SigningKey::force_from(&TEST_256_HASH[..31].to_vec());
-		assert_ne!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		let key = SigningKey::force_from(&TEST_PRVKEY[..31].to_vec());
+		assert_ne!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	
 	//		hash																
 	#[test]
 	fn hash() {
-		let key1        = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
+		let key1        = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
 		let key2        = SigningKey { key: RealSigningKey::from_bytes(&EMPTY_256_HASH) };
 		let mut hasher1 = DefaultHasher::new();
 		let mut hasher2 = DefaultHasher::new();
@@ -1213,32 +1236,32 @@ mod signing_key__traits {
 	//		partial_eq															
 	#[test]
 	fn partial_eq() {
-		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
-		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
+		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 		assert_ne!(key, SigningKey { key: RealSigningKey::from_bytes(&EMPTY_256_HASH) });
 	}
 	
 	//		serialize															
 	#[test]
 	fn serialize() {
-		let key  = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
-		let json = json!(TEST_256_HEX);
+		let key  = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
+		let json = json!(TEST_PRVKEY_HEX);
 		assert_json_eq!(json!(key), json);
 	}
 	
 	//		deserialize															
 	#[test]
 	fn deserialize() {
-		let json = r#""beef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f""#;
-		let key  = SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) };
+		let json = format!(r#""{TEST_PRVKEY_HEX}""#);
+		let key  = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
 		assert_ok_eq!(serde_json::from_str::<SigningKey>(&json), key);
 	}
 	
 	//		try_from															
 	#[test]
 	fn try_from__byte_slice() {
-		let key = SigningKey::try_from(&TEST_256_HASH[..]);
-		assert_ok_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		let key = SigningKey::try_from(&TEST_PRVKEY[..]);
+		assert_ok_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	#[test]
 	fn try_from__byte_slice__err_too_long() {
@@ -1249,57 +1272,57 @@ mod signing_key__traits {
 	}
 	#[test]
 	fn try_from__byte_slice__err_too_short() {
-		let err = SigningKey::try_from(&TEST_256_HASH[..31]);
+		let err = SigningKey::try_from(&TEST_PRVKEY[..31]);
 		assert_err_eq!(err, ByteSizedError::DataTooShort(32));
 		assert_eq!(err.unwrap_err().to_string(), s!("The supplied data is shorter than 32 bytes"));
 	}
 	#[test]
 	fn try_from__str() {
 		let key = SigningKey::try_from("beef1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f");
-		assert_ok_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		assert_ok_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	#[test]
 	fn try_from__str_ref() {
-		let key = SigningKey::try_from(TEST_256_HEX);
-		assert_ok_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		let key = SigningKey::try_from(TEST_PRVKEY_HEX);
+		assert_ok_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	#[test]
 	fn try_from__string() {
-		let key = SigningKey::try_from(TEST_256_HEX.to_owned());
-		assert_ok_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		let key = SigningKey::try_from(TEST_PRVKEY_HEX.to_owned());
+		assert_ok_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	#[test]
 	fn try_from__string_ref() {
-		let key = SigningKey::try_from(&TEST_256_HEX.to_owned());
-		assert_ok_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		let key = SigningKey::try_from(&TEST_PRVKEY_HEX.to_owned());
+		assert_ok_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	#[test]
 	fn try_from__box_str() {
-		let box_str = TEST_256_HEX.to_owned().into_boxed_str();
+		let box_str = TEST_PRVKEY_HEX.to_owned().into_boxed_str();
 		let key     = SigningKey::try_from(box_str);
-		assert_ok_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		assert_ok_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	#[test]
 	fn try_from__cow_borrowed() {
-		let cow: Cow<'_, str> = Cow::Borrowed(TEST_256_HEX);
+		let cow: Cow<'_, str> = Cow::Borrowed(TEST_PRVKEY_HEX);
 		let key               = SigningKey::try_from(cow);
-		assert_ok_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		assert_ok_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	#[test]
 	fn try_from__cow_owned() {
-		let cow: Cow<'_, str> = Cow::Owned(TEST_256_HEX.to_owned());
+		let cow: Cow<'_, str> = Cow::Owned(TEST_PRVKEY_HEX.to_owned());
 		let key               = SigningKey::try_from(cow);
-		assert_ok_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		assert_ok_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	#[test]
 	fn try_from__vec_u8() {
-		let key = SigningKey::try_from(TEST_256_HASH.to_vec());
-		assert_ok_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		let key = SigningKey::try_from(TEST_PRVKEY.to_vec());
+		assert_ok_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	#[test]
 	fn try_from__vec_u8_ref() {
-		let key = SigningKey::try_from(&TEST_256_HASH.to_vec());
-		assert_ok_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_256_HASH) });
+		let key = SigningKey::try_from(&TEST_PRVKEY.to_vec());
+		assert_ok_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 }
 
@@ -1311,56 +1334,56 @@ mod signing_key_ext__bytesized {
 	//		as_bytes															
 	#[test]
 	fn as_bytes() {
-		let key        = RealSigningKey::from_bytes(&TEST_256_HASH);
+		let key        = RealSigningKey::from_bytes(&TEST_PRVKEY);
 		let byte_slice = ByteSized::as_bytes(&key);
 		
 		//	Ensure the byte slice matches the original key's bytes.
-		assert_eq!(*byte_slice, TEST_256_HASH);
+		assert_eq!(*byte_slice, TEST_PRVKEY);
 		
 		//	We can't modify the byte slice due to immutability.
 		//	Uncommenting the line below would cause a compilation error:
 		//byte_slice[10] = 84;
 		
 		//	as_bytes() doesn't consume the original key.
-		assert_eq!(key, RealSigningKey::from_bytes(&TEST_256_HASH));
+		assert_eq!(key, RealSigningKey::from_bytes(&TEST_PRVKEY));
 	}
 	
 	//		to_bytes															
 	#[test]
 	fn to_bytes() {
-		let key            = RealSigningKey::from_bytes(&TEST_256_HASH);
+		let key            = RealSigningKey::from_bytes(&TEST_PRVKEY);
 		let mut byte_clone = ByteSized::to_bytes(&key);
 		
 		//	Ensure the clone matches the original key's bytes.
-		assert_eq!(byte_clone, TEST_256_HASH);
+		assert_eq!(byte_clone, TEST_PRVKEY);
 		
 		//	We can modify the cloned byte array.
 		byte_clone[10]     = 84;
-		assert_ne!(byte_clone, TEST_256_HASH);
+		assert_ne!(byte_clone, TEST_PRVKEY);
 		
 		//	to_bytes() doesn't consume or affect the original key.
-		assert_eq!(key, RealSigningKey::from_bytes(&TEST_256_HASH));
+		assert_eq!(key, RealSigningKey::from_bytes(&TEST_PRVKEY));
 	}
 	
 	//		from_bytes															
 	#[test]
 	fn from_bytes() {
-		let key = <RealSigningKey as ByteSized<32>>::from_bytes(TEST_256_HASH);
-		assert_eq!(key, RealSigningKey::from_bytes(&TEST_256_HASH));
+		let key = <RealSigningKey as ByteSized<32>>::from_bytes(TEST_PRVKEY);
+		assert_eq!(key, RealSigningKey::from_bytes(&TEST_PRVKEY));
 	}
 	
 	//		to_base64															
 	#[test]
 	fn to_base64() {
-		let key = RealSigningKey::from_bytes(&TEST_256_HASH);
-		assert_eq!(key.to_base64(), TEST_256_BASE64);
+		let key = RealSigningKey::from_bytes(&TEST_PRVKEY);
+		assert_eq!(key.to_base64(), TEST_PRVKEY_B64);
 	}
 	
 	//		from_base64															
 	#[test]
 	fn from_base64__valid() {
-		let key = RealSigningKey::from_base64(TEST_256_BASE64).unwrap();
-		assert_eq!(key, RealSigningKey::from_bytes(&TEST_256_HASH));
+		let key = RealSigningKey::from_base64(TEST_PRVKEY_B64).unwrap();
+		assert_eq!(key, RealSigningKey::from_bytes(&TEST_PRVKEY));
 		
 		let key = RealSigningKey::from_base64("").unwrap();
 		assert_eq!(key, RealSigningKey::from_bytes(&EMPTY_256_HASH));
@@ -1373,15 +1396,15 @@ mod signing_key_ext__bytesized {
 	//		to_hex																
 	#[test]
 	fn to_hex() {
-		let key = RealSigningKey::from_bytes(&TEST_256_HASH);
-		assert_eq!(key.to_hex(), TEST_256_HEX);
+		let key = RealSigningKey::from_bytes(&TEST_PRVKEY);
+		assert_eq!(key.to_hex(), TEST_PRVKEY_HEX);
 	}
 	
 	//		from_hex															
 	#[test]
 	fn from_hex__valid() {
-		let key = RealSigningKey::from_hex(TEST_256_HEX).unwrap();
-		assert_eq!(key, RealSigningKey::from_bytes(&TEST_256_HASH));
+		let key = RealSigningKey::from_hex(TEST_PRVKEY_HEX).unwrap();
+		assert_eq!(key, RealSigningKey::from_bytes(&TEST_PRVKEY));
 		
 		let key = RealSigningKey::from_hex("").unwrap();
 		assert_eq!(key, RealSigningKey::from_bytes(&EMPTY_256_HASH));
@@ -1394,18 +1417,18 @@ mod signing_key_ext__bytesized {
 	//		to_vec																
 	#[test]
 	fn to_vec() {
-		let key            = RealSigningKey::from_bytes(&TEST_256_HASH);
+		let key            = RealSigningKey::from_bytes(&TEST_PRVKEY);
 		let mut byte_clone = key.to_vec();
 		
 		//	Ensure the clone matches the original key's vec.
-		assert_eq!(byte_clone, TEST_256_HASH.to_vec());
+		assert_eq!(byte_clone, TEST_PRVKEY.to_vec());
 		
 		//	We can modify the cloned byte vector.
 		byte_clone[10]     = 84;
-		assert_ne!(byte_clone, TEST_256_HASH.to_vec());
+		assert_ne!(byte_clone, TEST_PRVKEY.to_vec());
 		
 		//	to_vec() doesn't consume or affect the original key.
-		assert_eq!(key, RealSigningKey::from_bytes(&TEST_256_HASH));
+		assert_eq!(key, RealSigningKey::from_bytes(&TEST_PRVKEY));
 	}
 }
 
@@ -1416,27 +1439,27 @@ mod signing_key_ext__traits {
 	//		force_from															
 	#[test]
 	fn force_from__byte_slice() {
-		let key = RealSigningKey::force_from(&TEST_256_HASH[..]);
-		assert_eq!(key, RealSigningKey::from_bytes(&TEST_256_HASH));
+		let key = RealSigningKey::force_from(&TEST_PRVKEY[..]);
+		assert_eq!(key, RealSigningKey::from_bytes(&TEST_PRVKEY));
 		
-		let key = RealSigningKey::force_from(&TEST_256_HASH[..31]);
-		assert_ne!(key, RealSigningKey::from_bytes(&TEST_256_HASH));
+		let key = RealSigningKey::force_from(&TEST_PRVKEY[..31]);
+		assert_ne!(key, RealSigningKey::from_bytes(&TEST_PRVKEY));
 	}
 	#[test]
 	fn force_from__vec_u8() {
-		let key = RealSigningKey::force_from(TEST_256_HASH.to_vec());
-		assert_eq!(key, RealSigningKey::from_bytes(&TEST_256_HASH));
+		let key = RealSigningKey::force_from(TEST_PRVKEY.to_vec());
+		assert_eq!(key, RealSigningKey::from_bytes(&TEST_PRVKEY));
 		
-		let key = RealSigningKey::force_from(TEST_256_HASH[..31].to_vec());
-		assert_ne!(key, RealSigningKey::from_bytes(&TEST_256_HASH));
+		let key = RealSigningKey::force_from(TEST_PRVKEY[..31].to_vec());
+		assert_ne!(key, RealSigningKey::from_bytes(&TEST_PRVKEY));
 	}
 	#[test]
 	fn force_from__vec_u8_ref() {
-		let key = RealSigningKey::force_from(&TEST_256_HASH.to_vec());
-		assert_eq!(key, RealSigningKey::from_bytes(&TEST_256_HASH));
+		let key = RealSigningKey::force_from(&TEST_PRVKEY.to_vec());
+		assert_eq!(key, RealSigningKey::from_bytes(&TEST_PRVKEY));
 		
-		let key = RealSigningKey::force_from(&TEST_256_HASH[..31].to_vec());
-		assert_ne!(key, RealSigningKey::from_bytes(&TEST_256_HASH));
+		let key = RealSigningKey::force_from(&TEST_PRVKEY[..31].to_vec());
+		assert_ne!(key, RealSigningKey::from_bytes(&TEST_PRVKEY));
 	}
 }
 
@@ -1732,7 +1755,7 @@ mod verifying_key__traits {
 	//		deserialize															
 	#[test]
 	fn deserialize() {
-		let json = r#""9fd7b9e728de47ab7d9d816e7057606dd302f38ddee64272e0ed933f0896bc8e""#;
+		let json = format!(r#""{TEST_PUBKEY_HEX}""#);
 		let key  = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
 		assert_ok_eq!(serde_json::from_str::<VerifyingKey>(&json), key);
 	}

@@ -4,6 +4,11 @@ The [`crypto`](https://docs.rs/rubedo/latest/rubedo/sha2/index.html) module
 provides extensions to the [Rust Crypto](https://github.com/RustCrypto) set of
 crates.
 
+## Hashed
+
+The [`Hashed`](https://docs.rs/rubedo/latest/rubedo/crypto/trait.Hashed.html)
+trait provides a formal representation of actual hash values.
+
 
 ## Sha256Hash
 

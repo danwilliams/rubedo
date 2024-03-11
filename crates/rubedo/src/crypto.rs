@@ -23,10 +23,13 @@ use core::{
 	ops::Deref,
 	str::FromStr,
 };
+use digest::Digest;
+use sha2::{Sha256, Sha512};
 use ed25519_dalek::{SigningKey as RealSigningKey, VerifyingKey as RealVerifyingKey};
 use generic_array::{
+	ArrayLength,
 	GenericArray,
-	typenum::{U32, U64},
+	typenum::{U32, U64, Unsigned},
 };
 use hex::{FromHexError, self};
 use rand_core::CryptoRngCore;
@@ -295,6 +298,19 @@ impl ForceFrom<&Vec<u8>> for Sha256Hash {
 	/// 
 	fn force_from(v: &Vec<u8>) -> Self {
 		Self::force_from(&**v)
+	}
+}
+
+//󰭅		Hashed																	
+impl Hashed for Sha256Hash {
+	type Algorithm = Sha256;
+	type OutputSize = U32;
+	
+	//		from_digest															
+	fn from_digest(output: GenericArray<u8, Self::OutputSize>) -> Self {
+		let mut hash = [0_u8; 32];
+		hash.copy_from_slice(output.as_slice());
+		Self::from_bytes(hash)
 	}
 }
 
@@ -718,6 +734,19 @@ impl ForceFrom<&Vec<u8>> for Sha512Hash {
 	/// 
 	fn force_from(v: &Vec<u8>) -> Self {
 		Self::force_from(&**v)
+	}
+}
+
+//󰭅		Hashed																	
+impl Hashed for Sha512Hash {
+	type Algorithm = Sha512;
+	type OutputSize = U64;
+	
+	//		from_digest															
+	fn from_digest(output: GenericArray<u8, Self::OutputSize>) -> Self {
+		let mut hash = [0_u8; 64];
+		hash.copy_from_slice(output.as_slice());
+		Self::from_bytes(hash)
 	}
 }
 
@@ -1686,6 +1715,32 @@ impl TryFrom<&Vec<u8>> for VerifyingKey {
 
 
 //		Traits
+
+//§		Hashed																	
+/// This trait provides a formal representation of actual hash values.
+/// 
+/// This trait is called `Hashed` because Rust already has a trait called
+/// [`Hash`], which is used for hashing keys in hash maps. To avoid confusion,
+/// this trait is called `Hashed` which hopefully makes it clear that it
+/// represents the result of a hashing algorithm, and not the hashable type or
+/// the algorithm itself.
+/// 
+pub trait Hashed: Sized {
+	/// The hashing algorithm to use produce the hash.
+	type Algorithm: Digest<OutputSize = Self::OutputSize> + Send;
+	
+	/// The output size of the hashing algorithm.
+	type OutputSize: ArrayLength<u8> + Unsigned;
+	
+	//		from_digest															
+	/// Converts the output of the hashing algorithm to the [`Hashed`] type.
+	/// 
+	/// # Parameters
+	/// 
+	/// * `output` - The output of the hashing algorithm, taken as input here.
+	/// 
+	fn from_digest(output: GenericArray<u8, Self::OutputSize>) -> Self;
+}
 
 //§		SigningKeyExt															
 /// This trait provides additional functionality to
