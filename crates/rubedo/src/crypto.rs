@@ -81,226 +81,6 @@ impl Sha256Hash {
 	}
 }
 
-//󰭅		ByteSized																
-impl ByteSized<32> for Sha256Hash {
-	//		as_bytes															
-	fn as_bytes(&self) -> &[u8; 32] {
-		&self.hash
-	}
-	
-	//		to_bytes															
-	fn to_bytes(&self) -> [u8; 32] {
-		self.hash
-	}
-	
-	//		from_bytes															
-	fn from_bytes(bytes: [u8; 32]) -> Self {
-		Self { hash: bytes }
-	}
-	
-	//		to_base64															
-	fn to_base64(&self) -> String {
-		BASE64.encode(self.hash)
-	}
-	
-	//		from_base64															
-	fn from_base64(encoded: &str) -> Result<Self, DecodeError> {
-		Ok(Self::force_from(BASE64.decode(encoded)?))
-	}
-	
-	//		to_hex																
-	fn to_hex(&self) -> String {
-		hex::encode(self.hash)
-	}
-	
-	//		from_hex															
-	fn from_hex(encoded: &str) -> Result<Self, FromHexError> {
-		Ok(Self::force_from(hex::decode(encoded)?))
-	}
-	
-	//		to_vec																
-	fn to_vec(&self) -> Vec<u8> {
-		self.hash.to_vec()
-	}
-}
-
-//󰭅		ByteSizedMut															
-impl ByteSizedMut<32> for Sha256Hash {
-	//		as_mut_bytes														
-	fn as_mut_bytes(&mut self) -> &mut [u8; 32] {
-		&mut self.hash
-	}
-	
-	//		into_bytes															
-	fn into_bytes(self) -> [u8; 32] {
-		self.hash
-	}
-	
-	//		into_vec															
-	fn into_vec(self) -> Vec<u8> {
-		self.hash.into_iter().collect()
-	}
-}
-
-//󰭅		AsMut [u8; 32]															
-impl AsMut<[u8; 32]> for Sha256Hash {
-	//		as_mut																
-	fn as_mut(&mut self) -> &mut [u8; 32] {
-		self.as_mut_bytes()
-	}
-}
-
-//󰭅		AsRef [u8; 32]															
-impl AsRef<[u8; 32]> for Sha256Hash {
-	//		as_ref																
-	fn as_ref(&self) -> &[u8; 32] {
-		self.as_bytes()
-	}
-}
-
-//󰭅		Debug																	
-impl Debug for Sha256Hash {
-	//		fmt																	
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		write!(f, "{}", self.to_hex())
-	}
-}
-
-//󰭅		Display																	
-impl Display for Sha256Hash {
-	//		fmt																	
-	/// Formats the SHA256 hash for display.
-	///
-	/// This method serialises the SHA256 hash into hexadecimal string
-	/// representation.
-	/// 
-	/// # See also
-	/// 
-	/// * [`Sha256Hash::serialize()`]
-	/// * [`Sha256Hash::to_base64()`]
-	/// 
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		write!(f, "{}", self.to_hex())
-	}
-}
-
-//󰭅		From [u8; 32]															
-impl From<[u8; 32]> for Sha256Hash {
-	//		from																
-	/// Converts a [`[u8; 32]`](https://doc.rust-lang.org/std/primitive.slice.html)
-	/// to a [`Sha256Hash`].
-	fn from(b: [u8; 32]) -> Self {
-		Self::from_bytes(b)
-	}
-}
-
-//󰭅		From &[u8; 32]															
-impl From<&[u8; 32]> for Sha256Hash {
-	//		from																
-	/// Converts a [`&[u8; 32]`](https://doc.rust-lang.org/std/primitive.slice.html)
-	/// to a [`Sha256Hash`].
-	fn from(b: &[u8; 32]) -> Self {
-		Self::from_bytes(*b)
-	}
-}
-
-//󰭅		From GenericArray<u8, U32>												
-impl From<GenericArray<u8, U32>> for Sha256Hash {
-	//		from																
-	/// Converts a [`GenericArray<u8, U32>`](GenericArray) to a [`Sha256Hash`].
-	fn from(a: GenericArray<u8, U32>) -> Self {
-		Self::from(&a)
-	}
-}
-
-//󰭅		From &GenericArray<u8, U32>												
-impl From<&GenericArray<u8, U32>> for Sha256Hash {
-	//		from																
-	/// Converts a [`GenericArray<u8, U32>`](GenericArray) to a [`Sha256Hash`].
-	fn from(a: &GenericArray<u8, U32>) -> Self {
-		let mut hash = [0_u8; 32];
-		hash.copy_from_slice(a.as_slice());
-		Self::from_bytes(hash)
-	}
-}
-
-//󰭅		FromStr																	
-impl FromStr for Sha256Hash {
-	type Err = ByteSizedError;
-	
-	//		from_str															
-	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		Self::try_from(s)
-	}
-}
-
-//󰭅		ForceFrom &[u8]															
-impl ForceFrom<&[u8]> for Sha256Hash {
-	//		force_from															
-	/// Converts a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html)
-	/// to a [`Sha256Hash`].
-	/// 
-	/// Note that if the incoming `[u8]` is too long to fit, it will be
-	/// truncated without error or warning. If there is not enough data, it will
-	/// be padded with zeroes. If this situation needs checking, use
-	/// `try_from()` instead.
-	/// 
-	fn force_from(b: &[u8]) -> Self {
-		let mut array = [0_u8; 32];
-		let len       = b.len().min(32);
-		#[cfg_attr(    feature = "reasons",  allow(clippy::indexing_slicing, reason = "Infallible"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::indexing_slicing))]
-		array[..len].copy_from_slice(&b[..len]);
-		Self::from(array)
-	}
-}
-
-//󰭅		ForceFrom &[u8; N]														
-impl<const N: usize> ForceFrom<&[u8; N]> for Sha256Hash {
-	//		force_from															
-	/// Converts a [`&[u8; N]`](https://doc.rust-lang.org/std/primitive.slice.html)
-	/// to a [`Sha256Hash`].
-	/// 
-	/// Note that if the incoming `[u8; N]` is too long to fit, it will be
-	/// truncated without error or warning. If there is not enough data, it will
-	/// be padded with zeroes. If this situation needs checking, use
-	/// `try_from()` instead.
-	/// 
-	fn force_from(b: &[u8; N]) -> Self {
-		Self::force_from(&b[..])
-	}
-}
-
-//󰭅		ForceFrom Vec<u8>														
-impl ForceFrom<Vec<u8>> for Sha256Hash {
-	//		force_from															
-	/// Converts a [`Vec<u8>`](Vec) to a [`Sha256Hash`].
-	/// 
-	/// Note that if the incoming [`Vec<u8>`](Vec) is too long to fit, it will
-	/// be truncated without error or warning. If there is not enough data, it
-	/// will be padded with zeroes. If this situation needs checking, use
-	/// `try_from()` instead.
-	/// 
-	fn force_from(v: Vec<u8>) -> Self {
-		Self::force_from(&*v)
-	}
-}
-
-//󰭅		ForceFrom &Vec<u8>														
-impl ForceFrom<&Vec<u8>> for Sha256Hash {
-	//		force_from															
-	/// Converts a [`&Vec[u8]`](Vec) to a [`Sha256Hash`].
-	/// 
-	/// Note that if the incoming [`Vec<u8>`](Vec) is too long to fit, it will
-	/// be truncated without error or warning. If there is not enough data, it
-	/// will be padded with zeroes. If this situation needs checking, use
-	/// `try_from()` instead.
-	/// 
-	fn force_from(v: &Vec<u8>) -> Self {
-		Self::force_from(&**v)
-	}
-}
-
 //󰭅		Hashed																	
 impl Hashed for Sha256Hash {
 	type Algorithm = Sha256;
@@ -311,160 +91,6 @@ impl Hashed for Sha256Hash {
 		let mut hash = [0_u8; 32];
 		hash.copy_from_slice(output.as_slice());
 		Self::from_bytes(hash)
-	}
-}
-
-//󰭅		PartialEq [u8; 32]														
-impl PartialEq<[u8; 32]> for Sha256Hash {
-	//		eq																	
-	fn eq(&self, other: &[u8; 32]) -> bool {
-		&self.hash == other
-	}
-}
-
-//󰭅		PartialEq &[u8; 32]														
-impl PartialEq<&[u8; 32]> for Sha256Hash {
-	//		eq																	
-	fn eq(&self, other: &&[u8; 32]) -> bool {
-		&&self.hash == other
-	}
-}
-
-//󰭅		Serialize																
-impl Serialize for Sha256Hash {
-	//		serialize															
-	/// Serialises the SHA256 hash to a [`String`].
-	/// 
-	/// This method serialises the SHA256 hash into hexadecimal string
-	/// representation.
-	/// 
-	/// # See also
-	/// 
-	/// * [`Sha256Hash::deserialize()`]
-	/// * [`Sha256Hash::<Display>fmt()`]
-	/// * [`Sha256Hash::to_base64()`]
-	/// 
-	fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-	where
-		S: Serializer,
-	{
-		serializer.serialize_str(&self.to_string())
-	}
-}
-
-//󰭅		Deserialize																
-impl<'de> Deserialize<'de> for Sha256Hash {
-	//		deserialize															
-	/// Deserialises the SHA256 hash from a [`String`].
-	/// 
-	/// This method deserialises the SHA256 hash from hexadecimal string
-	/// representation.
-	/// 
-	/// # See also
-	///
-	/// * [`Sha256Hash::deserialize()`]
-	/// * [`Sha256Hash::from_base64()`]
-	///
-	fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-	where
-		D: Deserializer<'de>,
-	{
-		let string = String::deserialize(deserializer)?;
-		Self::from_hex(&string).map_err(D::Error::custom)
-	}
-}
-
-//󰭅		TryFrom &[u8]															
-impl TryFrom<&[u8]> for Sha256Hash {
-	type Error = ByteSizedError;
-	
-	//		try_from															
-	/// Converts a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html)
-	/// to a [`Sha256Hash`].
-	fn try_from(b: &[u8]) -> Result<Self, Self::Error> {
-		match b.len().cmp(&32) {
-			Ordering::Greater => return Err(ByteSizedError::DataTooLong(32)),
-			Ordering::Less    => return Err(ByteSizedError::DataTooShort(32)),
-			Ordering::Equal   => {},
-		}
-		Ok(Self::force_from(b))
-	}
-}
-
-//󰭅		TryFrom &str															
-impl TryFrom<&str> for Sha256Hash {
-	type Error = ByteSizedError;
-	
-	//		try_from															
-	/// Converts a [`&str`](str) to a [`Sha256Hash`].
-	fn try_from(s: &str) -> Result<Self, Self::Error> {
-		Self::try_from(hex::decode(s).map_err(|_err| ByteSizedError::InvalidHexString)?)
-	}
-}
-
-//󰭅		TryFrom String															
-impl TryFrom<String> for Sha256Hash {
-	type Error = ByteSizedError;
-	
-	//		try_from															
-	/// Converts a [`String`] to a [`Sha256Hash`].
-	fn try_from(s: String) -> Result<Self, Self::Error> {
-		Self::try_from(s.as_str())
-	}
-}
-
-//󰭅		TryFrom &String															
-impl TryFrom<&String> for Sha256Hash {
-	type Error = ByteSizedError;
-	
-	//		try_from															
-	/// Converts a [`&String`](String) to a [`Sha256Hash`].
-	fn try_from(s: &String) -> Result<Self, Self::Error> {
-		Self::try_from(s.as_str())
-	}
-}
-
-//󰭅		TryFrom Box<str>														
-impl TryFrom<Box<str>> for Sha256Hash {
-	type Error = ByteSizedError;
-	
-	//		try_from															
-	/// Converts a [boxed](Box) [string](str) slice to a [`Sha256Hash`].
-	fn try_from(s: Box<str>) -> Result<Self, Self::Error> {
-		Self::try_from(&*s)
-	}
-}
-
-//󰭅		TryFrom Cow<str>														
-impl<'a> TryFrom<Cow<'a, str>> for Sha256Hash {
-	type Error = ByteSizedError;
-	
-	//		try_from															
-	/// Converts a [clone-on-write](Cow) [string](str) to a [`Sha256Hash`].
-	fn try_from(s: Cow<'a, str>) -> Result<Self, Self::Error> {
-		Self::try_from(s.as_ref())
-	}
-}
-
-//󰭅		TryFrom Vec<u8>>														
-impl TryFrom<Vec<u8>> for Sha256Hash {
-	type Error = ByteSizedError;
-	
-	//		try_from															
-	/// Converts a [`Vec<u8>`](Vec) to a [`Sha256Hash`].
-	fn try_from(v: Vec<u8>) -> Result<Self, Self::Error> {
-		Self::try_from(&*v)
-	}
-}
-
-//󰭅		TryFrom &Vec<u8>														
-impl TryFrom<&Vec<u8>> for Sha256Hash {
-	type Error = ByteSizedError;
-	
-	//		try_from															
-	/// Converts a [`&Vec[u8]`](Vec) to a [`Sha256Hash`].
-	fn try_from(v: &Vec<u8>) -> Result<Self, Self::Error> {
-		Self::try_from(v.as_slice())
 	}
 }
 
@@ -509,20 +135,44 @@ impl Sha512Hash {
 	}
 }
 
+//󰭅		Default																	
+impl Default for Sha512Hash {
+	//		default																
+	fn default() -> Self {
+		Self { hash: [0; 64] }
+	}
+}
+
+//󰭅		Hashed																	
+impl Hashed for Sha512Hash {
+	type Algorithm = Sha512;
+	type OutputSize = U64;
+	
+	//		from_digest															
+	fn from_digest(output: GenericArray<u8, Self::OutputSize>) -> Self {
+		let mut hash = [0_u8; 64];
+		hash.copy_from_slice(output.as_slice());
+		Self::from_bytes(hash)
+	}
+}
+
+//		impl_traits_for_hashed_type												
+/// Implements common traits for [`Hashed`] types.
+macro_rules! impl_traits_for_hashed_type { ($t:ty, $o:ty, $s:expr) => {
 //󰭅		ByteSized																
-impl ByteSized<64> for Sha512Hash {
+impl ByteSized<$s> for $t {
 	//		as_bytes															
-	fn as_bytes(&self) -> &[u8; 64] {
+	fn as_bytes(&self) -> &[u8; $s] {
 		&self.hash
 	}
 	
 	//		to_bytes															
-	fn to_bytes(&self) -> [u8; 64] {
+	fn to_bytes(&self) -> [u8; $s] {
 		self.hash
 	}
 	
 	//		from_bytes															
-	fn from_bytes(bytes: [u8; 64]) -> Self {
+	fn from_bytes(bytes: [u8; $s]) -> Self {
 		Self { hash: bytes }
 	}
 	
@@ -553,14 +203,14 @@ impl ByteSized<64> for Sha512Hash {
 }
 
 //󰭅		ByteSizedMut															
-impl ByteSizedMut<64> for Sha512Hash {
+impl ByteSizedMut<$s> for $t {
 	//		as_mut_bytes														
-	fn as_mut_bytes(&mut self) -> &mut [u8; 64] {
+	fn as_mut_bytes(&mut self) -> &mut [u8; $s] {
 		&mut self.hash
 	}
 	
 	//		into_bytes															
-	fn into_bytes(self) -> [u8; 64] {
+	fn into_bytes(self) -> [u8; $s] {
 		self.hash
 	}
 	
@@ -570,98 +220,90 @@ impl ByteSizedMut<64> for Sha512Hash {
 	}
 }
 
-//󰭅		AsMut [u8; 64]															
-impl AsMut<[u8; 64]> for Sha512Hash {
+//󰭅		AsMut [u8; $s]															
+impl AsMut<[u8; $s]> for $t {
 	//		as_mut																
-	fn as_mut(&mut self) -> &mut [u8; 64] {
+	fn as_mut(&mut self) -> &mut [u8; $s] {
 		self.as_mut_bytes()
 	}
 }
 
-//󰭅		AsRef [u8; 64]															
-impl AsRef<[u8; 64]> for Sha512Hash {
+//󰭅		AsRef [u8; $s]															
+impl AsRef<[u8; $s]> for $t {
 	//		as_ref																
-	fn as_ref(&self) -> &[u8; 64] {
+	fn as_ref(&self) -> &[u8; $s] {
 		self.as_bytes()
 	}
 }
 
 //󰭅		Debug																	
-impl Debug for Sha512Hash {
+impl Debug for $t {
 	//		fmt																	
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		write!(f, "{}", self.to_hex())
-	}
-}
-
-//󰭅		Default																	
-impl Default for Sha512Hash {
-	//		default																
-	fn default() -> Self {
-		Self { hash: [0; 64] }
 	}
 }
 
 //󰭅		Display																	
-impl Display for Sha512Hash {
+impl Display for $t {
 	//		fmt																	
-	/// Formats the SHA512 hash for display.
+	/// Formats the SHA256 hash for display.
 	///
-	/// This method serialises the SHA512 hash into hexadecimal string
+	/// This method serialises the SHA256 hash into hexadecimal string
 	/// representation.
 	/// 
 	/// # See also
 	/// 
-	/// * [`Sha512Hash::serialize()`]
-	/// * [`Sha512Hash::to_base64()`]
+	/// * [`$t::serialize()`]
+	/// * [`$t::to_base64()`]
 	/// 
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		write!(f, "{}", self.to_hex())
 	}
 }
 
-//󰭅		From [u8; 64]															
-impl From<[u8; 64]> for Sha512Hash {
+//󰭅		From [u8; $s]															
+impl From<[u8; $s]> for $t {
 	//		from																
-	/// Converts a [`[u8; 64]`](https://doc.rust-lang.org/std/primitive.slice.html)
-	/// to a [`Sha512Hash`].
-	fn from(b: [u8; 64]) -> Self {
+	/// Converts a [`[u8; $s]`](https://doc.rust-lang.org/std/primitive.slice.html)
+	/// to a [`$t`].
+	fn from(b: [u8; $s]) -> Self {
 		Self::from_bytes(b)
 	}
 }
 
-//󰭅		From &[u8; 64]															
-impl From<&[u8; 64]> for Sha512Hash {
+//󰭅		From &[u8; $s]															
+impl From<&[u8; $s]> for $t {
 	//		from																
-	/// Converts a [`&[u8; 64]`](https://doc.rust-lang.org/std/primitive.slice.html)
-	/// to a [`Sha512Hash`].
-	fn from(b: &[u8; 64]) -> Self {
+	/// Converts a [`&[u8; $s]`](https://doc.rust-lang.org/std/primitive.slice.html)
+	/// to a [`$t`].
+	fn from(b: &[u8; $s]) -> Self {
 		Self::from_bytes(*b)
 	}
 }
 
-//󰭅		From GenericArray<u8, U64>												
-impl From<GenericArray<u8, U64>> for Sha512Hash {
+//󰭅		From GenericArray<u8, $o>												
+impl From<GenericArray<u8, $o>> for $t {
 	//		from																
-	/// Converts a [`GenericArray<u8, U64>`](GenericArray) to a [`Sha512Hash`].
-	fn from(a: GenericArray<u8, U64>) -> Self {
+	/// Converts a [`GenericArray<u8, $o>`](GenericArray) to a [`$t`].
+	fn from(a: GenericArray<u8, $o>) -> Self {
 		Self::from(&a)
 	}
 }
 
-//󰭅		From &GenericArray<u8, U64>												
-impl From<&GenericArray<u8, U64>> for Sha512Hash {
+//󰭅		From &GenericArray<u8, $o>												
+impl From<&GenericArray<u8, $o>> for $t {
 	//		from																
-	/// Converts a [`GenericArray<u8, U64>`](GenericArray) to a [`Sha512Hash`].
-	fn from(a: &GenericArray<u8, U64>) -> Self {
-		let mut hash = [0_u8; 64];
+	/// Converts a [`GenericArray<u8, $o>`](GenericArray) to a [`$t`].
+	fn from(a: &GenericArray<u8, $o>) -> Self {
+		let mut hash = [0_u8; $s];
 		hash.copy_from_slice(a.as_slice());
 		Self::from_bytes(hash)
 	}
 }
 
 //󰭅		FromStr																	
-impl FromStr for Sha512Hash {
+impl FromStr for $t {
 	type Err = ByteSizedError;
 	
 	//		from_str															
@@ -671,10 +313,10 @@ impl FromStr for Sha512Hash {
 }
 
 //󰭅		ForceFrom &[u8]															
-impl ForceFrom<&[u8]> for Sha512Hash {
+impl ForceFrom<&[u8]> for $t {
 	//		force_from															
 	/// Converts a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html)
-	/// to a [`Sha512Hash`].
+	/// to a [`$t`].
 	/// 
 	/// Note that if the incoming `[u8]` is too long to fit, it will be
 	/// truncated without error or warning. If there is not enough data, it will
@@ -682,8 +324,8 @@ impl ForceFrom<&[u8]> for Sha512Hash {
 	/// `try_from()` instead.
 	/// 
 	fn force_from(b: &[u8]) -> Self {
-		let mut array = [0_u8; 64];
-		let len       = b.len().min(64);
+		let mut array = [0_u8; $s];
+		let len       = b.len().min($s);
 		#[cfg_attr(    feature = "reasons",  allow(clippy::indexing_slicing, reason = "Infallible"))]
 		#[cfg_attr(not(feature = "reasons"), allow(clippy::indexing_slicing))]
 		array[..len].copy_from_slice(&b[..len]);
@@ -692,10 +334,10 @@ impl ForceFrom<&[u8]> for Sha512Hash {
 }
 
 //󰭅		ForceFrom &[u8; N]														
-impl<const N: usize> ForceFrom<&[u8; N]> for Sha512Hash {
+impl<const N: usize> ForceFrom<&[u8; N]> for $t {
 	//		force_from															
 	/// Converts a [`&[u8; N]`](https://doc.rust-lang.org/std/primitive.slice.html)
-	/// to a [`Sha512Hash`].
+	/// to a [`$t`].
 	/// 
 	/// Note that if the incoming `[u8; N]` is too long to fit, it will be
 	/// truncated without error or warning. If there is not enough data, it will
@@ -708,9 +350,9 @@ impl<const N: usize> ForceFrom<&[u8; N]> for Sha512Hash {
 }
 
 //󰭅		ForceFrom Vec<u8>														
-impl ForceFrom<Vec<u8>> for Sha512Hash {
+impl ForceFrom<Vec<u8>> for $t {
 	//		force_from															
-	/// Converts a [`Vec<u8>`](Vec) to a [`Sha512Hash`].
+	/// Converts a [`Vec<u8>`](Vec) to a [`$t`].
 	/// 
 	/// Note that if the incoming [`Vec<u8>`](Vec) is too long to fit, it will
 	/// be truncated without error or warning. If there is not enough data, it
@@ -723,9 +365,9 @@ impl ForceFrom<Vec<u8>> for Sha512Hash {
 }
 
 //󰭅		ForceFrom &Vec<u8>														
-impl ForceFrom<&Vec<u8>> for Sha512Hash {
+impl ForceFrom<&Vec<u8>> for $t {
 	//		force_from															
-	/// Converts a [`&Vec[u8]`](Vec) to a [`Sha512Hash`].
+	/// Converts a [`&Vec[u8]`](Vec) to a [`$t`].
 	/// 
 	/// Note that if the incoming [`Vec<u8>`](Vec) is too long to fit, it will
 	/// be truncated without error or warning. If there is not enough data, it
@@ -737,48 +379,35 @@ impl ForceFrom<&Vec<u8>> for Sha512Hash {
 	}
 }
 
-//󰭅		Hashed																	
-impl Hashed for Sha512Hash {
-	type Algorithm = Sha512;
-	type OutputSize = U64;
-	
-	//		from_digest															
-	fn from_digest(output: GenericArray<u8, Self::OutputSize>) -> Self {
-		let mut hash = [0_u8; 64];
-		hash.copy_from_slice(output.as_slice());
-		Self::from_bytes(hash)
-	}
-}
-
-//󰭅		PartialEq [u8; 64]														
-impl PartialEq<[u8; 64]> for Sha512Hash {
+//󰭅		PartialEq [u8; $s]														
+impl PartialEq<[u8; $s]> for $t {
 	//		eq																	
-	fn eq(&self, other: &[u8; 64]) -> bool {
+	fn eq(&self, other: &[u8; $s]) -> bool {
 		&self.hash == other
 	}
 }
 
-//󰭅		PartialEq &[u8; 64]														
-impl PartialEq<&[u8; 64]> for Sha512Hash {
+//󰭅		PartialEq &[u8; $s]														
+impl PartialEq<&[u8; $s]> for $t {
 	//		eq																	
-	fn eq(&self, other: &&[u8; 64]) -> bool {
+	fn eq(&self, other: &&[u8; $s]) -> bool {
 		&&self.hash == other
 	}
 }
 
 //󰭅		Serialize																
-impl Serialize for Sha512Hash {
+impl Serialize for $t {
 	//		serialize															
-	/// Serialises the SHA512 hash to a [`String`].
+	/// Serialises the SHA256 hash to a [`String`].
 	/// 
-	/// This method serialises the SHA512 hash into hexadecimal string
+	/// This method serialises the SHA256 hash into hexadecimal string
 	/// representation.
 	/// 
 	/// # See also
 	/// 
-	/// * [`Sha512Hash::deserialize()`]
-	/// * [`Sha512Hash::<Display>fmt()`]
-	/// * [`Sha512Hash::to_base64()`]
+	/// * [`$t::deserialize()`]
+	/// * [`$t::<Display>fmt()`]
+	/// * [`$t::to_base64()`]
 	/// 
 	fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
 	where
@@ -789,17 +418,17 @@ impl Serialize for Sha512Hash {
 }
 
 //󰭅		Deserialize																
-impl<'de> Deserialize<'de> for Sha512Hash {
+impl<'de> Deserialize<'de> for $t {
 	//		deserialize															
-	/// Deserialises the SHA512 hash from a [`String`].
+	/// Deserialises the SHA256 hash from a [`String`].
 	/// 
-	/// This method deserialises the SHA512 hash from hexadecimal string
+	/// This method deserialises the SHA256 hash from hexadecimal string
 	/// representation.
 	/// 
 	/// # See also
 	///
-	/// * [`Sha512Hash::deserialize()`]
-	/// * [`Sha512Hash::from_base64()`]
+	/// * [`$t::deserialize()`]
+	/// * [`$t::from_base64()`]
 	///
 	fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
 	where
@@ -811,16 +440,16 @@ impl<'de> Deserialize<'de> for Sha512Hash {
 }
 
 //󰭅		TryFrom &[u8]															
-impl TryFrom<&[u8]> for Sha512Hash {
+impl TryFrom<&[u8]> for $t {
 	type Error = ByteSizedError;
 	
 	//		try_from															
 	/// Converts a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html)
-	/// to a [`Sha512Hash`].
+	/// to a [`$t`].
 	fn try_from(b: &[u8]) -> Result<Self, Self::Error> {
-		match b.len().cmp(&64) {
-			Ordering::Greater => return Err(ByteSizedError::DataTooLong(64)),
-			Ordering::Less    => return Err(ByteSizedError::DataTooShort(64)),
+		match b.len().cmp(&$s) {
+			Ordering::Greater => return Err(ByteSizedError::DataTooLong($s)),
+			Ordering::Less    => return Err(ByteSizedError::DataTooShort($s)),
 			Ordering::Equal   => {},
 		}
 		Ok(Self::force_from(b))
@@ -828,81 +457,85 @@ impl TryFrom<&[u8]> for Sha512Hash {
 }
 
 //󰭅		TryFrom &str															
-impl TryFrom<&str> for Sha512Hash {
+impl TryFrom<&str> for $t {
 	type Error = ByteSizedError;
 	
 	//		try_from															
-	/// Converts a [`&str`](str) to a [`Sha512Hash`].
+	/// Converts a [`&str`](str) to a [`$t`].
 	fn try_from(s: &str) -> Result<Self, Self::Error> {
 		Self::try_from(hex::decode(s).map_err(|_err| ByteSizedError::InvalidHexString)?)
 	}
 }
 
-//󰭅		TryFrom String 															
-impl TryFrom<String> for Sha512Hash {
+//󰭅		TryFrom String															
+impl TryFrom<String> for $t {
 	type Error = ByteSizedError;
 	
 	//		try_from															
-	/// Converts a [`String`] to a [`Sha512Hash`].
+	/// Converts a [`String`] to a [`$t`].
 	fn try_from(s: String) -> Result<Self, Self::Error> {
-		Self::try_from(&s)
+		Self::try_from(s.as_str())
 	}
 }
 
 //󰭅		TryFrom &String															
-impl TryFrom<&String> for Sha512Hash {
+impl TryFrom<&String> for $t {
 	type Error = ByteSizedError;
 	
 	//		try_from															
-	/// Converts a [`&String`](String) to a [`Sha512Hash`].
+	/// Converts a [`&String`](String) to a [`$t`].
 	fn try_from(s: &String) -> Result<Self, Self::Error> {
 		Self::try_from(s.as_str())
 	}
 }
 
 //󰭅		TryFrom Box<str>														
-impl TryFrom<Box<str>> for Sha512Hash {
+impl TryFrom<Box<str>> for $t {
 	type Error = ByteSizedError;
 	
 	//		try_from															
-	/// Converts a [boxed](Box) [string](str) slice to a [`Sha512Hash`].
+	/// Converts a [boxed](Box) [string](str) slice to a [`$t`].
 	fn try_from(s: Box<str>) -> Result<Self, Self::Error> {
 		Self::try_from(&*s)
 	}
 }
 
 //󰭅		TryFrom Cow<str>														
-impl<'a> TryFrom<Cow<'a, str>> for Sha512Hash {
+impl<'a> TryFrom<Cow<'a, str>> for $t {
 	type Error = ByteSizedError;
 	
 	//		try_from															
-	/// Converts a [clone-on-write](Cow) [string](str) to a [`Sha512Hash`].
+	/// Converts a [clone-on-write](Cow) [string](str) to a [`$t`].
 	fn try_from(s: Cow<'a, str>) -> Result<Self, Self::Error> {
 		Self::try_from(s.as_ref())
 	}
 }
 
 //󰭅		TryFrom Vec<u8>															
-impl TryFrom<Vec<u8>> for Sha512Hash {
+impl TryFrom<Vec<u8>> for $t {
 	type Error = ByteSizedError;
 	
 	//		try_from															
-	/// Converts a [`Vec<u8>`](Vec) to a [`Sha512Hash`].
+	/// Converts a [`Vec<u8>`](Vec) to a [`$t`].
 	fn try_from(v: Vec<u8>) -> Result<Self, Self::Error> {
 		Self::try_from(&*v)
 	}
 }
 
 //󰭅		TryFrom &Vec<u8>														
-impl TryFrom<&Vec<u8>> for Sha512Hash {
+impl TryFrom<&Vec<u8>> for $t {
 	type Error = ByteSizedError;
 	
 	//		try_from															
-	/// Converts a [`&Vec[u8]`](Vec) to a [`Sha512Hash`].
+	/// Converts a [`&Vec[u8]`](Vec) to a [`$t`].
 	fn try_from(v: &Vec<u8>) -> Result<Self, Self::Error> {
 		Self::try_from(v.as_slice())
 	}
 }
+};}
+
+impl_traits_for_hashed_type!(Sha256Hash, U32, 32);
+impl_traits_for_hashed_type!(Sha512Hash, U64, 64);
 
 //		SigningKey																
 /// An ed25519 signing key which can be used to produce signatures.
