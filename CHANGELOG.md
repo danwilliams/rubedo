@@ -12,6 +12,28 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.5.1 (11 March 2024)
+
+### Added
+
+  - Extended the `crypto` module
+      - Added `Hashed` trait
+      - Implemented `Hashed` for `Sha256Hash` and `Sha512Hash`
+  - Extended the `std` module
+      - Added `AsyncFileExt` trait
+          - Added `AsyncFile::hash()`
+      - Added `FileExt` trait
+          - Added `File::hash()`
+
+### Fixed
+
+  - Fixed wrong links in README documentation
+
+### Changed
+
+  - Improved README documentation
+
+
 ## 0.5.0 (10 March 2024)
 
 ### Added
@@ -47,6 +69,7 @@ The format is based on [Keep a Changelog][], and this project adheres to
 
 ### Changed
 
+  - Upgraded to [Chrono][] [0.4.35](https://github.com/chronotope/chrono/releases/tag/v0.4.35)
   - Updated lint configuration
   - Updated crate dependencies
 
@@ -55,8 +78,9 @@ The format is based on [Keep a Changelog][], and this project adheres to
 
 ### Changed
 
-  - Locked [Chrono][] dependency to 0.4.33 due to test-breaking changes in
-    version 0.4.34 and build-breaking changes in 0.4.35
+  - Locked [Chrono][] dependency to [0.4.33](https://github.com/chronotope/chrono/releases/tag/v0.4.33)
+    due to test-breaking changes in version [0.4.34](https://github.com/chronotope/chrono/releases/tag/v0.4.34)
+    and build-breaking changes in [0.4.35](https://github.com/chronotope/chrono/releases/tag/v0.4.35)
 
 
 ## 0.4.6 (15 February 2024)
