@@ -4,6 +4,7 @@ The [`std`](https://docs.rs/rubedo/latest/rubedo/std/index.html) module provides
 extensions to the [Rust standard library](https://doc.rust-lang.org/std/).
 
   - [`AsStr`](#asstr)
+  - [`FileExt` and `AsyncFileExt`](#fileext-and-asyncfileext)
   - [`FromIntWithScale` and `ToIntWithScale`](#fromintwithscale-and-tointwithscale)
   - [`Iterator`](#iterator)
   - [`Path`](#path)
@@ -30,6 +31,17 @@ and [`ByteSizedMut`](https://docs.rs/rubedo/latest/rubedo/std/trait.ByteSizedMut
 can be applied as well. For third-party types, inner mutation/consumption is not
 possible, and neither is application of external traits due to the orphan rule,
 hence the split.
+
+
+## FileExt and AsyncFileExt
+
+The [`File`](https://doc.rust-lang.org/std/file/struct.File.html) and
+[`AsyncFile`](https://docs.rs/tokio/latest/tokio/fs/struct.File.html) structs
+are extended with the following methods:
+
+  - [`hash()`](https://docs.rs/rubedo/latest/rubedo/std/trait.FileExt.html#tymethod.hash) -
+    Hashes the contents of a file and returns the specified [`Hashed`](https://docs.rs/rubedo/latest/rubedo/crypto/trait.Hashed.html)
+    type.
 
 
 ## FromIntWithScale and ToIntWithScale

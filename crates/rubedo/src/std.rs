@@ -12,14 +12,19 @@ mod tests;
 
 //		Packages
 
-use crate::sugar::s;
+use crate::{
+	crypto::Hashed,
+	sugar::s,
+};
 use base64::DecodeError;
 use core::{
 	convert::TryFrom,
 	fmt::{Debug, Display, self},
+	future::Future,
 	hash::Hash,
 	str::FromStr,
 };
+use digest::Digest;
 use hex::FromHexError;
 use rust_decimal::{
 	Decimal,
@@ -31,7 +36,13 @@ use std::{
 	env,
 	error::Error,
 	ffi::OsString,
+	fs::File,
+	io::{BufReader, Error as IoError, Read},
 	path::{Component as PathComponent, Path, PathBuf},
+};
+use tokio::{
+	fs::File as AsyncFile,
+	io::{AsyncReadExt, BufReader as AsyncBufReader},
 };
 
 
@@ -603,6 +614,90 @@ pub trait ByteSizedMut<const SIZE: usize>:
 	/// 
 	#[must_use]
 	fn into_vec(self) -> Vec<u8>;
+}
+
+//§		FileExt																	
+/// This trait provides additional functionality to [`File`].
+pub trait FileExt {
+	/// Hashes the contents of a file.
+	/// 
+	/// This function reads the contents of a file and hashes it using the
+	/// hashing algorithm associated to the hash type specified. The resulting
+	/// hash is returned as the specified formal [`Hashed`] type.
+	/// 
+	/// # Parameters
+	/// 
+	/// * `path` - The path to the file to hash.
+	/// 
+	/// # Errors
+	/// 
+	/// This function will return an error if the file cannot be opened, or if
+	/// there is a problem reading from the file.
+	/// 
+	fn hash<T: Hashed>(path: &Path) -> Result<T, IoError>;
+}
+
+//󰭅		File																	
+impl FileExt for File {
+	fn hash<T: Hashed>(path: &Path) -> Result<T, IoError> {
+		let file       = Self::open(path)?;
+		let mut reader = BufReader::new(file);
+		let mut hasher = T::Algorithm::new();
+		let mut buffer = [0; 0x2000];  //  8KB buffer
+		loop {
+			let count = reader.read(&mut buffer)?;
+			if count == 0 {
+				break;
+			}
+			#[cfg_attr(    feature = "reasons",  allow(clippy::indexing_slicing, reason = "Infallible"))]
+			#[cfg_attr(not(feature = "reasons"), allow(clippy::indexing_slicing))]
+			hasher.update(&buffer[..count]);
+		}
+		Ok(T::from_digest(hasher.finalize()))
+	}
+}
+
+//§		AsyncFileExt															
+/// This trait provides additional functionality to [`AsyncFile`].
+pub trait AsyncFileExt {
+	/// Hashes the contents of a file asynchronously.
+	/// 
+	/// This function reads the contents of a file and hashes it using the
+	/// hashing algorithm associated to the hash type specified. The resulting
+	/// hash is returned as the specified formal [`Hashed`] type.
+	/// 
+	/// # Parameters
+	/// 
+	/// * `path` - The path to the file to hash.
+	/// 
+	/// # Errors
+	/// 
+	/// This function will return an error if the file cannot be opened, or if
+	/// there is a problem reading from the file.
+	/// 
+	//	Cannot use the async keyword here due to needing to specify Send as a
+	//	constraint.
+	fn hash<T: Hashed>(path: &Path) -> impl Future<Output = Result<T, IoError>> + Send;
+}
+
+//󰭅		AsyncFile																
+impl AsyncFileExt for AsyncFile {
+	async fn hash<T: Hashed>(path: &Path) -> Result<T, IoError> {
+		let file       = Self::open(path).await?;
+		let mut reader = AsyncBufReader::new(file);
+		let mut hasher = T::Algorithm::new();
+		let mut buffer = [0; 0x2000];  //  8KB buffer
+		loop {
+			let count = reader.read(&mut buffer).await?;
+			if count == 0 {
+				break;
+			}
+			#[cfg_attr(    feature = "reasons",  allow(clippy::indexing_slicing, reason = "Infallible"))]
+			#[cfg_attr(not(feature = "reasons"), allow(clippy::indexing_slicing))]
+			hasher.update(&buffer[..count]);
+		}
+		Ok(T::from_digest(hasher.finalize()))
+	}
 }
 
 //§		FromIntWithScale														

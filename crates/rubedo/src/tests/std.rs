@@ -3,8 +3,41 @@
 //		Packages
 
 use super::*;
-use crate::sugar::s;
+use crate::{
+	crypto::{Sha256Hash, Sha512Hash},
+	sugar::s,
+};
 use rust_decimal::prelude::*;
+use std::io::Write;
+use tempfile::{TempDir, tempdir};
+
+
+
+//		Constants
+
+const HASH_INPUT:      &str     = "This is a test";
+const TEST_256_HASH:   [u8; 32] = [
+	0xc7, 0xbe, 0x1e, 0xd9, 0x02, 0xfb, 0x8d, 0xd4, 0xd4, 0x89, 0x97, 0xc6, 0x45, 0x2f, 0x5d, 0x7e,
+	0x50, 0x9f, 0xbc, 0xdb, 0xe2, 0x80, 0x8b, 0x16, 0xbc, 0xf4, 0xed, 0xce, 0x4c, 0x07, 0xd1, 0x4e,
+];
+const TEST_512_HASH:   [u8; 64] = [
+	0xa0, 0x28, 0xd4, 0xf7, 0x4b, 0x60, 0x2b, 0xa4, 0x5e, 0xb0, 0xa9, 0x3c, 0x9a, 0x46, 0x77, 0x24,
+	0x0d, 0xcf, 0x28, 0x1a, 0x1a, 0x93, 0x22, 0xf1, 0x83, 0xbd, 0x32, 0xf0, 0xbe, 0xd8, 0x2e, 0xc7,
+	0x2d, 0xe9, 0xc3, 0x95, 0x7b, 0x2f, 0x4c, 0x9a, 0x1c, 0xcf, 0x7e, 0xd1, 0x4f, 0x85, 0xd7, 0x34,
+	0x98, 0xdf, 0x38, 0x01, 0x7e, 0x70, 0x3d, 0x47, 0xeb, 0xb9, 0xf0, 0xb3, 0xbf, 0x11, 0x6f, 0x69,
+];
+
+
+
+//		Common
+
+//		setup_files																
+fn setup_files() -> (TempDir, PathBuf) {
+	let temp_dir = tempdir().unwrap();
+	let path     = temp_dir.path().join("testdata");
+	File::create(&path).unwrap().write_all(HASH_INPUT.as_bytes()).unwrap();
+	(temp_dir, path)
+}
 
 
 
@@ -25,6 +58,46 @@ mod as_str {
 	fn as_str__str() {
 		let foo = "Test";
 		assert_eq!(foo.as_str(), "Test");
+	}
+}
+
+//§		FileExt																	
+#[cfg(test)]
+mod file_ext {
+	use super::*;
+	
+	//		hash																
+	#[test]
+	fn hash__sha256() {
+		//	The temp_dir needs to be maintained for the duration of the test
+		let (_temp_dir, path) = setup_files();
+		assert_eq!(File::hash::<Sha256Hash>(&path).unwrap(), TEST_256_HASH);
+	}
+	#[test]
+	fn hash__sha512() {
+		//	The temp_dir needs to be maintained for the duration of the test
+		let (_temp_dir, path) = setup_files();
+		assert_eq!(File::hash::<Sha512Hash>(&path).unwrap(), TEST_512_HASH);
+	}
+}
+
+//§		AsyncFileExt															
+#[cfg(test)]
+mod async_file_ext {
+	use super::*;
+	
+	//		hash																
+	#[tokio::test]
+	async fn hash__sha256() {
+		//	The temp_dir needs to be maintained for the duration of the test
+		let (_temp_dir, path) = setup_files();
+		assert_eq!(AsyncFile::hash::<Sha256Hash>(&path).await.unwrap(), TEST_256_HASH);
+	}
+	#[tokio::test]
+	async fn hash__sha512() {
+		//	The temp_dir needs to be maintained for the duration of the test
+		let (_temp_dir, path) = setup_files();
+		assert_eq!(AsyncFile::hash::<Sha512Hash>(&path).await.unwrap(), TEST_512_HASH);
 	}
 }
 
