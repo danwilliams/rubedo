@@ -17,7 +17,7 @@ reasons = []
 
 [dependencies]
 base64 = "0.22.0"
-chrono = { version = "0.4.35", features = ["alloc", "clock", "std"] }
+chrono = { version = "0.4.37", features = ["alloc", "clock", "std"] }
 digest = { version = "0.10.7", features = ["rand_core"] }
 ed25519-dalek = { version = "2.1.1", features = ["rand_core"] }
 futures = "0.3.30"
@@ -28,11 +28,11 @@ http-body = "0.4.6"
 hyper = "0.14.28"
 rand_core = "0.6.4"
 rubedo-macros = { path = "../rubedo-macros", version = "0.5.1" }
-rust_decimal = "1.34.3"
+rust_decimal = "1.35.0"
 serde = { version = "1.0.197", features = ["derive"] }
-serde_json = { version = "1.0.114", features = ["preserve_order"] }
+serde_json = { version = "1.0.115", features = ["preserve_order"] }
 sha2 = "0.10.8"
-tokio = { version = "1.36.0", features = ["fs", "io-std", "io-util", "macros"] }
+tokio = { version = "1.37.0", features = ["fs", "io-std", "io-util", "macros"] }
 
 [dev-dependencies]
 assert-json-diff = "2.0.2"
