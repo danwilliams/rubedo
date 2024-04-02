@@ -1,6 +1,6 @@
 [package]
 name = "rubedo-macros"
-version = "0.5.1"
+version = "0.5.2"
 description = "Proc macros for Rubedo"
 categories = ["development-tools"]
 keywords = ["macro", "library", "utility"]

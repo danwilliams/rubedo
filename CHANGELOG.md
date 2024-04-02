@@ -12,12 +12,21 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.5.2 (02 April 2024)
+
+### Changed
+
+  - Updated lint configuration for Rust 1.77
+  - Updated crate dependencies
+
+
 ## 0.5.1 (11 March 2024)
 
 ### Added
 
   - Extended the `crypto` module
       - Added `Hashed` trait
+          - Added `Hashed::from_digest()`
       - Implemented `Hashed` for `Sha256Hash` and `Sha512Hash`
   - Extended the `std` module
       - Added `AsyncFileExt` trait
@@ -70,7 +79,7 @@ The format is based on [Keep a Changelog][], and this project adheres to
 ### Changed
 
   - Upgraded to [Chrono][] [0.4.35](https://github.com/chronotope/chrono/releases/tag/v0.4.35)
-  - Updated lint configuration
+  - Updated lint configuration for Rust 1.76
   - Updated crate dependencies
 
 
