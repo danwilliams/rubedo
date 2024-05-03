@@ -1,3 +1,7 @@
+#![cfg_attr(    feature = "reasons",  allow(clippy::std_instead_of_core,
+reason = "False positive due to bug: https://github.com/rust-lang/rust-clippy/issues/12438"
+))]
+#![cfg_attr(not(feature = "reasons"), allow(clippy::std_instead_of_core))]
 //! This module provides extensions to the Rust standard library.
 
 
