@@ -12,6 +12,14 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.5.3 (03 May 2024)
+
+### Changed
+
+  - Added lint exception due to [bug in Rust 1.78](https://github.com/rust-lang/rust-clippy/issues/12438)
+  - Updated crate dependencies
+
+
 ## 0.5.2 (02 April 2024)
 
 ### Changed
