@@ -747,8 +747,8 @@ impl ForceFrom<&[u8]> for SigningKey {
 	/// be padded with zeroes. If this situation needs checking, use
 	/// `try_from()` instead.
 	/// 
-	fn force_from(b: &[u8]) -> Self {
-		Self { key: RealSigningKey::force_from(b) }
+	fn force_from(value: &[u8]) -> Self {
+		Self { key: RealSigningKey::force_from(value) }
 	}
 }
 
@@ -763,8 +763,8 @@ impl<const N: usize> ForceFrom<&[u8; N]> for SigningKey {
 	/// be padded with zeroes. If this situation needs checking, use
 	/// `try_from()` instead.
 	/// 
-	fn force_from(b: &[u8; N]) -> Self {
-		Self::force_from(&b[..])
+	fn force_from(value: &[u8; N]) -> Self {
+		Self::force_from(&value[..])
 	}
 }
 
@@ -778,8 +778,8 @@ impl ForceFrom<Vec<u8>> for SigningKey {
 	/// will be padded with zeroes. If this situation needs checking, use
 	/// `try_from()` instead.
 	/// 
-	fn force_from(v: Vec<u8>) -> Self {
-		Self::force_from(&*v)
+	fn force_from(value: Vec<u8>) -> Self {
+		Self::force_from(&*value)
 	}
 }
 
@@ -793,8 +793,8 @@ impl ForceFrom<&Vec<u8>> for SigningKey {
 	/// will be padded with zeroes. If this situation needs checking, use
 	/// `try_from()` instead.
 	/// 
-	fn force_from(v: &Vec<u8>) -> Self {
-		Self::force_from(&**v)
+	fn force_from(value: &Vec<u8>) -> Self {
+		Self::force_from(&**value)
 	}
 }
 
@@ -1148,8 +1148,8 @@ impl ForceFrom<&[u8]> for VerifyingKey {
 	/// be padded with zeroes. If this situation needs checking, use
 	/// `try_from()` instead.
 	/// 
-	fn force_from(b: &[u8]) -> Self {
-		Self { key: RealVerifyingKey::force_from(b) }
+	fn force_from(value: &[u8]) -> Self {
+		Self { key: RealVerifyingKey::force_from(value) }
 	}
 }
 
@@ -1164,8 +1164,8 @@ impl<const N: usize> ForceFrom<&[u8; N]> for VerifyingKey {
 	/// be padded with zeroes. If this situation needs checking, use
 	/// `try_from()` instead.
 	/// 
-	fn force_from(b: &[u8; N]) -> Self {
-		Self::force_from(&b[..])
+	fn force_from(value: &[u8; N]) -> Self {
+		Self::force_from(&value[..])
 	}
 }
 
@@ -1179,8 +1179,8 @@ impl ForceFrom<Vec<u8>> for VerifyingKey {
 	/// will be padded with zeroes. If this situation needs checking, use
 	/// `try_from()` instead.
 	/// 
-	fn force_from(v: Vec<u8>) -> Self {
-		Self::force_from(&*v)
+	fn force_from(value: Vec<u8>) -> Self {
+		Self::force_from(&*value)
 	}
 }
 
@@ -1194,8 +1194,8 @@ impl ForceFrom<&Vec<u8>> for VerifyingKey {
 	/// will be padded with zeroes. If this situation needs checking, use
 	/// `try_from()` instead.
 	/// 
-	fn force_from(v: &Vec<u8>) -> Self {
-		Self::force_from(&**v)
+	fn force_from(value: &Vec<u8>) -> Self {
+		Self::force_from(&**value)
 	}
 }
 
@@ -1452,12 +1452,12 @@ impl ForceFrom<&[u8]> for RealSigningKey {
 	/// be padded with zeroes. If this situation needs checking, use
 	/// `try_from()` instead.
 	/// 
-	fn force_from(b: &[u8]) -> Self {
+	fn force_from(value: &[u8]) -> Self {
 		let mut array = [0_u8; 32];
-		let len       = b.len().min(32);
+		let len       = value.len().min(32);
 		#[cfg_attr(    feature = "reasons",  allow(clippy::indexing_slicing, reason = "Infallible"))]
 		#[cfg_attr(not(feature = "reasons"), allow(clippy::indexing_slicing))]
-		array[..len].copy_from_slice(&b[..len]);
+		array[..len].copy_from_slice(&value[..len]);
 		Self::from(array)
 	}
 }
@@ -1473,8 +1473,8 @@ impl<const N: usize> ForceFrom<&[u8; N]> for RealSigningKey {
 	/// be padded with zeroes. If this situation needs checking, use
 	/// `try_from()` instead.
 	/// 
-	fn force_from(b: &[u8; N]) -> Self {
-		Self::force_from(&b[..])
+	fn force_from(value: &[u8; N]) -> Self {
+		Self::force_from(&value[..])
 	}
 }
 
@@ -1488,8 +1488,8 @@ impl ForceFrom<Vec<u8>> for RealSigningKey {
 	/// will be padded with zeroes. If this situation needs checking, use
 	/// `try_from()` instead.
 	/// 
-	fn force_from(v: Vec<u8>) -> Self {
-		Self::force_from(&*v)
+	fn force_from(value: Vec<u8>) -> Self {
+		Self::force_from(&*value)
 	}
 }
 
@@ -1503,8 +1503,8 @@ impl ForceFrom<&Vec<u8>> for RealSigningKey {
 	/// will be padded with zeroes. If this situation needs checking, use
 	/// `try_from()` instead.
 	/// 
-	fn force_from(v: &Vec<u8>) -> Self {
-		Self::force_from(&**v)
+	fn force_from(value: &Vec<u8>) -> Self {
+		Self::force_from(&**value)
 	}
 }
 
@@ -1601,12 +1601,12 @@ impl ForceFrom<&[u8]> for RealVerifyingKey {
 	/// [`VerifyingKey::from_bytes()`](RealVerifyingKey::from_bytes) instead
 	/// (which will be default unless this method is specifically called).
 	/// 
-	fn force_from(b: &[u8]) -> Self {
+	fn force_from(value: &[u8]) -> Self {
 		let mut array = [0_u8; 32];
-		let len       = b.len().min(32);
+		let len       = value.len().min(32);
 		#[cfg_attr(    feature = "reasons",  allow(clippy::indexing_slicing, reason = "Infallible"))]
 		#[cfg_attr(not(feature = "reasons"), allow(clippy::indexing_slicing))]
-		array[..len].copy_from_slice(&b[..len]);
+		array[..len].copy_from_slice(&value[..len]);
 		#[cfg_attr(    feature = "reasons",  allow(clippy::unwrap_used, reason = "Infallible"))]
 		#[cfg_attr(not(feature = "reasons"), allow(clippy::unwrap_used))]
 		Self::from_bytes(&array).unwrap_or_else(|_| Self::from_bytes(&[0_u8; 32]).unwrap())
@@ -1624,8 +1624,8 @@ impl<const N: usize> ForceFrom<&[u8; N]> for RealVerifyingKey {
 	/// be padded with zeroes. If this situation needs checking, use
 	/// `try_from()` instead.
 	/// 
-	fn force_from(b: &[u8; N]) -> Self {
-		Self::force_from(&b[..])
+	fn force_from(value: &[u8; N]) -> Self {
+		Self::force_from(&value[..])
 	}
 }
 
@@ -1639,8 +1639,8 @@ impl ForceFrom<Vec<u8>> for RealVerifyingKey {
 	/// will be padded with zeroes. If this situation needs checking, use
 	/// `try_from()` instead.
 	/// 
-	fn force_from(v: Vec<u8>) -> Self {
-		Self::force_from(&*v)
+	fn force_from(value: Vec<u8>) -> Self {
+		Self::force_from(&*value)
 	}
 }
 
@@ -1654,8 +1654,8 @@ impl ForceFrom<&Vec<u8>> for RealVerifyingKey {
 	/// will be padded with zeroes. If this situation needs checking, use
 	/// `try_from()` instead.
 	/// 
-	fn force_from(v: &Vec<u8>) -> Self {
-		Self::force_from(&**v)
+	fn force_from(value: &Vec<u8>) -> Self {
+		Self::force_from(&**value)
 	}
 }
 

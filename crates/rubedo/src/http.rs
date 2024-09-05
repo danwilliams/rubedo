@@ -774,8 +774,8 @@ impl Add<&[u8]> for UnpackedResponseBody {
 	//		add																	
 	/// Adds a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html) to
 	/// an [`UnpackedResponseBody`].
-	fn add(mut self, other: &[u8]) -> Self {
-		self.push_bytes(other);
+	fn add(mut self, rhs: &[u8]) -> Self {
+		self.push_bytes(rhs);
 		self
 	}
 }
@@ -787,8 +787,8 @@ impl<const N: usize> Add<&[u8; N]> for UnpackedResponseBody {
 	//		add																	
 	/// Adds a [`&[u8; N]`](https://doc.rust-lang.org/std/primitive.slice.html)
 	/// to an [`UnpackedResponseBody`].
-	fn add(mut self, other: &[u8; N]) -> Self {
-		self.push_bytes(other);
+	fn add(mut self, rhs: &[u8; N]) -> Self {
+		self.push_bytes(rhs);
 		self
 	}
 }
@@ -799,8 +799,8 @@ impl Add<char> for UnpackedResponseBody {
 	
 	//		add																	
 	/// Adds a [`char`] to an [`UnpackedResponseBody`].
-	fn add(mut self, other: char) -> Self {
-		self.push_char(&other);
+	fn add(mut self, rhs: char) -> Self {
+		self.push_char(&rhs);
 		self
 	}
 }
@@ -811,8 +811,8 @@ impl Add<&char> for UnpackedResponseBody {
 	
 	//		add																	
 	/// Adds a [`&char`](char) to an [`UnpackedResponseBody`].
-	fn add(mut self, other: &char) -> Self {
-		self.push_char(other);
+	fn add(mut self, rhs: &char) -> Self {
+		self.push_char(rhs);
 		self
 	}
 }
@@ -823,8 +823,8 @@ impl Add<&str> for UnpackedResponseBody {
 	
 	//		add																	
 	/// Adds a [`&str`](str) to an [`UnpackedResponseBody`].
-	fn add(mut self, other: &str) -> Self {
-		self.push_str(other);
+	fn add(mut self, rhs: &str) -> Self {
+		self.push_str(rhs);
 		self
 	}
 }
@@ -835,8 +835,8 @@ impl Add<String> for UnpackedResponseBody {
 	
 	//		add																	
 	/// Adds a [`String`] to an [`UnpackedResponseBody`].
-	fn add(mut self, other: String) -> Self {
-		self.push_str(&other);
+	fn add(mut self, rhs: String) -> Self {
+		self.push_str(&rhs);
 		self
 	}
 }
@@ -847,8 +847,8 @@ impl Add<&String> for UnpackedResponseBody {
 	
 	//		add																	
 	/// Adds a [`&String`](String) to an [`UnpackedResponseBody`].
-	fn add(mut self, other: &String) -> Self {
-		self.push_str(other);
+	fn add(mut self, rhs: &String) -> Self {
+		self.push_str(rhs);
 		self
 	}
 }
@@ -859,8 +859,8 @@ impl Add<Box<str>> for UnpackedResponseBody {
 	
 	//		add																	
 	/// Adds a [boxed](Box) [string](str) slice to an [`UnpackedResponseBody`].
-	fn add(mut self, other: Box<str>) -> Self::Output {
-		self.push_str(&other);
+	fn add(mut self, rhs: Box<str>) -> Self::Output {
+		self.push_str(&rhs);
 		self
 	}
 }
@@ -872,8 +872,8 @@ impl<'a> Add<Cow<'a, str>> for UnpackedResponseBody {
 	//		add																	
 	/// Adds a [clone-on-write](Cow) [string](str) to an
 	/// [`UnpackedResponseBody`].
-	fn add(mut self, other: Cow<'a, str>) -> Self::Output {
-		self.push_str(&other);
+	fn add(mut self, rhs: Cow<'a, str>) -> Self::Output {
+		self.push_str(&rhs);
 		self
 	}
 }
@@ -884,8 +884,8 @@ impl Add<u8> for UnpackedResponseBody {
 	
 	//		add																	
 	/// Adds a [`u8`] to an [`UnpackedResponseBody`].
-	fn add(mut self, other: u8) -> Self {
-		self.push(other);
+	fn add(mut self, rhs: u8) -> Self {
+		self.push(rhs);
 		self
 	}
 }
@@ -896,8 +896,8 @@ impl Add<Vec<u8>> for UnpackedResponseBody {
 	
 	//		add																	
 	/// Adds a [`Vec[u8]`](Vec) to an [`UnpackedResponseBody`].
-	fn add(mut self, other: Vec<u8>) -> Self {
-		self.push_bytes(&other);
+	fn add(mut self, rhs: Vec<u8>) -> Self {
+		self.push_bytes(&rhs);
 		self
 	}
 }
@@ -908,8 +908,8 @@ impl Add<&Vec<u8>> for UnpackedResponseBody {
 	
 	//		add																	
 	/// Adds a [`&Vec[u8]`](Vec) to an [`UnpackedResponseBody`].
-	fn add(mut self, other: &Vec<u8>) -> Self {
-		self.push_bytes(other);
+	fn add(mut self, rhs: &Vec<u8>) -> Self {
+		self.push_bytes(rhs);
 		self
 	}
 }
@@ -920,8 +920,8 @@ impl Add<Self> for UnpackedResponseBody {
 	
 	//		add																	
 	/// Adds an [`UnpackedResponseBody`] to an [`UnpackedResponseBody`].
-	fn add(mut self, other: Self) -> Self {
-		self.push_bytes(&other.body);
+	fn add(mut self, rhs: Self) -> Self {
+		self.push_bytes(&rhs.body);
 		self
 	}
 }
@@ -933,8 +933,8 @@ impl Add<&Self> for UnpackedResponseBody {
 	//		add																	
 	/// Adds an [`&UnpackedResponseBody`](UnpackedResponseBody) to an
 	/// [`UnpackedResponseBody`].
-	fn add(mut self, other: &Self) -> Self {
-		self.push_bytes(other.as_bytes());
+	fn add(mut self, rhs: &Self) -> Self {
+		self.push_bytes(rhs.as_bytes());
 		self
 	}
 }
@@ -944,8 +944,8 @@ impl AddAssign<&[u8]> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [`&[u8]`](https://doc.rust-lang.org/std/primitive.slice.html) to
 	/// an [`UnpackedResponseBody`].
-	fn add_assign(&mut self, other: &[u8]) {
-		self.push_bytes(other);
+	fn add_assign(&mut self, rhs: &[u8]) {
+		self.push_bytes(rhs);
 	}
 }
 
@@ -954,8 +954,8 @@ impl<const N: usize> AddAssign<&[u8; N]> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [`&[u8; N]`](https://doc.rust-lang.org/std/primitive.slice.html)
 	/// to an [`UnpackedResponseBody`].
-	fn add_assign(&mut self, other: &[u8; N]) {
-		self.push_bytes(other);
+	fn add_assign(&mut self, rhs: &[u8; N]) {
+		self.push_bytes(rhs);
 	}
 }
 
@@ -963,8 +963,8 @@ impl<const N: usize> AddAssign<&[u8; N]> for UnpackedResponseBody {
 impl AddAssign<char> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [`char`] to an [`UnpackedResponseBody`].
-	fn add_assign(&mut self, other: char) {
-		self.push_char(&other);
+	fn add_assign(&mut self, rhs: char) {
+		self.push_char(&rhs);
 	}
 }
 
@@ -972,8 +972,8 @@ impl AddAssign<char> for UnpackedResponseBody {
 impl AddAssign<&char> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [`&char`](char) to an [`UnpackedResponseBody`].
-	fn add_assign(&mut self, other: &char) {
-		self.push_char(other);
+	fn add_assign(&mut self, rhs: &char) {
+		self.push_char(rhs);
 	}
 }
 
@@ -981,8 +981,8 @@ impl AddAssign<&char> for UnpackedResponseBody {
 impl AddAssign<&str> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [`&str`](str) to an [`UnpackedResponseBody`].
-	fn add_assign(&mut self, other: &str) {
-		self.push_str(other);
+	fn add_assign(&mut self, rhs: &str) {
+		self.push_str(rhs);
 	}
 }
 
@@ -990,8 +990,8 @@ impl AddAssign<&str> for UnpackedResponseBody {
 impl AddAssign<String> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [`String`] to an [`UnpackedResponseBody`].
-	fn add_assign(&mut self, other: String) {
-		self.push_str(&other);
+	fn add_assign(&mut self, rhs: String) {
+		self.push_str(&rhs);
 	}
 }
 
@@ -999,8 +999,8 @@ impl AddAssign<String> for UnpackedResponseBody {
 impl AddAssign<&String> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [`&String`](String) to an [`UnpackedResponseBody`].
-	fn add_assign(&mut self, other: &String) {
-		self.push_str(other);
+	fn add_assign(&mut self, rhs: &String) {
+		self.push_str(rhs);
 	}
 }
 
@@ -1008,8 +1008,8 @@ impl AddAssign<&String> for UnpackedResponseBody {
 impl AddAssign<Box<str>> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [boxed](Box) [string](str) slice to an [`UnpackedResponseBody`].
-	fn add_assign(&mut self, other: Box<str>) {
-		self.push_str(&other);
+	fn add_assign(&mut self, rhs: Box<str>) {
+		self.push_str(&rhs);
 	}
 }
 
@@ -1018,8 +1018,8 @@ impl<'a> AddAssign<Cow<'a, str>> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [clone-on-write](Cow) [string](str) to an
 	/// [`UnpackedResponseBody`].
-	fn add_assign(&mut self, other: Cow<'a, str>){
-		self.push_str(&other);
+	fn add_assign(&mut self, rhs: Cow<'a, str>){
+		self.push_str(&rhs);
 	}
 }
 
@@ -1027,8 +1027,8 @@ impl<'a> AddAssign<Cow<'a, str>> for UnpackedResponseBody {
 impl AddAssign<u8> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [`u8`] to an [`UnpackedResponseBody`].
-	fn add_assign(&mut self, other: u8) {
-		self.push(other);
+	fn add_assign(&mut self, rhs: u8) {
+		self.push(rhs);
 	}
 }
 
@@ -1036,8 +1036,8 @@ impl AddAssign<u8> for UnpackedResponseBody {
 impl AddAssign<Vec<u8>> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [`Vec[u8]`](Vec) to an [`UnpackedResponseBody`].
-	fn add_assign(&mut self, other: Vec<u8>) {
-		self.push_bytes(&other);
+	fn add_assign(&mut self, rhs: Vec<u8>) {
+		self.push_bytes(&rhs);
 	}
 }
 
@@ -1045,8 +1045,8 @@ impl AddAssign<Vec<u8>> for UnpackedResponseBody {
 impl AddAssign<&Vec<u8>> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds a [`&Vec[u8]`](Vec) to an [`UnpackedResponseBody`].
-	fn add_assign(&mut self, other: &Vec<u8>) {
-		self.push_bytes(other);
+	fn add_assign(&mut self, rhs: &Vec<u8>) {
+		self.push_bytes(rhs);
 	}
 }
 
@@ -1054,8 +1054,8 @@ impl AddAssign<&Vec<u8>> for UnpackedResponseBody {
 impl AddAssign<Self> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds an [`UnpackedResponseBody`] to an [`UnpackedResponseBody`].
-	fn add_assign(&mut self, other: Self) {
-		self.push_bytes(&other.body);
+	fn add_assign(&mut self, rhs: Self) {
+		self.push_bytes(&rhs.body);
 	}
 }
 
@@ -1064,8 +1064,8 @@ impl AddAssign<&Self> for UnpackedResponseBody {
 	//		add_assign															
 	/// Adds an [`&UnpackedResponseBody`](UnpackedResponseBody) to an
 	/// [`UnpackedResponseBody`].
-	fn add_assign(&mut self, other: &Self) {
-		self.push_bytes(other.as_bytes());
+	fn add_assign(&mut self, rhs: &Self) {
+		self.push_bytes(rhs.as_bytes());
 	}
 }
 
