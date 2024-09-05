@@ -66,10 +66,7 @@ mod variants {
 	
 	//		variants!															
 	#[test]
-	#[cfg_attr(    feature = "reasons",  allow(trivial_casts,
-		reason = "Trivial cast here is needed for the test"
-	))]
-	#[cfg_attr(not(feature = "reasons"), allow(trivial_casts))]
+	#[expect(trivial_casts, reason = "Trivial cast here is needed for the test")]
 	fn variants__empty() {
 		assert_eq!(variants![] as Vec<Position>, vec![]);
 		assert_eq!(variants!() as Vec<Position>, vec![]);
@@ -111,10 +108,7 @@ mod variants_hashset {
 	
 	//		variants_hashset!													
 	#[test]
-	#[cfg_attr(    feature = "reasons",  allow(trivial_casts,
-		reason = "Trivial cast here is needed for the test"
-	))]
-	#[cfg_attr(not(feature = "reasons"), allow(trivial_casts))]
+	#[expect(trivial_casts, reason = "Trivial cast here is needed for the test")]
 	fn variants__empty() {
 		assert_eq!(variants_hashset![] as HashSet<Position>, HashSet::new());
 		assert_eq!(variants_hashset!() as HashSet<Position>, HashSet::new());

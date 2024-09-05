@@ -77,28 +77,23 @@ pub trait DurationExt {
 	/// The [`Duration`] struct stores its value as a number of seconds and
 	/// nanoseconds, but artificially limits the number of seconds so that the
 	/// milliseconds will never overflow.
-	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
-	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
+	#[expect(clippy::integer_division, reason = "Precision is not needed here")]
 	const MAX_SECONDS:           i64  = i64::MAX / 1_000;
 	
 	/// The maximum number of minutes that can be represented by a [`Duration`].
-	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
-	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
+	#[expect(clippy::integer_division, reason = "Precision is not needed here")]
 	const MAX_MINUTES:           i64  = i64::MAX / 1_000 / 60;
 	
 	/// The maximum number of hours that can be represented by a [`Duration`].
-	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
-	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
+	#[expect(clippy::integer_division, reason = "Precision is not needed here")]
 	const MAX_HOURS:             i64  = i64::MAX / 1_000 / 60 / 60;
 	
 	/// The maximum number of days that can be represented by a [`Duration`].
-	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
-	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
+	#[expect(clippy::integer_division, reason = "Precision is not needed here")]
 	const MAX_DAYS:              i64  = i64::MAX / 1_000 / 60 / 60 / 24;
 	
 	/// The maximum number of weeks that can be represented by a [`Duration`].
-	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
-	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
+	#[expect(clippy::integer_division, reason = "Precision is not needed here")]
 	const MAX_WEEKS:             i64  = i64::MAX / 1_000 / 60 / 60 / 24 / 7;
 	
 	/// The minimum number of nanoseconds that can be represented by a
@@ -160,28 +155,23 @@ pub trait DurationExt {
 	/// The [`Duration`] struct stores its value as a number of seconds and
 	/// nanoseconds, but artificially limits the number of seconds so that the
 	/// milliseconds will never overflow.
-	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
-	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
+	#[expect(clippy::integer_division, reason = "Precision is not needed here")]
 	const MIN_SECONDS:           i64  = i64::MIN / 1_000;
 	
 	/// The minimum number of minutes that can be represented by a [`Duration`].
-	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
-	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
+	#[expect(clippy::integer_division, reason = "Precision is not needed here")]
 	const MIN_MINUTES:           i64  = i64::MIN / 1_000 / 60;
 	
 	/// The minimum number of hours that can be represented by a [`Duration`].
-	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
-	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
+	#[expect(clippy::integer_division, reason = "Precision is not needed here")]
 	const MIN_HOURS:             i64  = i64::MIN / 1_000 / 60 / 60;
 	
 	/// The minimum number of days that can be represented by a [`Duration`].
-	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
-	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
+	#[expect(clippy::integer_division, reason = "Precision is not needed here")]
 	const MIN_DAYS:              i64  = i64::MIN / 1_000 / 60 / 60 / 24;
 	
 	/// The minimum number of weeks that can be represented by a [`Duration`].
-	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
-	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
+	#[expect(clippy::integer_division, reason = "Precision is not needed here")]
 	const MIN_WEEKS:             i64  = i64::MIN / 1_000 / 60 / 60 / 24 / 7;
 	
 	/// The units used by [`humanize()`](DurationExt::humanize()). These
@@ -290,14 +280,8 @@ impl DurationExt for Duration {
 		let seconds = self.num_seconds();
 		for &(unit, name) in &Self::UNITS {
 			if seconds >= unit {
-				#[cfg_attr(    feature = "reasons",  allow(clippy::arithmetic_side_effects,
-					reason = "Precision is not needed here, and unit cannot be zero"
-				))]
-				#[cfg_attr(not(feature = "reasons"), allow(clippy::arithmetic_side_effects))]
-				#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division,
-					reason = "Precision is not needed here"
-				))]
-				#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
+				#[expect(clippy::arithmetic_side_effects, reason = "Precision is not needed here, and unit cannot be zero")]
+				#[expect(clippy::integer_division,        reason = "Precision is not needed here")]
 				let count = seconds / unit;
 				return format!("{} {}{}", count, name, if count == 1 { "" } else { "s" });
 			}
@@ -310,8 +294,7 @@ impl DurationExt for Duration {
 		if !(Self::MIN_NANOSECONDS_FULL..=Self::MAX_NANOSECONDS_FULL).contains(&nanoseconds) {
 			return None;
 		}
-		#[cfg_attr(    feature = "reasons",  allow(clippy::cast_possible_truncation, reason = "Range is controlled"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_possible_truncation))]
+		#[expect(clippy::cast_possible_truncation, reason = "Range is controlled")]
 		if (i128::from(Self::MIN_NANOSECONDS)..=i128::from(Self::MAX_NANOSECONDS)).contains(&nanoseconds) {
 			Some(Self::nanoseconds(nanoseconds as i64))
 		} else if nanoseconds < 0 {
@@ -330,8 +313,7 @@ impl DurationExt for Duration {
 		if !(Self::MIN_MICROSECONDS_FULL..=Self::MAX_MICROSECONDS_FULL).contains(&microseconds) {
 			return None;
 		}
-		#[cfg_attr(    feature = "reasons",  allow(clippy::cast_possible_truncation, reason = "Range is controlled"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_possible_truncation))]
+		#[expect(clippy::cast_possible_truncation, reason = "Range is controlled")]
 		if (i128::from(Self::MIN_MICROSECONDS)..=i128::from(Self::MAX_MICROSECONDS)).contains(&microseconds) {
 			Some(Self::microseconds(microseconds as i64))
 		} else if microseconds < 0 {
@@ -369,8 +351,7 @@ pub trait MonthsExt {
 	const MAX_MONTHS: u32 = u32::MAX;
 	
 	/// The maximum number of years that can be represented by a [`Months`].
-	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
-	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
+	#[expect(clippy::integer_division, reason = "Precision is not needed here")]
 	const MAX_YEARS:  u32 = u32::MAX / 12;
 	
 	//		months																
@@ -438,8 +419,7 @@ impl MonthsExt for Months {
 	}
 	
 	//		num_years															
-	#[cfg_attr(    feature = "reasons",  allow(clippy::integer_division, reason = "Precision is not needed here"))]
-	#[cfg_attr(not(feature = "reasons"), allow(clippy::integer_division))]
+	#[expect(clippy::integer_division, reason = "Precision is not needed here")]
 	fn num_years(&self) -> u32 {
 		self.as_u32() / 12
 	}
@@ -689,8 +669,7 @@ impl NaiveDateExt for NaiveDate {
 	
 	//		days_in_month														
 	fn days_in_month(&self) -> u32 {
-		#[cfg_attr(    feature = "reasons",  allow(clippy::unwrap_used, reason = "Infallible"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::unwrap_used))]
+		#[expect(clippy::unwrap_used, reason = "Infallible")]
 		Self::days_in_month_opt(self.year(), self.month()).unwrap()
 	}
 	
@@ -701,8 +680,7 @@ impl NaiveDateExt for NaiveDate {
 	
 	//		days_in_year														
 	fn days_in_year(&self) -> u32 {
-		#[cfg_attr(    feature = "reasons",  allow(clippy::unwrap_used, reason = "Infallible"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::unwrap_used))]
+		#[expect(clippy::unwrap_used, reason = "Infallible")]
 		Self::days_in_year_opt(self.year()).unwrap()
 	}
 	
@@ -713,8 +691,7 @@ impl NaiveDateExt for NaiveDate {
 	
 	//		is_leap_year														
 	fn is_leap_year(&self) -> bool {
-		#[cfg_attr(    feature = "reasons",  allow(clippy::unwrap_used, reason = "Infallible"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::unwrap_used))]
+		#[expect(clippy::unwrap_used, reason = "Infallible")]
 		Self::is_leap_year_opt(self.year()).unwrap()
 	}
 	
@@ -725,8 +702,7 @@ impl NaiveDateExt for NaiveDate {
 	
 	//		start_of_month														
 	fn start_of_month(&self) -> Self {
-		#[cfg_attr(    feature = "reasons",  allow(clippy::unwrap_used, reason = "Infallible"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::unwrap_used))]
+		#[expect(clippy::unwrap_used, reason = "Infallible")]
 		Self::start_of_month_opt(self.year(), self.month()).unwrap()
 	}
 	
@@ -737,8 +713,7 @@ impl NaiveDateExt for NaiveDate {
 	
 	//		end_of_month														
 	fn end_of_month(&self) -> Self {
-		#[cfg_attr(    feature = "reasons",  allow(clippy::unwrap_used, reason = "Infallible"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::unwrap_used))]
+		#[expect(clippy::unwrap_used, reason = "Infallible")]
 		Self::end_of_month_opt(self.year(), self.month()).unwrap()
 	}
 	
@@ -748,8 +723,7 @@ impl NaiveDateExt for NaiveDate {
 		//	The range of years is controlled by having already validated the date
 		//	by attempting to create it above. This is well within the range of a u32.
 		//	The same applies to the month.
-		#[cfg_attr(    feature = "reasons",  allow(clippy::arithmetic_side_effects, reason = "Range is controlled"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::arithmetic_side_effects))]
+		#[expect(clippy::arithmetic_side_effects, reason = "Range is controlled")]
 		Self::from_ymd_opt(
 			if month == 12 { year + 1 } else { year      },
 			if month == 12 { month    } else { month + 1 },
@@ -759,8 +733,7 @@ impl NaiveDateExt for NaiveDate {
 	
 	//		start_of_year														
 	fn start_of_year(&self) -> Self {
-		#[cfg_attr(    feature = "reasons",  allow(clippy::unwrap_used, reason = "Infallible"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::unwrap_used))]
+		#[expect(clippy::unwrap_used, reason = "Infallible")]
 		Self::start_of_year_opt(self.year()).unwrap()
 	}
 	
@@ -771,8 +744,7 @@ impl NaiveDateExt for NaiveDate {
 	
 	//		end_of_year															
 	fn end_of_year(&self) -> Self {
-		#[cfg_attr(    feature = "reasons",  allow(clippy::unwrap_used, reason = "Infallible"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::unwrap_used))]
+		#[expect(clippy::unwrap_used, reason = "Infallible")]
 		Self::end_of_year_opt(self.year()).unwrap()
 	}
 	

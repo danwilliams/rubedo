@@ -326,8 +326,7 @@ impl ForceFrom<&[u8]> for $t {
 	fn force_from(b: &[u8]) -> Self {
 		let mut array = [0_u8; $s];
 		let len       = b.len().min($s);
-		#[cfg_attr(    feature = "reasons",  allow(clippy::indexing_slicing, reason = "Infallible"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::indexing_slicing))]
+		#[expect(clippy::indexing_slicing, reason = "Infallible")]
 		array[..len].copy_from_slice(&b[..len]);
 		Self::from(array)
 	}
@@ -995,10 +994,7 @@ impl ByteSized<32> for VerifyingKey {
 	/// [`VerifyingKey::from_bytes()`](RealVerifyingKey::from_bytes()) instead.
 	/// 
 	fn from_bytes(bytes: [u8; 32]) -> Self {
-		#[cfg_attr(    feature = "reasons",  allow(clippy::option_if_let_else,
-			reason = "Using map_or_else() here would not be as clear, and no more concise"
-		))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::option_if_let_else))]
+		#[expect(clippy::option_if_let_else, reason = "Using map_or_else() here would not be as clear, and no more concise")]
 		match RealVerifyingKey::from_bytes(&bytes) {
 			Ok(key) => Self { key },
 			Err(_)  => Self::default(),
@@ -1054,8 +1050,7 @@ impl Debug for VerifyingKey {
 impl Default for VerifyingKey {
 	//		default																
 	fn default() -> Self {
-		#[cfg_attr(    feature = "reasons",  allow(clippy::unwrap_used, reason = "Infallible"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::unwrap_used))]
+		#[expect(clippy::unwrap_used, reason = "Infallible")]
 		Self { key: RealVerifyingKey::from_bytes(&[0; 32]).unwrap() }
 	}
 }
@@ -1455,8 +1450,7 @@ impl ForceFrom<&[u8]> for RealSigningKey {
 	fn force_from(value: &[u8]) -> Self {
 		let mut array = [0_u8; 32];
 		let len       = value.len().min(32);
-		#[cfg_attr(    feature = "reasons",  allow(clippy::indexing_slicing, reason = "Infallible"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::indexing_slicing))]
+		#[expect(clippy::indexing_slicing, reason = "Infallible")]
 		array[..len].copy_from_slice(&value[..len]);
 		Self::from(array)
 	}
@@ -1553,8 +1547,7 @@ impl ByteSized<32> for RealVerifyingKey {
 	/// (which will be default unless this method is specifically called).
 	/// 
 	fn from_bytes(bytes: [u8; 32]) -> Self {
-		#[cfg_attr(    feature = "reasons",  allow(clippy::unwrap_used, reason = "Infallible"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::unwrap_used))]
+		#[expect(clippy::unwrap_used, reason = "Infallible")]
 		Self::from_bytes(&bytes).unwrap_or_else(|_| Self::from_bytes(&[0_u8; 32]).unwrap())
 	}
 	
@@ -1604,11 +1597,9 @@ impl ForceFrom<&[u8]> for RealVerifyingKey {
 	fn force_from(value: &[u8]) -> Self {
 		let mut array = [0_u8; 32];
 		let len       = value.len().min(32);
-		#[cfg_attr(    feature = "reasons",  allow(clippy::indexing_slicing, reason = "Infallible"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::indexing_slicing))]
+		#[expect(clippy::indexing_slicing, reason = "Infallible")]
 		array[..len].copy_from_slice(&value[..len]);
-		#[cfg_attr(    feature = "reasons",  allow(clippy::unwrap_used, reason = "Infallible"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::unwrap_used))]
+		#[expect(clippy::unwrap_used, reason = "Infallible")]
 		Self::from_bytes(&array).unwrap_or_else(|_| Self::from_bytes(&[0_u8; 32]).unwrap())
 	}
 }

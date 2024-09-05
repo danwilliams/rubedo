@@ -472,7 +472,7 @@ mod iterator_ext {
 	use super::*;
 	
 	//		limit																
-	#[allow(clippy::needless_collect)]
+	#[expect(clippy::needless_collect, reason = "Consistency with the other tests")]
 	#[test]
 	fn limit__empty() {
 		let vec:    Vec<usize> = Vec::new();
@@ -508,7 +508,7 @@ mod path_ext {
 	use super::*;
 	
 	//		append																
-	#[allow(clippy::unnecessary_to_owned)]
+	#[expect(clippy::unnecessary_to_owned, reason = "Needed for the test")]
 	#[test]
 	fn append() {
 		let mut path: PathBuf;
@@ -631,8 +631,8 @@ mod path_ext {
 	}
 
 	//		restrict															
-	#[allow(clippy::needless_borrows_for_generic_args)]
-	#[allow(clippy::unnecessary_to_owned)]
+	#[expect(clippy::needless_borrows_for_generic_args, reason = "Needed for the test")]
+	#[expect(clippy::unnecessary_to_owned,              reason = "Also needed for the test")]
 	#[test]
 	fn restrict() {
 		let cwd = env::current_dir().unwrap();

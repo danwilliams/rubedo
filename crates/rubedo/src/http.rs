@@ -21,6 +21,7 @@ use base64::{DecodeError, engine::{Engine as _, general_purpose::STANDARD as BAS
 use core::{
 	cmp::Ordering,
 	convert::Infallible,
+	error::Error,
 	fmt::{Debug, Display, Write, self},
 	ops::{Add, AddAssign},
 	str::FromStr,
@@ -35,10 +36,7 @@ use hyper::{
 };
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as DeError};
 use serde_json::Value as Json;
-use std::{
-	borrow::Cow,
-	error::Error,
-};
+use std::borrow::Cow;
 
 
 
@@ -56,8 +54,7 @@ use std::{
 /// This enum is exhaustive and will never have any additional variants added
 /// to it, as all possibilities are already covered.
 /// 
-#[cfg_attr(    feature = "reasons",  allow(clippy::exhaustive_enums, reason = "Exhaustive"))]
-#[cfg_attr(not(feature = "reasons"), allow(clippy::exhaustive_enums))]
+#[expect(clippy::exhaustive_enums, reason = "Exhaustive")]
 #[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
 pub enum ContentType {
 	/// The response body is text. It will be represented as an ordinary
@@ -83,8 +80,7 @@ pub enum ResponseError {
 impl Display for ResponseError {
 	//		fmt																	
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		#[cfg_attr(    feature = "reasons",  allow(clippy::pattern_type_mismatch, reason = "Cannot dereference a Box"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::pattern_type_mismatch))]
+		#[expect(clippy::pattern_type_mismatch, reason = "Cannot dereference a Box")]
 		let description = match self {
 			Self::ConversionError(err) => format!("Error encountered while converting response body to bytes: {err}"),
 		};
@@ -211,7 +207,7 @@ impl UnpackedResponse {
 	/// * `body`    - The response body. See [`body`](UnpackedResponse::body).
 	/// 
 	#[must_use]
-	pub fn new_from_parts(
+	pub const fn new_from_parts(
 		status:  StatusCode,
 		headers: Vec<UnpackedResponseHeader>,
 		body:    UnpackedResponseBody
@@ -246,8 +242,7 @@ impl PartialEq for UnpackedResponse {
 /// 
 /// * [`UnpackedResponse`]
 /// 
-#[cfg_attr(    feature = "reasons",  allow(clippy::exhaustive_structs, reason = "Exhaustive"))]
-#[cfg_attr(not(feature = "reasons"), allow(clippy::exhaustive_structs))]
+#[expect(clippy::exhaustive_structs, reason = "Exhaustive")]
 #[derive(Debug, Deserialize, Serialize)]
 pub struct UnpackedResponseHeader {
 	//		Public properties													
@@ -740,8 +735,7 @@ impl UnpackedResponseBody {
 	pub fn push_char(&mut self, char: &char) {
 		let mut bytes = [0; 4];
 		let used      = char.encode_utf8(&mut bytes).len();
-		#[cfg_attr(    feature = "reasons",  allow(clippy::indexing_slicing, reason = "Infallible"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::indexing_slicing))]
+		#[expect(clippy::indexing_slicing, reason = "Infallible")]
 		self.body.extend(&bytes[..used]);
 	}
 	
@@ -1193,8 +1187,7 @@ impl From<char> for UnpackedResponseBody {
 	fn from(c: char) -> Self {
 		let mut bytes = [0; 4];
 		let used      = c.encode_utf8(&mut bytes).len();
-		#[cfg_attr(    feature = "reasons",  allow(clippy::indexing_slicing, reason = "Infallible"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::indexing_slicing))]
+		#[expect(clippy::indexing_slicing, reason = "Infallible")]
 		Self { body: bytes[..used].to_vec(), ..Default::default() }
 	}
 }
@@ -1417,10 +1410,7 @@ impl <'de> Deserialize<'de> for UnpackedResponseBody {
 		D: Deserializer<'de>,
 	{
 		let string = String::deserialize(deserializer)?;
-		#[cfg_attr(    feature = "reasons",  allow(clippy::option_if_let_else,
-			reason = "Using map_or_else() here would not be as clear, and no more concise"
-		))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::option_if_let_else))]
+		#[expect(clippy::option_if_let_else, reason = "Using map_or_else() here would not be as clear, and no more concise")]
 		match BASE64.decode(&string) {
 			Ok(decoded) => Ok(Self { body: decoded,             content_type: ContentType::Binary }),
 			Err(_)      => Ok(Self { body: string.into_bytes(), content_type: ContentType::Text }),
@@ -1552,8 +1542,7 @@ impl ResponseExt for Response<String> {
 /// 
 fn convert_headers(headermap: &HeaderMap<HeaderValue>) -> Vec<UnpackedResponseHeader> {
 	let mut headers = vec![];
-	#[cfg_attr(    feature = "reasons",  allow(clippy::shadow_reuse, reason = "Clear purpose"))]
-	#[cfg_attr(not(feature = "reasons"), allow(clippy::shadow_reuse))]
+	#[expect(clippy::shadow_reuse, reason = "Clear purpose")]
 	for (name, value) in headermap {
 		let name    = name.as_str().to_owned();
 		let value   = String::from_utf8_lossy(value.as_bytes()).into_owned();
@@ -1624,8 +1613,7 @@ fn convert_response(
 /// * [`http::StatusCode`]
 /// * [`UnpackedResponse`]
 /// 
-#[cfg_attr(    feature = "reasons",  allow(clippy::trivially_copy_pass_by_ref, reason = "Needs to match trait"))]
-#[cfg_attr(not(feature = "reasons"), allow(clippy::trivially_copy_pass_by_ref))]
+#[expect(clippy::trivially_copy_pass_by_ref, reason = "Needs to match trait")]
 fn serialize_status_code<S>(status_code: &StatusCode, serializer: S) -> Result<S::Ok, S::Error>
 where
 	S: Serializer,

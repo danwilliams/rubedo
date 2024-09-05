@@ -500,13 +500,13 @@ fn from_str__int() {
 	let test: IntFromStr = serde_json::from_str(r#"{"foo":"1234"}"#).unwrap();
 	assert_eq!(test.foo, 1234);
 }
-#[allow(clippy::float_cmp)]
+#[expect(clippy::float_cmp, reason = "Acceptable for the test")]
 #[test]
 fn from_str__float() {
 	let test: FloatFromStr = serde_json::from_str(r#"{"foo":"12.34"}"#).unwrap();
 	assert_eq!(test.foo, 12.34);
 }
-#[allow(clippy::bool_assert_comparison)]
+#[expect(clippy::bool_assert_comparison, reason = "Consistency with the other tests")]
 #[test]
 fn from_str__bool() {
 	let test: BoolFromStr = serde_json::from_str(r#"{"foo":"true"}"#).unwrap();
@@ -641,7 +641,7 @@ fn try_from__string_absent() {
 }
 
 //		try_from_int_1dp__f32_u8												
-#[allow(clippy::float_cmp)]
+#[expect(clippy::float_cmp, reason = "Acceptable for the test")]
 #[test]
 fn try_from_int_1dp__f32_u8() {
 	let test: F32TryFromInt1DpU8 = serde_json::from_str(r#"{"foo":123}"#).unwrap();
@@ -649,7 +649,7 @@ fn try_from_int_1dp__f32_u8() {
 }
 
 //		try_from_int_2dp__f64_u16												
-#[allow(clippy::float_cmp)]
+#[expect(clippy::float_cmp, reason = "Acceptable for the test")]
 #[test]
 fn try_from_int_2dp__f64_u16() {
 	let test: F64TryFromInt2DpU16 = serde_json::from_str(r#"{"foo":1234}"#).unwrap();
@@ -664,7 +664,7 @@ fn try_from_int_3dp__Decimal_u32() {
 }
 
 //		try_from_int_4dp__f32_u64												
-#[allow(clippy::float_cmp)]
+#[expect(clippy::float_cmp, reason = "Acceptable for the test")]
 #[test]
 fn try_from_int_4dp__f32_u64() {
 	let test: F32TryFromInt4DpU64 = serde_json::from_str(r#"{"foo":12345}"#).unwrap();

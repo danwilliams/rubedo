@@ -460,7 +460,7 @@ mod unpacked_response_body__struct {
 	}
 	
 	//		to_base64															
-	#[allow(invalid_from_utf8)]
+	#[expect(invalid_from_utf8, reason = "Needed for the test")]
 	#[test]
 	fn to_base64() {
 		let mut body    = UnpackedResponseBody {
@@ -478,7 +478,7 @@ mod unpacked_response_body__struct {
 	}
 	
 	//		from_base64															
-	#[allow(invalid_from_utf8)]
+	#[expect(invalid_from_utf8, reason = "Needed for the test")]
 	#[test]
 	fn from_base64__valid() {
 		let body1 = UnpackedResponseBody::from_base64("VGhpcyBpcyBhIHRlc3Q=").unwrap();
@@ -594,7 +594,7 @@ mod unpacked_response_body__traits {
 		//	Uncommenting the line below would cause a compilation error:
 		//assert_eq!(body, UnpackedResponseBody { body: b"This is".to_vec(), ..Default::default() });
 	}
-	#[allow(clippy::string_lit_as_bytes)]
+	#[expect(clippy::string_lit_as_bytes, reason = "Needed for the test")]
 	#[test]
 	fn add__char_one_byte() {
 		let body = UnpackedResponseBody { body: b"This is ".to_vec(), ..Default::default() };
@@ -631,7 +631,7 @@ mod unpacked_response_body__traits {
 		//	Uncommenting the line below would cause a compilation error:
 		//assert_eq!(body, UnpackedResponseBody { body: s!("This is ").into_bytes() });
 	}
-	#[allow(clippy::string_lit_as_bytes)]
+	#[expect(clippy::string_lit_as_bytes, reason = "Needed for the test")]
 	#[test]
 	fn add__char_ref() {
 		let body = UnpackedResponseBody { body: b"This is ".to_vec(), ..Default::default() };
@@ -771,7 +771,7 @@ mod unpacked_response_body__traits {
 		body         += &b" a test"[..];
 		assert_eq!(body, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
 	}
-	#[allow(clippy::string_lit_as_bytes)]
+	#[expect(clippy::string_lit_as_bytes, reason = "Needed for the test")]
 	#[test]
 	fn add_assign__char_one_byte() {
 		let mut body  = UnpackedResponseBody { body: b"This is ".to_vec(), ..Default::default() };
@@ -796,7 +796,7 @@ mod unpacked_response_body__traits {
 		body         += '𐍈';
 		assert_eq!(body, UnpackedResponseBody { body: s!("This is 𐍈").into_bytes(), ..Default::default() });
 	}
-	#[allow(clippy::string_lit_as_bytes)]
+	#[expect(clippy::string_lit_as_bytes, reason = "Needed for the test")]
 	#[test]
 	fn add_assign__char_ref() {
 		let mut body  = UnpackedResponseBody { body: b"This is ".to_vec(), ..Default::default() };
@@ -1016,7 +1016,7 @@ mod unpacked_response_body__traits {
 		assert_eq!(body, UnpackedResponseBody { body: b"A".to_vec(), ..Default::default() });
 		assert_eq!(char, 'A');
 	}
-	#[allow(clippy::string_lit_as_bytes)]
+	#[expect(clippy::string_lit_as_bytes, reason = "Needed for the test")]
 	#[test]
 	fn from__char_one_byte() {
 		let body = UnpackedResponseBody::from('A');

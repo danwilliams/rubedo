@@ -54,7 +54,7 @@ mod sha256_hash__struct {
 	use super::*;
 	
 	//		new																	
-	#[allow(clippy::needless_borrows_for_generic_args)]
+	#[expect(clippy::needless_borrows_for_generic_args, reason = "Needed for the test")]
 	#[test]
 	fn new() {
 		let hash1 = Sha256Hash::new(TEST_256_HASH);
@@ -261,7 +261,7 @@ mod sha256_hash__traits {
 	}
 	
 	//		clone																
-	#[allow(clippy::clone_on_copy)]
+	#[expect(clippy::clone_on_copy, reason = "Needed for the test")]
 	#[test]
 	fn clone() {
 		let mut hash   = Sha256Hash { hash: TEST_256_HASH };
@@ -498,7 +498,7 @@ mod sha512_hash__struct {
 	use super::*;
 	
 	//		new																	
-	#[allow(clippy::needless_borrows_for_generic_args)]
+	#[expect(clippy::needless_borrows_for_generic_args, reason = "Needed for the test")]
 	#[test]
 	fn new() {
 		let hash1 = Sha512Hash::new(TEST_512_HASH);
@@ -705,7 +705,7 @@ mod sha512_hash__traits {
 	}
 	
 	//		clone																
-	#[allow(clippy::clone_on_copy)]
+	#[expect(clippy::clone_on_copy, reason = "Needed for the test")]
 	#[test]
 	fn clone() {
 		let mut hash   = Sha512Hash { hash: TEST_512_HASH };
@@ -1096,7 +1096,7 @@ mod signing_key__traits {
 	}
 	
 	//		clone																
-	#[allow(clippy::redundant_clone)]
+	#[expect(clippy::redundant_clone, reason = "Needed for the test")]
 	#[test]
 	fn clone() {
 		let key   = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
@@ -1129,7 +1129,7 @@ mod signing_key__traits {
 	}
 	
 	//		deref																
-	#[allow(clippy::explicit_deref_methods)]
+	#[expect(clippy::explicit_deref_methods, reason = "Needed for the test")]
 	#[test]
 	fn deref() {
 		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
@@ -1607,7 +1607,7 @@ mod verifying_key__traits {
 	}
 	
 	//		clone																
-	#[allow(clippy::clone_on_copy)]
+	#[expect(clippy::clone_on_copy, reason = "Needed for the test")]
 	#[test]
 	fn clone() {
 		let key   = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
@@ -1640,7 +1640,7 @@ mod verifying_key__traits {
 	}
 	
 	//		deref																
-	#[allow(clippy::explicit_deref_methods)]
+	#[expect(clippy::explicit_deref_methods, reason = "Needed for the test")]
 	#[test]
 	fn deref() {
 		let key = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };

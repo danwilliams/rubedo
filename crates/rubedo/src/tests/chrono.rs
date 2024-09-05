@@ -467,7 +467,7 @@ mod months_ext {
 	}
 	
 	//		num_years															
-	#[allow(clippy::integer_division)]
+	#[expect(clippy::integer_division, reason = "Acceptable for the test")]
 	#[test]
 	fn num_years() {
 		assert_eq!(Months::new(0).num_years(), 0);
@@ -486,7 +486,7 @@ mod naivedate_ext {
 	use super::*;
 	
 	//		MAX_YEAR															
-	#[allow(clippy::decimal_literal_representation)]
+	#[expect(clippy::decimal_literal_representation, reason = "Needed for clear formatting")]
 	#[test]
 	fn max_year__max_allowed() {
 		assert_eq!(Utc.with_ymd_and_hms(NaiveDate::MAX_YEAR, 12, 31, 00, 00, 00).unwrap(), Utc.with_ymd_and_hms(262_142, 12, 31, 00, 00, 00).unwrap());
@@ -498,7 +498,7 @@ mod naivedate_ext {
 	}
 	
 	//		MIN_YEAR															
-	#[allow(clippy::decimal_literal_representation)]
+	#[expect(clippy::decimal_literal_representation, reason = "Needed for clear formatting")]
 	#[test]
 	fn min_year__min_allowed() {
 		assert_eq!(Utc.with_ymd_and_hms(NaiveDate::MIN_YEAR, 1, 1, 00, 00, 00).unwrap(), Utc.with_ymd_and_hms(-262_143, 1, 1, 00, 00, 00).unwrap());

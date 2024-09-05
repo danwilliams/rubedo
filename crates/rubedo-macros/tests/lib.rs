@@ -1,4 +1,4 @@
-#![allow(unused_crate_dependencies)]
+#![allow(unused_crate_dependencies, reason = "Creates a lot of noise")]
 
 //	Lints specifically disabled for integration tests
 #![cfg_attr(test, allow(
@@ -21,6 +21,7 @@
 	clippy::tests_outside_test_module,
 	clippy::unwrap_in_result,
 	clippy::unwrap_used,
+	reason = "Not useful in integration tests"
 ))]
 
 

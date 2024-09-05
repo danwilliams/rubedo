@@ -9,9 +9,9 @@
 //		Global configuration
 
 //	Customisations of the standard linting configuration
-#![allow(clippy::expect_used)]             // Okay in a proc macro
-#![allow(clippy::items_after_test_module)] // Not needed with separated tests
-#![allow(clippy::panic)]                   // Okay in a proc macro
+#![allow(clippy::expect_used,             reason = "Okay in a proc macro")]
+#![allow(clippy::items_after_test_module, reason = "Not needed with separated tests")]
+#![allow(clippy::panic,                   reason = "Also okay in a proc macro")]
 
 
 

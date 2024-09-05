@@ -1,7 +1,6 @@
-#![cfg_attr(    feature = "reasons",  allow(clippy::std_instead_of_core,
+#![allow(clippy::std_instead_of_core,
 reason = "False positive due to bug: https://github.com/rust-lang/rust-clippy/issues/12438"
-))]
-#![cfg_attr(not(feature = "reasons"), allow(clippy::std_instead_of_core))]
+)]
 //! This module provides extensions to the Rust standard library.
 
 
@@ -121,8 +120,7 @@ impl<I: Iterator> Iterator for LimitIterator<I> {
 	
 	//		next																
 	fn next(&mut self) -> Option<Self::Item> {
-		#[cfg_attr(    feature = "reasons",  allow(clippy::arithmetic_side_effects, reason = "Range is controlled"))]
-		#[cfg_attr(not(feature = "reasons"), allow(clippy::arithmetic_side_effects))]
+		#[expect(clippy::arithmetic_side_effects, reason = "Range is controlled")]
 		if let Some(limit) = self.limit {
 			if self.count >= limit {
 				return None;
@@ -235,8 +233,7 @@ impl AsStr for str {
 /// * [`ByteSizedFull`]
 /// * [`ByteSizedMut`]
 /// 
-#[cfg_attr(    feature = "reasons",  allow(clippy::trait_duplication_in_bounds, reason = "Not actually duplicates"))]
-#[cfg_attr(not(feature = "reasons"), allow(clippy::trait_duplication_in_bounds))]
+#[expect(clippy::trait_duplication_in_bounds, reason = "Not actually duplicates")]
 pub trait ByteSized<const SIZE: usize>:
 	Sized
 	+ Clone
@@ -473,8 +470,7 @@ pub trait ByteSized<const SIZE: usize>:
 /// * [`ByteSized`]
 /// * [`ByteSizedMut`]
 /// 
-#[cfg_attr(    feature = "reasons",  allow(clippy::trait_duplication_in_bounds, reason = "Not actually duplicates"))]
-#[cfg_attr(not(feature = "reasons"), allow(clippy::trait_duplication_in_bounds))]
+#[expect(clippy::trait_duplication_in_bounds, reason = "Not actually duplicates")]
 pub trait ByteSizedFull<const SIZE: usize>:
 	ByteSized<SIZE>
 	+ AsRef<[u8; SIZE]>
@@ -653,8 +649,7 @@ impl FileExt for File {
 			if count == 0 {
 				break;
 			}
-			#[cfg_attr(    feature = "reasons",  allow(clippy::indexing_slicing, reason = "Infallible"))]
-			#[cfg_attr(not(feature = "reasons"), allow(clippy::indexing_slicing))]
+			#[expect(clippy::indexing_slicing, reason = "Infallible")]
 			hasher.update(&buffer[..count]);
 		}
 		Ok(T::from_digest(hasher.finalize()))
@@ -696,8 +691,7 @@ impl AsyncFileExt for AsyncFile {
 			if count == 0 {
 				break;
 			}
-			#[cfg_attr(    feature = "reasons",  allow(clippy::indexing_slicing, reason = "Infallible"))]
-			#[cfg_attr(not(feature = "reasons"), allow(clippy::indexing_slicing))]
+			#[expect(clippy::indexing_slicing, reason = "Infallible")]
 			hasher.update(&buffer[..count]);
 		}
 		Ok(T::from_digest(hasher.finalize()))
@@ -773,35 +767,18 @@ macro_rules! impl_from_int_with_scale_for_float {
 		//󰭅		Integer for f32													
 		impl FromIntWithScale<$t> for f32 {
 			//		from_int_with_scale											
-			#[cfg_attr(    feature = "reasons",  allow(clippy::cast_lossless,
-				reason = "Being potentially lossy does not matter here"
-			))]
-			#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_lossless))]
+			#[allow(clippy::allow_attributes, reason = "Multiple possibilities through the macro invocation")]
+			#[allow(clippy::cast_lossless,    reason = "Being potentially lossy does not matter here")]
 			fn from_int_with_scale(value: $t, scale: u8) -> Option<Self> {
 				let factor = 10_u32.checked_pow(u32::from(scale))?;
-				#[cfg_attr(    feature = "reasons",  allow(clippy::cast_precision_loss,
-				reason = "Losing precision does not matter here"
-				))]
-				#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_precision_loss))]
+				#[allow(clippy::cast_precision_loss, reason = "Losing precision does not matter here")]
 				let scaled = value as f32 / factor as f32;
 				//	We need to manually check if the value exceeds the range of integer
 				//	values supported by an f32, as that will result in a loss of precision.
-				#[cfg_attr(    feature = "reasons",  allow(trivial_numeric_casts,
-					reason = "Trivial casts here are due to the macro permutations"
-				))]
-				#[cfg_attr(not(feature = "reasons"), allow(trivial_numeric_casts))]
-				#[cfg_attr(    feature = "reasons",  allow(clippy::cast_sign_loss,
-					reason = "Loss of sign does not matter here, as we are checking for overflow"
-				))]
-				#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_sign_loss))]
-				#[cfg_attr(    feature = "reasons",  allow(clippy::cast_possible_wrap,
-					reason = "Possible wrapping does not matter here, as we are checking for underflow"
-				))]
-				#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_possible_wrap))]
-				#[cfg_attr(    feature = "reasons",  allow(clippy::invalid_upcast_comparisons,
-					reason = "Superfluous upcast comparisons here are due to the macro permutations"
-				))]
-				#[cfg_attr(not(feature = "reasons"), allow(clippy::invalid_upcast_comparisons))]
+				#[allow(trivial_numeric_casts,              reason = "Trivial casts here are due to the macro permutations")]
+				#[allow(clippy::cast_sign_loss,             reason = "Loss of sign does not matter here, as we are checking for overflow")]
+				#[allow(clippy::cast_possible_wrap,         reason = "Possible wrapping does not matter here, as we are checking for underflow")]
+				#[allow(clippy::invalid_upcast_comparisons, reason = "Superfluous upcast comparisons here are due to the macro permutations")]
 				if scaled.is_infinite() || (value as u128) > 0x0100_0000_u128 || (value as i128) < -0x0100_0000_i128 {
 					None
 				} else {
@@ -814,35 +791,18 @@ macro_rules! impl_from_int_with_scale_for_float {
 		//󰭅		Integer for f64													
 		impl FromIntWithScale<$t> for f64 {
 			//		from_int_with_scale											
-			#[cfg_attr(    feature = "reasons",  allow(clippy::cast_lossless,
-				reason = "Being potentially lossy does not matter here"
-			))]
-			#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_lossless))]
+			#[allow(clippy::allow_attributes, reason = "Multiple possibilities through the macro invocation")]
+			#[allow(clippy::cast_lossless,    reason = "Being potentially lossy does not matter here")]
 			fn from_int_with_scale(value: $t, scale: u8) -> Option<Self> {
 				let factor = 10_u64.checked_pow(u32::from(scale))?;
-				#[cfg_attr(    feature = "reasons",  allow(clippy::cast_precision_loss,
-				reason = "Losing precision does not matter here"
-				))]
-				#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_precision_loss))]
+				#[allow(clippy::cast_precision_loss, reason = "Losing precision does not matter here")]
 				let scaled = value as f64 / factor as f64;
 				//	We need to manually check if the value exceeds the range of integer
 				//	values supported by an f64, as that will result in a loss of precision.
-				#[cfg_attr(    feature = "reasons",  allow(trivial_numeric_casts,
-					reason = "Trivial casts here are due to the macro permutations"
-				))]
-				#[cfg_attr(not(feature = "reasons"), allow(trivial_numeric_casts))]
-				#[cfg_attr(    feature = "reasons",  allow(clippy::cast_sign_loss,
-					reason = "Loss of sign does not matter here, as we are checking for overflow"
-				))]
-				#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_sign_loss))]
-				#[cfg_attr(    feature = "reasons",  allow(clippy::cast_possible_wrap,
-					reason = "Possible wrapping does not matter here, as we are checking for underflow"
-				))]
-				#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_possible_wrap))]
-				#[cfg_attr(    feature = "reasons",  allow(clippy::invalid_upcast_comparisons,
-					reason = "Superfluous upcast comparisons here are due to the macro permutations"
-				))]
-				#[cfg_attr(not(feature = "reasons"), allow(clippy::invalid_upcast_comparisons))]
+				#[allow(trivial_numeric_casts,              reason = "Trivial casts here are due to the macro permutations")]
+				#[allow(clippy::cast_sign_loss,             reason = "Loss of sign does not matter here, as we are checking for overflow")]
+				#[allow(clippy::cast_possible_wrap,         reason = "Possible wrapping does not matter here, as we are checking for underflow")]
+				#[allow(clippy::invalid_upcast_comparisons, reason = "Superfluous upcast comparisons here are due to the macro permutations")]
 				if scaled.is_infinite() || (value as u128) > 0x0020_0000_0000_0000_u128 || (value as i128) < -0x0020_0000_0000_0000_i128 {
 					None
 				} else {
@@ -897,20 +857,15 @@ macro_rules! impl_from_int_with_scale_for_decimal {
 		//󰭅		u128 for Decimal												
 		impl FromIntWithScale<u128> for Decimal {
 			//		from_int_with_scale											
-			#[cfg_attr(    feature = "reasons",  allow(clippy::cast_lossless,
-				reason = "Being potentially lossy does not matter here"
-			))]
-			#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_lossless))]
+			#[allow(clippy::allow_attributes, reason = "Multiple possibilities through the macro invocation")]
+			#[allow(clippy::cast_lossless,    reason = "Being potentially lossy does not matter here")]
 			fn from_int_with_scale(value: u128, scale: u8) -> Option<Self> {
 				//	We should be able to rely upon Decimal::try_from_i128_with_scale() to
 				//	perform the necessary checks, but it currently has issues with numbers
 				//	larger than the supported 96-bit range, so we need to check manually.
 				//	Regardless of this, we would have to check if the value is larger than
 				//	supported by an i128 in any case.
-				#[cfg_attr(    feature = "reasons",  allow(clippy::cast_possible_wrap,
-					reason = "Possible wrapping does not matter here, as we are checking for underflow"
-				))]
-				#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_possible_wrap))]
+				#[allow(clippy::cast_possible_wrap, reason = "Possible wrapping does not matter here, as we are checking for underflow")]
 				if value > Decimal::MAX.to_u128().unwrap() || (value as i128) < Decimal::MIN.to_i128().unwrap() {
 					None
 				} else {
@@ -923,10 +878,8 @@ macro_rules! impl_from_int_with_scale_for_decimal {
 		//󰭅		Integer for Decimal												
 		impl FromIntWithScale<$t> for Decimal {
 			//		from_int_with_scale											
-			#[cfg_attr(    feature = "reasons",  allow(clippy::cast_lossless,
-				reason = "Being potentially lossy does not matter here"
-			))]
-			#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_lossless))]
+			#[allow(clippy::allow_attributes, reason = "Multiple possibilities through the macro invocation")]
+			#[allow(clippy::cast_lossless,    reason = "Being potentially lossy does not matter here")]
 			fn from_int_with_scale(value: $t, scale: u8) -> Option<Self> {
 				//	Everything less than 128 bits will fit safely into the Decimal's range.
 				Decimal::try_from_i128_with_scale(value as i128, u32::from(scale)).ok()
@@ -1012,28 +965,17 @@ macro_rules! impl_to_int_with_scale_for_float {
 		//󰭅		Integer for Float												
 		impl ToIntWithScale<$t> for $f {
 			//		to_int_with_scale											
-			#[cfg_attr(    feature = "reasons",  allow(clippy::cast_lossless,
-				reason = "Being potentially lossy does not matter here"
-			))]
-			#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_lossless))]
-			#[cfg_attr(    feature = "reasons",  allow(clippy::cast_precision_loss,
-				reason = "Losing precision does not matter here"
-			))]
-			#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_precision_loss))]
+			#[allow(clippy::allow_attributes,    reason = "Multiple possibilities through the macro invocation")]
+			#[allow(clippy::cast_lossless,       reason = "Being potentially lossy does not matter here")]
+			#[allow(clippy::cast_precision_loss, reason = "Losing precision does not matter here")]
 			fn to_int_with_scale(&self, scale: u8) -> Option<$t> {
 				let factor = 10_u64.checked_pow(u32::from(scale))?;
 				let scaled = (self * factor as $f).round();
 				if scaled.is_infinite() || scaled > <$t>::MAX as $f || scaled < <$t>::MIN as $f {
 					None
 				} else {
-					#[cfg_attr(    feature = "reasons",  allow(clippy::cast_possible_truncation,
-						reason = "Possible truncation does not matter here"
-					))]
-					#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_possible_truncation))]
-					#[cfg_attr(    feature = "reasons",  allow(clippy::cast_sign_loss,
-						reason = "Loss of sign will not occur here, as we are casting to a float"
-					))]
-					#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_sign_loss))]
+					#[allow(clippy::cast_possible_truncation, reason = "Possible truncation does not matter here")]
+					#[allow(clippy::cast_sign_loss,           reason = "Loss of sign will not occur here, as we are casting to a float")]
 					Some(scaled as $t)
 				}
 			}
