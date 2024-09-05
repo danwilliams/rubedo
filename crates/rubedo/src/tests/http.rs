@@ -1318,7 +1318,7 @@ mod response_ext {
 	}
 	#[test]
 	fn unpack__hyper_body() {
-		let mut response = hyper::Response::builder()
+		let mut response = Response::builder()
 			.status(StatusCode::OK)
 			.body(HyperBody::from("This is a test"))
 			.unwrap()

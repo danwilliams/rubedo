@@ -773,8 +773,16 @@ macro_rules! impl_from_int_with_scale_for_float {
 		//󰭅		Integer for f32													
 		impl FromIntWithScale<$t> for f32 {
 			//		from_int_with_scale											
+			#[cfg_attr(    feature = "reasons",  allow(clippy::cast_lossless,
+				reason = "Being potentially lossy does not matter here"
+			))]
+			#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_lossless))]
 			fn from_int_with_scale(value: $t, scale: u8) -> Option<Self> {
-				let factor = 10_u32.checked_pow(scale as u32)?;
+				let factor = 10_u32.checked_pow(u32::from(scale))?;
+				#[cfg_attr(    feature = "reasons",  allow(clippy::cast_precision_loss,
+				reason = "Losing precision does not matter here"
+				))]
+				#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_precision_loss))]
 				let scaled = value as f32 / factor as f32;
 				//	We need to manually check if the value exceeds the range of integer
 				//	values supported by an f32, as that will result in a loss of precision.
@@ -782,6 +790,14 @@ macro_rules! impl_from_int_with_scale_for_float {
 					reason = "Trivial casts here are due to the macro permutations"
 				))]
 				#[cfg_attr(not(feature = "reasons"), allow(trivial_numeric_casts))]
+				#[cfg_attr(    feature = "reasons",  allow(clippy::cast_sign_loss,
+					reason = "Loss of sign does not matter here, as we are checking for overflow"
+				))]
+				#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_sign_loss))]
+				#[cfg_attr(    feature = "reasons",  allow(clippy::cast_possible_wrap,
+					reason = "Possible wrapping does not matter here, as we are checking for underflow"
+				))]
+				#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_possible_wrap))]
 				#[cfg_attr(    feature = "reasons",  allow(clippy::invalid_upcast_comparisons,
 					reason = "Superfluous upcast comparisons here are due to the macro permutations"
 				))]
@@ -798,8 +814,16 @@ macro_rules! impl_from_int_with_scale_for_float {
 		//󰭅		Integer for f64													
 		impl FromIntWithScale<$t> for f64 {
 			//		from_int_with_scale											
+			#[cfg_attr(    feature = "reasons",  allow(clippy::cast_lossless,
+				reason = "Being potentially lossy does not matter here"
+			))]
+			#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_lossless))]
 			fn from_int_with_scale(value: $t, scale: u8) -> Option<Self> {
-				let factor = 10_u64.checked_pow(scale as u32)?;
+				let factor = 10_u64.checked_pow(u32::from(scale))?;
+				#[cfg_attr(    feature = "reasons",  allow(clippy::cast_precision_loss,
+				reason = "Losing precision does not matter here"
+				))]
+				#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_precision_loss))]
 				let scaled = value as f64 / factor as f64;
 				//	We need to manually check if the value exceeds the range of integer
 				//	values supported by an f64, as that will result in a loss of precision.
@@ -807,6 +831,14 @@ macro_rules! impl_from_int_with_scale_for_float {
 					reason = "Trivial casts here are due to the macro permutations"
 				))]
 				#[cfg_attr(not(feature = "reasons"), allow(trivial_numeric_casts))]
+				#[cfg_attr(    feature = "reasons",  allow(clippy::cast_sign_loss,
+					reason = "Loss of sign does not matter here, as we are checking for overflow"
+				))]
+				#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_sign_loss))]
+				#[cfg_attr(    feature = "reasons",  allow(clippy::cast_possible_wrap,
+					reason = "Possible wrapping does not matter here, as we are checking for underflow"
+				))]
+				#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_possible_wrap))]
 				#[cfg_attr(    feature = "reasons",  allow(clippy::invalid_upcast_comparisons,
 					reason = "Superfluous upcast comparisons here are due to the macro permutations"
 				))]
@@ -856,7 +888,7 @@ macro_rules! impl_from_int_with_scale_for_decimal {
 				if value > Decimal::MAX.to_i128().unwrap() || value < Decimal::MIN.to_i128().unwrap() {
 					None
 				} else {
-					Decimal::try_from_i128_with_scale(value, scale as u32).ok()
+					Decimal::try_from_i128_with_scale(value, u32::from(scale)).ok()
 				}
 			}
 		}
@@ -865,16 +897,24 @@ macro_rules! impl_from_int_with_scale_for_decimal {
 		//󰭅		u128 for Decimal												
 		impl FromIntWithScale<u128> for Decimal {
 			//		from_int_with_scale											
+			#[cfg_attr(    feature = "reasons",  allow(clippy::cast_lossless,
+				reason = "Being potentially lossy does not matter here"
+			))]
+			#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_lossless))]
 			fn from_int_with_scale(value: u128, scale: u8) -> Option<Self> {
 				//	We should be able to rely upon Decimal::try_from_i128_with_scale() to
 				//	perform the necessary checks, but it currently has issues with numbers
 				//	larger than the supported 96-bit range, so we need to check manually.
 				//	Regardless of this, we would have to check if the value is larger than
 				//	supported by an i128 in any case.
+				#[cfg_attr(    feature = "reasons",  allow(clippy::cast_possible_wrap,
+					reason = "Possible wrapping does not matter here, as we are checking for underflow"
+				))]
+				#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_possible_wrap))]
 				if value > Decimal::MAX.to_u128().unwrap() || (value as i128) < Decimal::MIN.to_i128().unwrap() {
 					None
 				} else {
-					Decimal::try_from_i128_with_scale(value as i128, scale as u32).ok()
+					Decimal::try_from_i128_with_scale(value as i128, u32::from(scale)).ok()
 				}
 			}
 		}
@@ -883,9 +923,13 @@ macro_rules! impl_from_int_with_scale_for_decimal {
 		//󰭅		Integer for Decimal												
 		impl FromIntWithScale<$t> for Decimal {
 			//		from_int_with_scale											
+			#[cfg_attr(    feature = "reasons",  allow(clippy::cast_lossless,
+				reason = "Being potentially lossy does not matter here"
+			))]
+			#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_lossless))]
 			fn from_int_with_scale(value: $t, scale: u8) -> Option<Self> {
 				//	Everything less than 128 bits will fit safely into the Decimal's range.
-				Decimal::try_from_i128_with_scale(value as i128, scale as u32).ok()
+				Decimal::try_from_i128_with_scale(value as i128, u32::from(scale)).ok()
 			}
 		}
 	};
@@ -968,12 +1012,28 @@ macro_rules! impl_to_int_with_scale_for_float {
 		//󰭅		Integer for Float												
 		impl ToIntWithScale<$t> for $f {
 			//		to_int_with_scale											
+			#[cfg_attr(    feature = "reasons",  allow(clippy::cast_lossless,
+				reason = "Being potentially lossy does not matter here"
+			))]
+			#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_lossless))]
+			#[cfg_attr(    feature = "reasons",  allow(clippy::cast_precision_loss,
+				reason = "Losing precision does not matter here"
+			))]
+			#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_precision_loss))]
 			fn to_int_with_scale(&self, scale: u8) -> Option<$t> {
-				let factor = 10_u64.checked_pow(scale as u32)?;
+				let factor = 10_u64.checked_pow(u32::from(scale))?;
 				let scaled = (self * factor as $f).round();
 				if scaled.is_infinite() || scaled > <$t>::MAX as $f || scaled < <$t>::MIN as $f {
 					None
 				} else {
+					#[cfg_attr(    feature = "reasons",  allow(clippy::cast_possible_truncation,
+						reason = "Possible truncation does not matter here"
+					))]
+					#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_possible_truncation))]
+					#[cfg_attr(    feature = "reasons",  allow(clippy::cast_sign_loss,
+						reason = "Loss of sign will not occur here, as we are casting to a float"
+					))]
+					#[cfg_attr(not(feature = "reasons"), allow(clippy::cast_sign_loss))]
 					Some(scaled as $t)
 				}
 			}
@@ -1014,7 +1074,7 @@ macro_rules! impl_to_int_with_scale_for_decimal {
 				//	component will be truncated and lost. We therefore need to scale first,
 				//	but this restricts the range of the final outcome to that of the Decimal
 				//	type, which is 96 bits.
-				let factor = 10_u64.checked_pow(scale as u32)?;
+				let factor = 10_u64.checked_pow(u32::from(scale))?;
 				(self.checked_mul(Decimal::from(factor))?.round()).to_i128()
 			}
 		}
@@ -1028,7 +1088,7 @@ macro_rules! impl_to_int_with_scale_for_decimal {
 				//	component will be truncated and lost. We therefore need to scale first,
 				//	but this restricts the range of the final outcome to that of the Decimal
 				//	type, which is 96 bits.
-				let factor = 10_u64.checked_pow(scale as u32)?;
+				let factor = 10_u64.checked_pow(u32::from(scale))?;
 				(self.checked_mul(Decimal::from(factor))?.round()).to_u128()
 			}
 		}
@@ -1037,7 +1097,7 @@ macro_rules! impl_to_int_with_scale_for_decimal {
 		//󰭅		Integer for Decimal												
 		impl ToIntWithScale<$t> for Decimal {
 			fn to_int_with_scale(&self, scale: u8) -> Option<$t> {
-				let factor = 10_u64.checked_pow(scale as u32)?;
+				let factor = 10_u64.checked_pow(u32::from(scale))?;
 				let scaled = self.checked_mul(Decimal::from(factor))?.round();
 				//	Everything less than 128 bits will fit safely into the Decimal's range.
 				if scaled > Decimal::from(<$t>::MAX) || scaled < Decimal::from(<$t>::MIN) {
