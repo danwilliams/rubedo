@@ -1,5 +1,3 @@
-#![allow(non_snake_case)]
-
 //		Packages
 
 use super::*;
@@ -351,29 +349,29 @@ mod to_int_with_scale {
 	}
 	#[test]
 	fn to_int_with_scale__f32_max_scale_0() {
-		assert_eq!({ let i: Option<i8>   = (2u32.pow(24) as f32).to_int_with_scale(0); i}, None);
-		assert_eq!({ let i: Option<i16>  = (2u32.pow(24) as f32).to_int_with_scale(0); i}, None);
-		assert_eq!({ let i: Option<i32>  = (2u32.pow(24) as f32).to_int_with_scale(0); i}, Some(0x0100_0000_i32));
-		assert_eq!({ let i: Option<i64>  = (2u32.pow(24) as f32).to_int_with_scale(0); i}, Some(0x0100_0000_i64));
-		assert_eq!({ let i: Option<i128> = (2u32.pow(24) as f32).to_int_with_scale(0); i}, Some(0x0100_0000_i128));
-		assert_eq!({ let i: Option<u8>   = (2u32.pow(24) as f32).to_int_with_scale(0); i}, None);
-		assert_eq!({ let i: Option<u16>  = (2u32.pow(24) as f32).to_int_with_scale(0); i}, None);
-		assert_eq!({ let i: Option<u32>  = (2u32.pow(24) as f32).to_int_with_scale(0); i}, Some(0x0100_0000_u32));
-		assert_eq!({ let i: Option<u64>  = (2u32.pow(24) as f32).to_int_with_scale(0); i}, Some(0x0100_0000_u64));
-		assert_eq!({ let i: Option<u128> = (2u32.pow(24) as f32).to_int_with_scale(0); i}, Some(0x0100_0000_u128));
+		assert_eq!({ let i: Option<i8>   = (2_u32.pow(24) as f32).to_int_with_scale(0); i}, None);
+		assert_eq!({ let i: Option<i16>  = (2_u32.pow(24) as f32).to_int_with_scale(0); i}, None);
+		assert_eq!({ let i: Option<i32>  = (2_u32.pow(24) as f32).to_int_with_scale(0); i}, Some(0x0100_0000_i32));
+		assert_eq!({ let i: Option<i64>  = (2_u32.pow(24) as f32).to_int_with_scale(0); i}, Some(0x0100_0000_i64));
+		assert_eq!({ let i: Option<i128> = (2_u32.pow(24) as f32).to_int_with_scale(0); i}, Some(0x0100_0000_i128));
+		assert_eq!({ let i: Option<u8>   = (2_u32.pow(24) as f32).to_int_with_scale(0); i}, None);
+		assert_eq!({ let i: Option<u16>  = (2_u32.pow(24) as f32).to_int_with_scale(0); i}, None);
+		assert_eq!({ let i: Option<u32>  = (2_u32.pow(24) as f32).to_int_with_scale(0); i}, Some(0x0100_0000_u32));
+		assert_eq!({ let i: Option<u64>  = (2_u32.pow(24) as f32).to_int_with_scale(0); i}, Some(0x0100_0000_u64));
+		assert_eq!({ let i: Option<u128> = (2_u32.pow(24) as f32).to_int_with_scale(0); i}, Some(0x0100_0000_u128));
 	}
 	#[test]
 	fn to_int_with_scale__f64_max_scale_0() {
-		assert_eq!({ let i: Option<i8>   = (2u64.pow(53) as f64).to_int_with_scale(0); i }, None);
-		assert_eq!({ let i: Option<i16>  = (2u64.pow(53) as f64).to_int_with_scale(0); i }, None);
-		assert_eq!({ let i: Option<i32>  = (2u64.pow(53) as f64).to_int_with_scale(0); i }, None);
-		assert_eq!({ let i: Option<i64>  = (2u64.pow(53) as f64).to_int_with_scale(0); i }, Some(0x0020_0000_0000_0000_i64));
-		assert_eq!({ let i: Option<i128> = (2u64.pow(53) as f64).to_int_with_scale(0); i }, Some(0x0020_0000_0000_0000_i128));
-		assert_eq!({ let i: Option<u8>   = (2u64.pow(53) as f64).to_int_with_scale(0); i }, None);
-		assert_eq!({ let i: Option<u16>  = (2u64.pow(53) as f64).to_int_with_scale(0); i }, None);
-		assert_eq!({ let i: Option<u32>  = (2u64.pow(53) as f64).to_int_with_scale(0); i }, None);
-		assert_eq!({ let i: Option<u64>  = (2u64.pow(53) as f64).to_int_with_scale(0); i }, Some(0x0020_0000_0000_0000_u64));
-		assert_eq!({ let i: Option<u128> = (2u64.pow(53) as f64).to_int_with_scale(0); i }, Some(0x0020_0000_0000_0000_u128));
+		assert_eq!({ let i: Option<i8>   = (2_u64.pow(53) as f64).to_int_with_scale(0); i }, None);
+		assert_eq!({ let i: Option<i16>  = (2_u64.pow(53) as f64).to_int_with_scale(0); i }, None);
+		assert_eq!({ let i: Option<i32>  = (2_u64.pow(53) as f64).to_int_with_scale(0); i }, None);
+		assert_eq!({ let i: Option<i64>  = (2_u64.pow(53) as f64).to_int_with_scale(0); i }, Some(0x0020_0000_0000_0000_i64));
+		assert_eq!({ let i: Option<i128> = (2_u64.pow(53) as f64).to_int_with_scale(0); i }, Some(0x0020_0000_0000_0000_i128));
+		assert_eq!({ let i: Option<u8>   = (2_u64.pow(53) as f64).to_int_with_scale(0); i }, None);
+		assert_eq!({ let i: Option<u16>  = (2_u64.pow(53) as f64).to_int_with_scale(0); i }, None);
+		assert_eq!({ let i: Option<u32>  = (2_u64.pow(53) as f64).to_int_with_scale(0); i }, None);
+		assert_eq!({ let i: Option<u64>  = (2_u64.pow(53) as f64).to_int_with_scale(0); i }, Some(0x0020_0000_0000_0000_u64));
+		assert_eq!({ let i: Option<u128> = (2_u64.pow(53) as f64).to_int_with_scale(0); i }, Some(0x0020_0000_0000_0000_u128));
 	}
 	#[test]
 	fn to_int_with_scale__decimal_max_scale_0() {
@@ -474,6 +472,7 @@ mod iterator_ext {
 	use super::*;
 	
 	//		limit																
+	#[allow(clippy::needless_collect)]
 	#[test]
 	fn limit__empty() {
 		let vec:    Vec<usize> = Vec::new();
@@ -482,24 +481,24 @@ mod iterator_ext {
 	}
 	#[test]
 	fn limit__no_limit() {
-		let vec            = vec![1, 2, 3, 4, 5];
-		let result: Vec<_> = vec.iter().limit(None).cloned().collect();
+		let vec            = [1, 2, 3, 4, 5];
+		let result: Vec<_> = vec.iter().limit(None).copied().collect();
 		assert_eq!(result.len(), vec.len());
 		assert_eq!(result,       vec);
 	}
 	#[test]
 	fn limit__within_limit() {
-		let vec            = vec![1, 2, 3, 4, 5];
-		let result: Vec<_> = vec.iter().limit(Some(10)).cloned().collect();
+		let vec            = [1, 2, 3, 4, 5];
+		let result: Vec<_> = vec.iter().limit(Some(10)).copied().collect();
 		assert_eq!(result.len(), vec.len());
 		assert_eq!(result,       vec);
 	}
 	#[test]
 	fn limit__exceeds_limit() {
-		let vec            = vec![1, 2, 3, 4, 5];
-		let result: Vec<_> = vec.iter().limit(Some(3)).cloned().collect();
+		let vec            = [1, 2, 3, 4, 5];
+		let result: Vec<_> = vec.iter().limit(Some(3)).copied().collect();
 		assert_eq!(result.len(), 3);
-		assert_eq!(result,       vec![1, 2, 3]);
+		assert_eq!(result,       [1, 2, 3]);
 	}
 }
 	
@@ -509,6 +508,7 @@ mod path_ext {
 	use super::*;
 	
 	//		append																
+	#[allow(clippy::unnecessary_to_owned)]
 	#[test]
 	fn append() {
 		let mut path: PathBuf;
@@ -523,29 +523,28 @@ mod path_ext {
 		assert_eq!(path.append(PathBuf::from(".bak")),  PathBuf::from("tests/std.rs.bak"));
 		assert_eq!(path.append(Path::new(".bak")),      PathBuf::from("tests/std.rs.bak"));
 		
-		let path: &Path;
-		path = Path::new("tests/std.rs");
-		assert_eq!(path.append(".bak"), PathBuf::from("tests/std.rs.bak"));
+		let path2: &Path = Path::new("tests/std.rs");
+		assert_eq!(path2.append(".bak"), PathBuf::from("tests/std.rs.bak"));
 	}
 	
 	//		is_subjective														
 	#[test]
 	fn is_subjective() {
-		assert_eq!(PathBuf::from(".").is_subjective(),      true);
-		assert_eq!(PathBuf::from("./").is_subjective(),     true);
-		assert_eq!(PathBuf::from("./foo").is_subjective(),  true);
-		assert_eq!(PathBuf::from("..").is_subjective(),     true);
-		assert_eq!(PathBuf::from("../").is_subjective(),    true);
-		assert_eq!(PathBuf::from("../foo").is_subjective(), true);
-		assert_eq!(PathBuf::from("foo").is_subjective(),    false);
-		assert_eq!(PathBuf::from(".bak").is_subjective(),   false);
-		assert_eq!(PathBuf::from("..bak").is_subjective(),  false);
-		assert_eq!(PathBuf::from("/").is_subjective(),      false);
-		assert_eq!(PathBuf::from("/.").is_subjective(),     false);
-		assert_eq!(PathBuf::from("/..").is_subjective(),    false);
-		assert_eq!(PathBuf::from("/foo").is_subjective(),   false);
+		assert!( PathBuf::from(".").is_subjective());
+		assert!( PathBuf::from("./").is_subjective());
+		assert!( PathBuf::from("./foo").is_subjective());
+		assert!( PathBuf::from("..").is_subjective());
+		assert!( PathBuf::from("../").is_subjective());
+		assert!( PathBuf::from("../foo").is_subjective());
+		assert!(!PathBuf::from("foo").is_subjective());
+		assert!(!PathBuf::from(".bak").is_subjective());
+		assert!(!PathBuf::from("..bak").is_subjective());
+		assert!(!PathBuf::from("/").is_subjective());
+		assert!(!PathBuf::from("/.").is_subjective());
+		assert!(!PathBuf::from("/..").is_subjective());
+		assert!(!PathBuf::from("/foo").is_subjective());
 		
-		assert_eq!(Path::new(".").is_subjective(),          true);
+		assert!( Path::new(".").is_subjective());
 	}
 	
 	//		normalize															
@@ -626,13 +625,14 @@ mod path_ext {
 		path = PathBuf::from("tests/🥳.rs");
 		assert_eq!(path.normalize(), cwd.join("tests/🥳.rs"));
 		
-		let path: &Path;
-		path = Path::new("/tests/std.rs");
-		assert_eq!(path.normalize(), Path::new("/tests/std.rs"));
-		assert_eq!(path.normalize(), PathBuf::from("/tests/std.rs"));
+		let path2: &Path = Path::new("/tests/std.rs");
+		assert_eq!(path2.normalize(), Path::new("/tests/std.rs"));
+		assert_eq!(path2.normalize(), PathBuf::from("/tests/std.rs"));
 	}
 
 	//		restrict															
+	#[allow(clippy::needless_borrows_for_generic_args)]
+	#[allow(clippy::unnecessary_to_owned)]
 	#[test]
 	fn restrict() {
 		let cwd = env::current_dir().unwrap();
@@ -692,14 +692,13 @@ mod path_ext {
 		path = PathBuf::from("/foo/bar/tests/std.rs");
 		assert_eq!(path.restrict(Path::new("/foo/bar")), PathBuf::from("/foo/bar/tests/std.rs"));
 		
-		let path: &Path;
-		path = Path::new("/foo/bar/tests/std.rs");
-		assert_eq!(path.restrict("/foo/bar"),                Path::new("/foo/bar/tests/std.rs"));
-		assert_eq!(path.restrict("/foo/bar".to_owned()),     Path::new("/foo/bar/tests/std.rs"));
-		assert_eq!(path.restrict(&Path::new("/foo/bar")),    Path::new("/foo/bar/tests/std.rs"));
-		assert_eq!(path.restrict(&Path::new("/foo/bar")),    PathBuf::from("/foo/bar/tests/std.rs"));
-		assert_eq!(path.restrict(PathBuf::from("/foo/bar")), Path::new("/foo/bar/tests/std.rs"));
-		assert_eq!(path.restrict(PathBuf::from("/foo/bar")), PathBuf::from("/foo/bar/tests/std.rs"));
+		let path2: &Path = Path::new("/foo/bar/tests/std.rs");
+		assert_eq!(path2.restrict("/foo/bar"),                Path::new("/foo/bar/tests/std.rs"));
+		assert_eq!(path2.restrict("/foo/bar".to_owned()),     Path::new("/foo/bar/tests/std.rs"));
+		assert_eq!(path2.restrict(&Path::new("/foo/bar")),    Path::new("/foo/bar/tests/std.rs"));
+		assert_eq!(path2.restrict(&Path::new("/foo/bar")),    PathBuf::from("/foo/bar/tests/std.rs"));
+		assert_eq!(path2.restrict(PathBuf::from("/foo/bar")), Path::new("/foo/bar/tests/std.rs"));
+		assert_eq!(path2.restrict(PathBuf::from("/foo/bar")), PathBuf::from("/foo/bar/tests/std.rs"));
 	}
 	
 	//		strip_parentdirs													
@@ -779,10 +778,9 @@ mod path_ext {
 		path = PathBuf::from("../tests/../../std.rs");
 		assert_eq!(path.strip_parentdirs(false), PathBuf::from("tests/../../std.rs"));
 		
-		let path: &Path;
-		path = Path::new("tests/std.rs");
-		assert_eq!(path.strip_parentdirs(false), Path::new("tests/std.rs"));
-		assert_eq!(path.strip_parentdirs(false), PathBuf::from("tests/std.rs"));
+		let path2: &Path = Path::new("tests/std.rs");
+		assert_eq!(path2.strip_parentdirs(false), Path::new("tests/std.rs"));
+		assert_eq!(path2.strip_parentdirs(false), PathBuf::from("tests/std.rs"));
 	}
 	
 	//		strip_root															
@@ -822,10 +820,9 @@ mod path_ext {
 			assert_eq!(path.strip_root(), PathBuf::from(r"tests\std.rs"));
 		}
 		
-		let path: &Path;
-		path = Path::new("tests/std.rs");
-		assert_eq!(path.strip_root(), Path::new("tests/std.rs"));
-		assert_eq!(path.strip_root(), PathBuf::from("tests/std.rs"));
+		let path2: &Path = Path::new("tests/std.rs");
+		assert_eq!(path2.strip_root(), Path::new("tests/std.rs"));
+		assert_eq!(path2.strip_root(), PathBuf::from("tests/std.rs"));
 	}
 }
 

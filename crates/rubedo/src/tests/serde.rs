@@ -1,19 +1,17 @@
-#![allow(non_snake_case)]
-
 //		Packages
 
 use super::*;
 use crate::sugar::s;
 use claims::{assert_err, assert_ok};
+use core::fmt::{Debug, self};
 use serde::Serialize;
-use std::fmt::{Debug, self};
 
 
 
 //		Enums
 
 //		Position																
-///	This enum is used to test the `into` and `try_from` functions. It represents
+/// This enum is used to test the `into` and `try_from` functions. It represents
 /// the typical use case for enums, as deserialisation is not guaranteed to give
 /// a valid result.
 #[derive(Copy, Clone, Deserialize, PartialEq, Serialize)]
@@ -58,7 +56,7 @@ impl Display for Position {
 impl From<Position> for String {
 	//		from																
 	fn from(position: Position) -> Self {
-		String::from(&position)
+		Self::from(&position)
 	}
 }
 
@@ -92,7 +90,7 @@ impl FromStr for Position {
 			"Zero" => Ok(Self::Zero),
 			"One"  => Ok(Self::One),
 			"Two"  => Ok(Self::Two),
-			_      => Err(format!("Invalid value for Position: {}", s)),
+			_      => Err(format!("Invalid value for Position: {s}")),
 		}
 	}
 }
@@ -115,13 +113,13 @@ impl TryFrom<u8> for Position {
 			0  => Ok(Self::Zero),
 			1  => Ok(Self::One),
 			2  => Ok(Self::Two),
-			_  => Err(format!("Invalid value for Position: {}", value)),
+			_  => Err(format!("Invalid value for Position: {value}")),
 		}
 	}
 }
 
 //		PositionInfallible														
-///	This enum is used to test the `from` function. It represents an atypical use
+/// This enum is used to test the `from` function. It represents an atypical use
 /// case for enums, as deserialisation is not guaranteed to give a valid result,
 /// but the `from` function is infallible. It only has the implementations that
 /// are necessary for the tests, and sets a default to use in case of no match.
@@ -502,11 +500,13 @@ fn from_str__int() {
 	let test: IntFromStr = serde_json::from_str(r#"{"foo":"1234"}"#).unwrap();
 	assert_eq!(test.foo, 1234);
 }
+#[allow(clippy::float_cmp)]
 #[test]
 fn from_str__float() {
 	let test: FloatFromStr = serde_json::from_str(r#"{"foo":"12.34"}"#).unwrap();
 	assert_eq!(test.foo, 12.34);
 }
+#[allow(clippy::bool_assert_comparison)]
 #[test]
 fn from_str__bool() {
 	let test: BoolFromStr = serde_json::from_str(r#"{"foo":"true"}"#).unwrap();
@@ -641,6 +641,7 @@ fn try_from__string_absent() {
 }
 
 //		try_from_int_1dp__f32_u8												
+#[allow(clippy::float_cmp)]
 #[test]
 fn try_from_int_1dp__f32_u8() {
 	let test: F32TryFromInt1DpU8 = serde_json::from_str(r#"{"foo":123}"#).unwrap();
@@ -648,6 +649,7 @@ fn try_from_int_1dp__f32_u8() {
 }
 
 //		try_from_int_2dp__f64_u16												
+#[allow(clippy::float_cmp)]
 #[test]
 fn try_from_int_2dp__f64_u16() {
 	let test: F64TryFromInt2DpU16 = serde_json::from_str(r#"{"foo":1234}"#).unwrap();
@@ -662,6 +664,7 @@ fn try_from_int_3dp__Decimal_u32() {
 }
 
 //		try_from_int_4dp__f32_u64												
+#[allow(clippy::float_cmp)]
 #[test]
 fn try_from_int_4dp__f32_u64() {
 	let test: F32TryFromInt4DpU64 = serde_json::from_str(r#"{"foo":12345}"#).unwrap();

@@ -1,8 +1,7 @@
-#![allow(non_snake_case)]
-
 //		Packages
 
 use super::*;
+use core::any::type_name;
 use std::collections::HashSet;
 
 
@@ -16,7 +15,7 @@ mod s {
 	
 	//		type_of																
 	fn type_of<T>(_: &T) -> &'static str {
-		std::any::type_name::<T>()
+		type_name::<T>()
 	}
 	
 	//		s!																	

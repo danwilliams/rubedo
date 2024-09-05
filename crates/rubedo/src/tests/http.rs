@@ -1,5 +1,3 @@
-#![allow(non_snake_case)]
-
 //		Packages
 
 use super::*;
@@ -7,13 +5,13 @@ use crate::sugar::s;
 use assert_json_diff::assert_json_eq;
 use axum::response::IntoResponse;
 use claims::{assert_err, assert_ok, assert_ok_eq};
+use core::str::from_utf8;
 use serde_assert::{
 	Deserializer as TestDeserializer,
 	Serializer as TestSerializer,
 	token::Token,
 };
 use serde_json::json;
-use std::str::from_utf8;
 
 
 
@@ -40,15 +38,14 @@ mod response_error {
 	fn debug() {
 		let err = Err::<ResponseError, _>(ResponseError::ConversionError(Box::new(TestError)));
 		assert_err!(&err);
-		assert_eq!(format!("{:?}", err), "Err(ConversionError(TestError))");
+		assert_eq!(format!("{err:?}"), "Err(ConversionError(TestError))");
 	}
 	
 	//		display																
 	#[test]
 	fn display() {
-		let err = Err::<ResponseError, _>(ResponseError::ConversionError(Box::new(TestError)));
-		assert_err!(&err);
-		assert_eq!(err.unwrap_err().to_string(), "Error encountered while converting response body to bytes: Test error");
+		let err = ResponseError::ConversionError(Box::new(TestError));
+		assert_eq!(err.to_string(), "Error encountered while converting response body to bytes: Test error");
 	}
 }
 
@@ -113,7 +110,7 @@ mod unpacked_response__traits {
 			],
 			body:          UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() },
 		};
-		assert_eq!(format!("{:?}", response), r#"UnpackedResponse { status: 200, headers: [UnpackedResponseHeader { name: "foo", value: "bar" }], body: UnpackedResponseBody { body: "This is a test", content_type: Text } }"#);
+		assert_eq!(format!("{response:?}"), r#"UnpackedResponse { status: 200, headers: [UnpackedResponseHeader { name: "foo", value: "bar" }], body: UnpackedResponseBody { body: "This is a test", content_type: Text } }"#);
 	}
 	
 	//		partial_eq															
@@ -317,27 +314,27 @@ mod unpacked_response_body__struct {
 	//		new																	
 	#[test]
 	fn new() {
-		let body = UnpackedResponseBody::new(b"This is a test".to_vec());
-		assert_eq!(body, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
+		let body1 = UnpackedResponseBody::new(b"This is a test".to_vec());
+		assert_eq!(body1, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
 		
-		let body = UnpackedResponseBody::new("This is a test");
-		assert_eq!(body, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
+		let body2 = UnpackedResponseBody::new("This is a test");
+		assert_eq!(body2, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
 	}
 	
 	//		content_type														
 	#[test]
 	fn content_type() {
-		let body        = UnpackedResponseBody {
+		let body1       = UnpackedResponseBody {
 			body:         b"This is a test".to_vec(),
 			content_type: ContentType::Text
 		};
-		assert_eq!(body.content_type(), ContentType::Text);
+		assert_eq!(body1.content_type(), ContentType::Text);
 		
-		let body        = UnpackedResponseBody {
+		let body2       = UnpackedResponseBody {
 			body:         b"This is a test".to_vec(),
 			content_type: ContentType::Binary
 		};
-		assert_eq!(body.content_type(), ContentType::Binary);
+		assert_eq!(body2.content_type(), ContentType::Binary);
 	}
 	
 	//		set_content_type													
@@ -362,26 +359,26 @@ mod unpacked_response_body__struct {
 	#[test]
 	fn is_binary() {
 		let mut body = UnpackedResponseBody { body: b"".to_vec(), ..Default::default() };
-		assert_eq!(body.is_binary(), false);
+		assert!(!body.is_binary());
 		
 		_ = body.set_content_type(ContentType::Binary);
-		assert_eq!(body.is_binary(), true);
+		assert!( body.is_binary());
 		
 		_ = body.set_content_type(ContentType::Text);
-		assert_eq!(body.is_binary(), false);
+		assert!(!body.is_binary());
 	}
 	
 	//		is_text																
 	#[test]
 	fn is_text() {
 		let mut body = UnpackedResponseBody { body: b"".to_vec(), ..Default::default() };
-		assert_eq!(body.is_text(), true);
+		assert!( body.is_text());
 		
 		_ = body.set_content_type(ContentType::Binary);
-		assert_eq!(body.is_text(), false);
+		assert!(!body.is_text());
 		
 		_ = body.set_content_type(ContentType::Text);
-		assert_eq!(body.is_text(), true);
+		assert!( body.is_text());
 	}
 	
 	//		as_bytes															
@@ -463,6 +460,7 @@ mod unpacked_response_body__struct {
 	}
 	
 	//		to_base64															
+	#[allow(invalid_from_utf8)]
 	#[test]
 	fn to_base64() {
 		let mut body    = UnpackedResponseBody {
@@ -475,25 +473,26 @@ mod unpacked_response_body__struct {
 		assert_eq!(body.to_base64(), "");
 		
 		body.body       = vec![0x80];
-		assert_err!(from_utf8(&vec![0x80]));
+		assert_err!(from_utf8(&[0x80]));
 		assert_eq!(body.to_base64(), "gA==");
 	}
 	
 	//		from_base64															
+	#[allow(invalid_from_utf8)]
 	#[test]
 	fn from_base64__valid() {
-		let body = UnpackedResponseBody::from_base64("VGhpcyBpcyBhIHRlc3Q=").unwrap();
-		assert_eq!(body.body,         b"This is a test");
-		assert_eq!(body.content_type, ContentType::Binary);
+		let body1 = UnpackedResponseBody::from_base64("VGhpcyBpcyBhIHRlc3Q=").unwrap();
+		assert_eq!(body1.body,         b"This is a test");
+		assert_eq!(body1.content_type, ContentType::Binary);
 		
-		let body = UnpackedResponseBody::from_base64("").unwrap();
-		assert!(body.body.is_empty());
-		assert_eq!(body.content_type, ContentType::Binary);
+		let body2 = UnpackedResponseBody::from_base64("").unwrap();
+		assert!(body2.body.is_empty());
+		assert_eq!(body2.content_type, ContentType::Binary);
 		
-		let body = UnpackedResponseBody::from_base64("gA==").unwrap();
-		assert_eq!(body.body,         vec![0x80]);
-		assert_eq!(body.content_type, ContentType::Binary);
-		assert_err!(from_utf8(&vec![0x80]));
+		let body3 = UnpackedResponseBody::from_base64("gA==").unwrap();
+		assert_eq!(body3.body,         vec![0x80]);
+		assert_eq!(body3.content_type, ContentType::Binary);
+		assert_err!(from_utf8(&[0x80]));
 	}
 	
 	#[test]
@@ -519,11 +518,11 @@ mod unpacked_response_body__struct {
 	//		is_empty															
 	#[test]
 	fn is_empty() {
-		let body = UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() };
-		assert_eq!(body.is_empty(), false);
+		let body1 = UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() };
+		assert!(!body1.is_empty());
 		
-		let body = UnpackedResponseBody { body: b"".to_vec(), ..Default::default() };
-		assert_eq!(body.is_empty(), true);
+		let body2 = UnpackedResponseBody { body: b"".to_vec(), ..Default::default() };
+		assert!( body2.is_empty());
 	}
 	
 	//		len																	
@@ -595,6 +594,7 @@ mod unpacked_response_body__traits {
 		//	Uncommenting the line below would cause a compilation error:
 		//assert_eq!(body, UnpackedResponseBody { body: b"This is".to_vec(), ..Default::default() });
 	}
+	#[allow(clippy::string_lit_as_bytes)]
 	#[test]
 	fn add__char_one_byte() {
 		let body = UnpackedResponseBody { body: b"This is ".to_vec(), ..Default::default() };
@@ -631,11 +631,12 @@ mod unpacked_response_body__traits {
 		//	Uncommenting the line below would cause a compilation error:
 		//assert_eq!(body, UnpackedResponseBody { body: s!("This is ").into_bytes() });
 	}
+	#[allow(clippy::string_lit_as_bytes)]
 	#[test]
 	fn add__char_ref() {
 		let body = UnpackedResponseBody { body: b"This is ".to_vec(), ..Default::default() };
 		let char = 'A';
-		assert_eq!(body + &char, UnpackedResponseBody { body: s!("This is A").into_bytes(), ..Default::default() });
+		assert_eq!(body + char, UnpackedResponseBody { body: s!("This is A").into_bytes(), ..Default::default() });
 		//	We cannot compare to the original response body after using the +
 		//	operator, because it has been consumed.
 		//	Uncommenting the line below would cause a compilation error:
@@ -770,6 +771,7 @@ mod unpacked_response_body__traits {
 		body         += &b" a test"[..];
 		assert_eq!(body, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
 	}
+	#[allow(clippy::string_lit_as_bytes)]
 	#[test]
 	fn add_assign__char_one_byte() {
 		let mut body  = UnpackedResponseBody { body: b"This is ".to_vec(), ..Default::default() };
@@ -794,6 +796,7 @@ mod unpacked_response_body__traits {
 		body         += '𐍈';
 		assert_eq!(body, UnpackedResponseBody { body: s!("This is 𐍈").into_bytes(), ..Default::default() });
 	}
+	#[allow(clippy::string_lit_as_bytes)]
 	#[test]
 	fn add_assign__char_ref() {
 		let mut body  = UnpackedResponseBody { body: b"This is ".to_vec(), ..Default::default() };
@@ -939,7 +942,7 @@ mod unpacked_response_body__traits {
 			body:         b"This is a test".to_vec(),
 			content_type: ContentType::Binary,
 		};
-		assert_eq!(format!("{:?}", body), r#"UnpackedResponseBody { body: "VGhpcyBpcyBhIHRlc3Q=", content_type: Binary }"#);
+		assert_eq!(format!("{body:?}"), r#"UnpackedResponseBody { body: "VGhpcyBpcyBhIHRlc3Q=", content_type: Binary }"#);
 	}
 	#[test]
 	fn debug__text() {
@@ -947,7 +950,7 @@ mod unpacked_response_body__traits {
 			body:         b"This is a test".to_vec(),
 			content_type: ContentType::Text,
 		};
-		assert_eq!(format!("{:?}", body), r#"UnpackedResponseBody { body: "This is a test", content_type: Text }"#);
+		assert_eq!(format!("{body:?}"), r#"UnpackedResponseBody { body: "This is a test", content_type: Text }"#);
 	}
 	
 	//		default																
@@ -964,7 +967,7 @@ mod unpacked_response_body__traits {
 			body:         b"This is a test".to_vec(),
 			content_type: ContentType::Binary,
 		};
-		assert_eq!(format!("{}", body), r#"VGhpcyBpcyBhIHRlc3Q="#);
+		assert_eq!(format!("{body}"), r"VGhpcyBpcyBhIHRlc3Q=");
 	}
 	#[test]
 	fn display__text() {
@@ -972,39 +975,39 @@ mod unpacked_response_body__traits {
 			body:         b"This is a test".to_vec(),
 			content_type: ContentType::Text,
 		};
-		assert_eq!(format!("{}", body), r#"This is a test"#);
+		assert_eq!(format!("{body}"), r"This is a test");
 	}
 	
 	//		from																
 	#[test]
 	fn from__byte_array() {
-		let body       = UnpackedResponseBody::from(b"This is a test");
-		assert_eq!(body,       UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
+		let body1      = UnpackedResponseBody::from(b"This is a test");
+		assert_eq!(body1,      UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
 		
 		let byte_array = b"This is another test";
-		let body       = UnpackedResponseBody::from(byte_array);
-		assert_eq!(body,       UnpackedResponseBody { body: b"This is another test".to_vec(), ..Default::default() });
+		let body2      = UnpackedResponseBody::from(byte_array);
+		assert_eq!(body2,      UnpackedResponseBody { body: b"This is another test".to_vec(), ..Default::default() });
 		assert_eq!(byte_array, b"This is another test");
 	}
 	#[test]
 	fn from__byte_slice() {
-		let body       = UnpackedResponseBody::from(&b"This is a test"[..]);
-		assert_eq!(body,       UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
+		let body1       = UnpackedResponseBody::from(&b"This is a test"[..]);
+		assert_eq!(body1,       UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
 		
 		let byte_slice = &b"This is another test"[..];
-		let body       = UnpackedResponseBody::from(byte_slice);
-		assert_eq!(body,       UnpackedResponseBody { body: b"This is another test".to_vec(), ..Default::default() });
+		let body2      = UnpackedResponseBody::from(byte_slice);
+		assert_eq!(body2,      UnpackedResponseBody { body: b"This is another test".to_vec(), ..Default::default() });
 		assert_eq!(byte_slice, b"This is another test");
 	}
 	#[test]
 	fn from__char() {
-		let body = UnpackedResponseBody::from('A');
-		assert_eq!(body, UnpackedResponseBody { body: b"A".to_vec(), ..Default::default() });
+		let body1 = UnpackedResponseBody::from('A');
+		assert_eq!(body1, UnpackedResponseBody { body: b"A".to_vec(), ..Default::default() });
 		
-		let char = 'B';
-		let body = UnpackedResponseBody::from(char);
-		assert_eq!(body, UnpackedResponseBody { body: b"B".to_vec(), ..Default::default() });
-		assert_eq!(char, 'B');
+		let char  = 'B';
+		let body2 = UnpackedResponseBody::from(char);
+		assert_eq!(body2, UnpackedResponseBody { body: b"B".to_vec(), ..Default::default() });
+		assert_eq!(char,  'B');
 	}
 	#[test]
 	fn from__char_ref() {
@@ -1013,6 +1016,7 @@ mod unpacked_response_body__traits {
 		assert_eq!(body, UnpackedResponseBody { body: b"A".to_vec(), ..Default::default() });
 		assert_eq!(char, 'A');
 	}
+	#[allow(clippy::string_lit_as_bytes)]
 	#[test]
 	fn from__char_one_byte() {
 		let body = UnpackedResponseBody::from('A');
@@ -1048,12 +1052,12 @@ mod unpacked_response_body__traits {
 	}
 	#[test]
 	fn from__hyper_body() {
-		let body       = UnpackedResponseBody::from(HyperBody::from("This is a test"));
-		assert_eq!(body, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
+		let body1       = UnpackedResponseBody::from(HyperBody::from("This is a test"));
+		assert_eq!(body1, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
 		
 		let hyper_body = HyperBody::from("This is another test");
-		let body       = UnpackedResponseBody::from(hyper_body);
-		assert_eq!(body, UnpackedResponseBody { body: b"This is another test".to_vec(), ..Default::default() });
+		let body2      = UnpackedResponseBody::from(hyper_body);
+		assert_eq!(body2, UnpackedResponseBody { body: b"This is another test".to_vec(), ..Default::default() });
 		//	We cannot compare to the original hyper body after calling from(),
 		//	because it has been consumed.
 		//	Uncommenting the line below would cause a compilation error:
@@ -1061,11 +1065,11 @@ mod unpacked_response_body__traits {
 	}
 	#[test]
 	fn from__json() {
-		let body = UnpackedResponseBody::from(json!({
+		let body1 = UnpackedResponseBody::from(json!({
 			"foo": "bar",
 			"baz": 2,
 		}));
-		assert_json_eq!(json!(body), r#"{"foo":"bar","baz":2}"#);
+		assert_json_eq!(json!(body1), r#"{"foo":"bar","baz":2}"#);
 		
 		let json = json!({
 			"str":   "foo",
@@ -1073,8 +1077,8 @@ mod unpacked_response_body__traits {
 			"float": 1.234,
 			"bool":  true,
 		});
-		let body = UnpackedResponseBody::from(json);
-		assert_json_eq!(json!(body), r#"{"str":"foo","int":99,"float":1.234,"bool":true}"#);
+		let body2 = UnpackedResponseBody::from(json);
+		assert_json_eq!(json!(body2), r#"{"str":"foo","int":99,"float":1.234,"bool":true}"#);
 		//	We cannot compare to the original JSON after calling from(),
 		//	because it has been consumed.
 		//	Uncommenting the lines below would cause a compilation error:
@@ -1167,12 +1171,12 @@ mod unpacked_response_body__traits {
 	}
 	#[test]
 	fn from__unsync_box_body() {
-		let body       = UnpackedResponseBody::from(UnsyncBoxBody::new(s!("This is a test")));
-		assert_eq!(body, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
+		let body1       = UnpackedResponseBody::from(UnsyncBoxBody::new(s!("This is a test")));
+		assert_eq!(body1, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
 		
 		let unsync_box = UnsyncBoxBody::new(s!("This is another test"));
-		let body       = UnpackedResponseBody::from(unsync_box);
-		assert_eq!(body, UnpackedResponseBody { body: b"This is another test".to_vec(), ..Default::default() });
+		let body2      = UnpackedResponseBody::from(unsync_box);
+		assert_eq!(body2, UnpackedResponseBody { body: b"This is another test".to_vec(), ..Default::default() });
 		//	We cannot compare to the original unsync box after calling from(),
 		//	because it has been consumed.
 		//	Uncommenting the line below would cause a compilation error:
@@ -1186,12 +1190,12 @@ mod unpacked_response_body__traits {
 	}
 	#[test]
 	fn from__vec_u8() {
-		let body = UnpackedResponseBody::from(b"This is a test".to_vec());
-		assert_eq!(body, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
+		let body1 = UnpackedResponseBody::from(b"This is a test".to_vec());
+		assert_eq!(body1, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
 		
-		let vec  = b"This is another test".to_vec();
-		let body = UnpackedResponseBody::from(vec);
-		assert_eq!(body, UnpackedResponseBody { body: b"This is another test".to_vec(), ..Default::default() });
+		let vec   = b"This is another test".to_vec();
+		let body2 = UnpackedResponseBody::from(vec);
+		assert_eq!(body2, UnpackedResponseBody { body: b"This is another test".to_vec(), ..Default::default() });
 		//	We cannot compare to the original vec after calling from(),
 		//	because it has been consumed.
 		//	Uncommenting the line below would cause a compilation error:
@@ -1253,7 +1257,7 @@ mod unpacked_response_body__traits {
 			body:         b"This is a test".to_vec(),
 			content_type: ContentType::Text,
 		};
-		assert_ok_eq!(serde_json::from_str::<UnpackedResponseBody>(&json), body);
+		assert_ok_eq!(serde_json::from_str::<UnpackedResponseBody>(json), body);
 	}
 	#[test]
 	fn deserialize__text() {
@@ -1262,7 +1266,7 @@ mod unpacked_response_body__traits {
 			body:         b"This is a test".to_vec(),
 			content_type: ContentType::Text,
 		};
-		assert_ok_eq!(serde_json::from_str::<UnpackedResponseBody>(&json), body);
+		assert_ok_eq!(serde_json::from_str::<UnpackedResponseBody>(json), body);
 	}
 	
 	//		write_str															

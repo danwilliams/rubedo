@@ -1,5 +1,3 @@
-#![allow(non_snake_case)]
-
 //		Packages
 
 use super::*;
@@ -56,13 +54,14 @@ mod sha256_hash__struct {
 	use super::*;
 	
 	//		new																	
+	#[allow(clippy::needless_borrows_for_generic_args)]
 	#[test]
 	fn new() {
-		let hash = Sha256Hash::new(TEST_256_HASH);
-		assert_eq!(hash, Sha256Hash { hash: TEST_256_HASH });
+		let hash1 = Sha256Hash::new(TEST_256_HASH);
+		assert_eq!(hash1, Sha256Hash { hash: TEST_256_HASH });
 		
-		let hash = Sha256Hash::new(&TEST_256_HASH);
-		assert_eq!(hash, Sha256Hash { hash: TEST_256_HASH });
+		let hash2 = Sha256Hash::new(&TEST_256_HASH);
+		assert_eq!(hash2, Sha256Hash { hash: TEST_256_HASH });
 	}
 }
 
@@ -165,11 +164,11 @@ mod sha256_hash__bytesized {
 	//		from_base64															
 	#[test]
 	fn from_base64__valid() {
-		let hash = Sha256Hash::from_base64(TEST_256_BASE64).unwrap();
-		assert_eq!(hash.hash, TEST_256_HASH);
+		let hash1 = Sha256Hash::from_base64(TEST_256_BASE64).unwrap();
+		assert_eq!(hash1.hash, TEST_256_HASH);
 		
-		let hash = Sha256Hash::from_base64("").unwrap();
-		assert_eq!(hash.hash, EMPTY_256_HASH);
+		let hash2 = Sha256Hash::from_base64("").unwrap();
+		assert_eq!(hash2.hash, EMPTY_256_HASH);
 	}
 	#[test]
 	fn from_base64__invalid() {
@@ -186,11 +185,11 @@ mod sha256_hash__bytesized {
 	//		from_hex															
 	#[test]
 	fn from_hex__valid() {
-		let hash = Sha256Hash::from_hex(TEST_256_HEX).unwrap();
-		assert_eq!(hash.hash, TEST_256_HASH);
+		let hash1 = Sha256Hash::from_hex(TEST_256_HEX).unwrap();
+		assert_eq!(hash1.hash, TEST_256_HASH);
 		
-		let hash = Sha256Hash::from_hex("").unwrap();
-		assert_eq!(hash.hash, EMPTY_256_HASH);
+		let hash2 = Sha256Hash::from_hex("").unwrap();
+		assert_eq!(hash2.hash, EMPTY_256_HASH);
 	}
 	#[test]
 	fn from_hex__invalid() {
@@ -262,6 +261,7 @@ mod sha256_hash__traits {
 	}
 	
 	//		clone																
+	#[allow(clippy::clone_on_copy)]
 	#[test]
 	fn clone() {
 		let mut hash   = Sha256Hash { hash: TEST_256_HASH };
@@ -288,7 +288,7 @@ mod sha256_hash__traits {
 	#[test]
 	fn debug() {
 		let hash = Sha256Hash { hash: TEST_256_HASH };
-		assert_eq!(format!("{:?}", hash), TEST_256_HEX);
+		assert_eq!(format!("{hash:?}"), TEST_256_HEX);
 	}
 	
 	//		default																
@@ -302,7 +302,7 @@ mod sha256_hash__traits {
 	#[test]
 	fn display() {
 		let hash = Sha256Hash { hash: TEST_256_HASH };
-		assert_eq!(format!("{}", hash), TEST_256_HEX);
+		assert_eq!(format!("{hash}"), TEST_256_HEX);
 	}
 	
 	//		from																
@@ -356,27 +356,27 @@ mod sha256_hash__traits {
 	//		force_from															
 	#[test]
 	fn force_from__byte_slice() {
-		let hash = Sha256Hash::force_from(&TEST_256_HASH[..]);
-		assert_eq!(hash, Sha256Hash { hash: TEST_256_HASH });
+		let hash1 = Sha256Hash::force_from(&TEST_256_HASH[..]);
+		assert_eq!(hash1, Sha256Hash { hash: TEST_256_HASH });
 		
-		let hash = Sha256Hash::force_from(&TEST_256_HASH[..31]);
-		assert_ne!(hash, Sha256Hash { hash: TEST_256_HASH });
+		let hash2 = Sha256Hash::force_from(&TEST_256_HASH[..31]);
+		assert_ne!(hash2, Sha256Hash { hash: TEST_256_HASH });
 	}
 	#[test]
 	fn force_from__vec_u8() {
-		let hash = Sha256Hash::force_from(TEST_256_HASH.to_vec());
-		assert_eq!(hash, Sha256Hash { hash: TEST_256_HASH });
+		let hash1 = Sha256Hash::force_from(TEST_256_HASH.to_vec());
+		assert_eq!(hash1, Sha256Hash { hash: TEST_256_HASH });
 		
-		let hash = Sha256Hash::force_from(TEST_256_HASH[..31].to_vec());
-		assert_ne!(hash, Sha256Hash { hash: TEST_256_HASH });
+		let hash2 = Sha256Hash::force_from(TEST_256_HASH[..31].to_vec());
+		assert_ne!(hash2, Sha256Hash { hash: TEST_256_HASH });
 	}
 	#[test]
 	fn force_from__vec_u8_ref() {
-		let hash = Sha256Hash::force_from(&TEST_256_HASH.to_vec());
-		assert_eq!(hash, Sha256Hash { hash: TEST_256_HASH });
+		let hash1 = Sha256Hash::force_from(&TEST_256_HASH.to_vec());
+		assert_eq!(hash1, Sha256Hash { hash: TEST_256_HASH });
 		
-		let hash = Sha256Hash::force_from(&TEST_256_HASH[..31].to_vec());
-		assert_ne!(hash, Sha256Hash { hash: TEST_256_HASH });
+		let hash2 = Sha256Hash::force_from(&TEST_256_HASH[..31].to_vec());
+		assert_ne!(hash2, Sha256Hash { hash: TEST_256_HASH });
 	}
 	
 	//		hashed																
@@ -498,13 +498,14 @@ mod sha512_hash__struct {
 	use super::*;
 	
 	//		new																	
+	#[allow(clippy::needless_borrows_for_generic_args)]
 	#[test]
 	fn new() {
-		let hash = Sha512Hash::new(TEST_512_HASH);
-		assert_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+		let hash1 = Sha512Hash::new(TEST_512_HASH);
+		assert_eq!(hash1, Sha512Hash { hash: TEST_512_HASH });
 		
-		let hash = Sha512Hash::new(&TEST_512_HASH);
-		assert_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+		let hash2 = Sha512Hash::new(&TEST_512_HASH);
+		assert_eq!(hash2, Sha512Hash { hash: TEST_512_HASH });
 	}
 }
 
@@ -607,11 +608,11 @@ mod sha512_hash__bytesized {
 	//		from_base64															
 	#[test]
 	fn from_base64__valid() {
-		let hash = Sha512Hash::from_base64(TEST_512_BASE64).unwrap();
-		assert_eq!(hash.hash, TEST_512_HASH);
+		let hash1 = Sha512Hash::from_base64(TEST_512_BASE64).unwrap();
+		assert_eq!(hash1.hash, TEST_512_HASH);
 		
-		let hash = Sha512Hash::from_base64("").unwrap();
-		assert_eq!(hash.hash, EMPTY_512_HASH);
+		let hash2 = Sha512Hash::from_base64("").unwrap();
+		assert_eq!(hash2.hash, EMPTY_512_HASH);
 	}
 	#[test]
 	fn from_base64__invalid() {
@@ -628,11 +629,11 @@ mod sha512_hash__bytesized {
 	//		from_hex															
 	#[test]
 	fn from_hex__valid() {
-		let hash = Sha512Hash::from_hex(TEST_512_HEX).unwrap();
-		assert_eq!(hash.hash, TEST_512_HASH);
+		let hash1 = Sha512Hash::from_hex(TEST_512_HEX).unwrap();
+		assert_eq!(hash1.hash, TEST_512_HASH);
 		
-		let hash = Sha512Hash::from_hex("").unwrap();
-		assert_eq!(hash.hash, EMPTY_512_HASH);
+		let hash2 = Sha512Hash::from_hex("").unwrap();
+		assert_eq!(hash2.hash, EMPTY_512_HASH);
 	}
 	#[test]
 	fn from_hex__invalid() {
@@ -704,6 +705,7 @@ mod sha512_hash__traits {
 	}
 	
 	//		clone																
+	#[allow(clippy::clone_on_copy)]
 	#[test]
 	fn clone() {
 		let mut hash   = Sha512Hash { hash: TEST_512_HASH };
@@ -730,7 +732,7 @@ mod sha512_hash__traits {
 	#[test]
 	fn debug() {
 		let hash = Sha512Hash { hash: TEST_512_HASH };
-		assert_eq!(format!("{:?}", hash), TEST_512_HEX);
+		assert_eq!(format!("{hash:?}"), TEST_512_HEX);
 	}
 	
 	//		default																
@@ -744,7 +746,7 @@ mod sha512_hash__traits {
 	#[test]
 	fn display() {
 		let hash = Sha512Hash { hash: TEST_512_HASH };
-		assert_eq!(format!("{}", hash), TEST_512_HEX);
+		assert_eq!(format!("{hash}"), TEST_512_HEX);
 	}
 	
 	//		from																
@@ -800,27 +802,27 @@ mod sha512_hash__traits {
 	//		force_from															
 	#[test]
 	fn force_from__byte_slice() {
-		let hash = Sha512Hash::force_from(&TEST_512_HASH[..]);
-		assert_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+		let hash1 = Sha512Hash::force_from(&TEST_512_HASH[..]);
+		assert_eq!(hash1, Sha512Hash { hash: TEST_512_HASH });
 		
-		let hash = Sha512Hash::force_from(&TEST_512_HASH[..31]);
-		assert_ne!(hash, Sha512Hash { hash: TEST_512_HASH });
+		let hash2 = Sha512Hash::force_from(&TEST_512_HASH[..31]);
+		assert_ne!(hash2, Sha512Hash { hash: TEST_512_HASH });
 	}
 	#[test]
 	fn force_from__vec_u8() {
-		let hash = Sha512Hash::force_from(TEST_512_HASH.to_vec());
-		assert_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+		let hash1 = Sha512Hash::force_from(TEST_512_HASH.to_vec());
+		assert_eq!(hash1, Sha512Hash { hash: TEST_512_HASH });
 		
-		let hash = Sha512Hash::force_from(TEST_512_HASH[..31].to_vec());
-		assert_ne!(hash, Sha512Hash { hash: TEST_512_HASH });
+		let hash2 = Sha512Hash::force_from(TEST_512_HASH[..31].to_vec());
+		assert_ne!(hash2, Sha512Hash { hash: TEST_512_HASH });
 	}
 	#[test]
 	fn force_from__vec_u8_ref() {
-		let hash = Sha512Hash::force_from(&TEST_512_HASH.to_vec());
-		assert_eq!(hash, Sha512Hash { hash: TEST_512_HASH });
+		let hash1 = Sha512Hash::force_from(&TEST_512_HASH.to_vec());
+		assert_eq!(hash1, Sha512Hash { hash: TEST_512_HASH });
 		
-		let hash = Sha512Hash::force_from(&TEST_512_HASH[..31].to_vec());
-		assert_ne!(hash, Sha512Hash { hash: TEST_512_HASH });
+		let hash2 = Sha512Hash::force_from(&TEST_512_HASH[..31].to_vec());
+		assert_ne!(hash2, Sha512Hash { hash: TEST_512_HASH });
 	}
 	
 	//		hashed																
@@ -1029,11 +1031,11 @@ mod signing_key__bytesized {
 	//		from_base64															
 	#[test]
 	fn from_base64__valid() {
-		let key = SigningKey::from_base64(TEST_PRVKEY_B64).unwrap();
-		assert_eq!(key.key, RealSigningKey::from_bytes(&TEST_PRVKEY));
+		let key1 = SigningKey::from_base64(TEST_PRVKEY_B64).unwrap();
+		assert_eq!(key1.key, RealSigningKey::from_bytes(&TEST_PRVKEY));
 		
-		let key = SigningKey::from_base64("").unwrap();
-		assert_eq!(key.key, RealSigningKey::from_bytes(&EMPTY_256_HASH));
+		let key2 = SigningKey::from_base64("").unwrap();
+		assert_eq!(key2.key, RealSigningKey::from_bytes(&EMPTY_256_HASH));
 	}
 	#[test]
 	fn from_base64__invalid() {
@@ -1050,11 +1052,11 @@ mod signing_key__bytesized {
 	//		from_hex															
 	#[test]
 	fn from_hex__valid() {
-		let key = SigningKey::from_hex(TEST_PRVKEY_HEX).unwrap();
-		assert_eq!(key.key, RealSigningKey::from_bytes(&TEST_PRVKEY));
+		let key1 = SigningKey::from_hex(TEST_PRVKEY_HEX).unwrap();
+		assert_eq!(key1.key, RealSigningKey::from_bytes(&TEST_PRVKEY));
 		
-		let key = SigningKey::from_hex("").unwrap();
-		assert_eq!(key.key, RealSigningKey::from_bytes(&EMPTY_256_HASH));
+		let key2 = SigningKey::from_hex("").unwrap();
+		assert_eq!(key2.key, RealSigningKey::from_bytes(&EMPTY_256_HASH));
 	}
 	#[test]
 	fn from_hex__invalid() {
@@ -1094,6 +1096,7 @@ mod signing_key__traits {
 	}
 	
 	//		clone																
+	#[allow(clippy::redundant_clone)]
 	#[test]
 	fn clone() {
 		let key   = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
@@ -1115,7 +1118,7 @@ mod signing_key__traits {
 	#[test]
 	fn debug() {
 		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
-		assert_eq!(format!("{:?}", key), TEST_PRVKEY_HEX);
+		assert_eq!(format!("{key:?}"), TEST_PRVKEY_HEX);
 	}
 	
 	//		default																
@@ -1126,6 +1129,7 @@ mod signing_key__traits {
 	}
 	
 	//		deref																
+	#[allow(clippy::explicit_deref_methods)]
 	#[test]
 	fn deref() {
 		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
@@ -1139,14 +1143,14 @@ mod signing_key__traits {
 		pair.extend_from_slice(&TEST_PRVKEY);
 		pair.extend_from_slice(&TEST_PUBKEY);
 		assert_eq!(key.to_keypair_bytes(), RealSigningKey::from_bytes(&TEST_PRVKEY).to_keypair_bytes());
-		assert_eq!(key.to_keypair_bytes(), &pair[..]);
+		assert_eq!(key.to_keypair_bytes(), &*pair);
 	}
 	
 	//		display																
 	#[test]
 	fn display() {
 		let key = SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) };
-		assert_eq!(format!("{}", key), TEST_PRVKEY_HEX);
+		assert_eq!(format!("{key}"), TEST_PRVKEY_HEX);
 	}
 	
 	//		from																
@@ -1198,27 +1202,27 @@ mod signing_key__traits {
 	//		force_from															
 	#[test]
 	fn force_from__byte_slice() {
-		let key = SigningKey::force_from(&TEST_PRVKEY[..]);
-		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
+		let key1 = SigningKey::force_from(&TEST_PRVKEY[..]);
+		assert_eq!(key1, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 		
-		let key = SigningKey::force_from(&TEST_PRVKEY[..31]);
-		assert_ne!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
+		let key2 = SigningKey::force_from(&TEST_PRVKEY[..31]);
+		assert_ne!(key2, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	#[test]
 	fn force_from__vec_u8() {
-		let key = SigningKey::force_from(TEST_PRVKEY.to_vec());
-		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
+		let key1 = SigningKey::force_from(TEST_PRVKEY.to_vec());
+		assert_eq!(key1, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 		
-		let key = SigningKey::force_from(TEST_PRVKEY[..31].to_vec());
-		assert_ne!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
+		let key2 = SigningKey::force_from(TEST_PRVKEY[..31].to_vec());
+		assert_ne!(key2, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	#[test]
 	fn force_from__vec_u8_ref() {
-		let key = SigningKey::force_from(&TEST_PRVKEY.to_vec());
-		assert_eq!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
+		let key1 = SigningKey::force_from(&TEST_PRVKEY.to_vec());
+		assert_eq!(key1, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 		
-		let key = SigningKey::force_from(&TEST_PRVKEY[..31].to_vec());
-		assert_ne!(key, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
+		let key2 = SigningKey::force_from(&TEST_PRVKEY[..31].to_vec());
+		assert_ne!(key2, SigningKey { key: RealSigningKey::from_bytes(&TEST_PRVKEY) });
 	}
 	
 	//		hash																
@@ -1382,11 +1386,11 @@ mod signing_key_ext__bytesized {
 	//		from_base64															
 	#[test]
 	fn from_base64__valid() {
-		let key = RealSigningKey::from_base64(TEST_PRVKEY_B64).unwrap();
-		assert_eq!(key, RealSigningKey::from_bytes(&TEST_PRVKEY));
+		let key1 = RealSigningKey::from_base64(TEST_PRVKEY_B64).unwrap();
+		assert_eq!(key1, RealSigningKey::from_bytes(&TEST_PRVKEY));
 		
-		let key = RealSigningKey::from_base64("").unwrap();
-		assert_eq!(key, RealSigningKey::from_bytes(&EMPTY_256_HASH));
+		let key2 = RealSigningKey::from_base64("").unwrap();
+		assert_eq!(key2, RealSigningKey::from_bytes(&EMPTY_256_HASH));
 	}
 	#[test]
 	fn from_base64__invalid() {
@@ -1403,11 +1407,11 @@ mod signing_key_ext__bytesized {
 	//		from_hex															
 	#[test]
 	fn from_hex__valid() {
-		let key = RealSigningKey::from_hex(TEST_PRVKEY_HEX).unwrap();
-		assert_eq!(key, RealSigningKey::from_bytes(&TEST_PRVKEY));
+		let key1 = RealSigningKey::from_hex(TEST_PRVKEY_HEX).unwrap();
+		assert_eq!(key1, RealSigningKey::from_bytes(&TEST_PRVKEY));
 		
-		let key = RealSigningKey::from_hex("").unwrap();
-		assert_eq!(key, RealSigningKey::from_bytes(&EMPTY_256_HASH));
+		let key2 = RealSigningKey::from_hex("").unwrap();
+		assert_eq!(key2, RealSigningKey::from_bytes(&EMPTY_256_HASH));
 	}
 	#[test]
 	fn from_hex__invalid() {
@@ -1439,27 +1443,27 @@ mod signing_key_ext__traits {
 	//		force_from															
 	#[test]
 	fn force_from__byte_slice() {
-		let key = RealSigningKey::force_from(&TEST_PRVKEY[..]);
-		assert_eq!(key, RealSigningKey::from_bytes(&TEST_PRVKEY));
+		let key1 = RealSigningKey::force_from(&TEST_PRVKEY[..]);
+		assert_eq!(key1, RealSigningKey::from_bytes(&TEST_PRVKEY));
 		
-		let key = RealSigningKey::force_from(&TEST_PRVKEY[..31]);
-		assert_ne!(key, RealSigningKey::from_bytes(&TEST_PRVKEY));
+		let key2 = RealSigningKey::force_from(&TEST_PRVKEY[..31]);
+		assert_ne!(key2, RealSigningKey::from_bytes(&TEST_PRVKEY));
 	}
 	#[test]
 	fn force_from__vec_u8() {
-		let key = RealSigningKey::force_from(TEST_PRVKEY.to_vec());
-		assert_eq!(key, RealSigningKey::from_bytes(&TEST_PRVKEY));
+		let key1 = RealSigningKey::force_from(TEST_PRVKEY.to_vec());
+		assert_eq!(key1, RealSigningKey::from_bytes(&TEST_PRVKEY));
 		
-		let key = RealSigningKey::force_from(TEST_PRVKEY[..31].to_vec());
-		assert_ne!(key, RealSigningKey::from_bytes(&TEST_PRVKEY));
+		let key2 = RealSigningKey::force_from(TEST_PRVKEY[..31].to_vec());
+		assert_ne!(key2, RealSigningKey::from_bytes(&TEST_PRVKEY));
 	}
 	#[test]
 	fn force_from__vec_u8_ref() {
-		let key = RealSigningKey::force_from(&TEST_PRVKEY.to_vec());
-		assert_eq!(key, RealSigningKey::from_bytes(&TEST_PRVKEY));
+		let key1 = RealSigningKey::force_from(&TEST_PRVKEY.to_vec());
+		assert_eq!(key1, RealSigningKey::from_bytes(&TEST_PRVKEY));
 		
-		let key = RealSigningKey::force_from(&TEST_PRVKEY[..31].to_vec());
-		assert_ne!(key, RealSigningKey::from_bytes(&TEST_PRVKEY));
+		let key2 = RealSigningKey::force_from(&TEST_PRVKEY[..31].to_vec());
+		assert_ne!(key2, RealSigningKey::from_bytes(&TEST_PRVKEY));
 	}
 }
 
@@ -1538,11 +1542,11 @@ mod verifying_key__bytesized {
 	//		from_base64															
 	#[test]
 	fn from_base64__valid() {
-		let key = VerifyingKey::from_base64(TEST_PUBKEY_B64).unwrap();
-		assert_eq!(key.key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		let key1 = VerifyingKey::from_base64(TEST_PUBKEY_B64).unwrap();
+		assert_eq!(key1.key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
 		
-		let key = VerifyingKey::from_base64("").unwrap();
-		assert_eq!(key.key, RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap());
+		let key2 = VerifyingKey::from_base64("").unwrap();
+		assert_eq!(key2.key, RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap());
 	}
 	#[test]
 	fn from_base64__invalid() {
@@ -1559,11 +1563,11 @@ mod verifying_key__bytesized {
 	//		from_hex															
 	#[test]
 	fn from_hex__valid() {
-		let key = VerifyingKey::from_hex(TEST_PUBKEY_HEX).unwrap();
-		assert_eq!(key.key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		let key1 = VerifyingKey::from_hex(TEST_PUBKEY_HEX).unwrap();
+		assert_eq!(key1.key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
 		
-		let key = VerifyingKey::from_hex("").unwrap();
-		assert_eq!(key.key, RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap());
+		let key2 = VerifyingKey::from_hex("").unwrap();
+		assert_eq!(key2.key, RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap());
 	}
 	#[test]
 	fn from_hex__invalid() {
@@ -1603,6 +1607,7 @@ mod verifying_key__traits {
 	}
 	
 	//		clone																
+	#[allow(clippy::clone_on_copy)]
 	#[test]
 	fn clone() {
 		let key   = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
@@ -1624,7 +1629,7 @@ mod verifying_key__traits {
 	#[test]
 	fn debug() {
 		let key = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
-		assert_eq!(format!("{:?}", key), TEST_PUBKEY_HEX);
+		assert_eq!(format!("{key:?}"), TEST_PUBKEY_HEX);
 	}
 	
 	//		default																
@@ -1635,6 +1640,7 @@ mod verifying_key__traits {
 	}
 	
 	//		deref																
+	#[allow(clippy::explicit_deref_methods)]
 	#[test]
 	fn deref() {
 		let key = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
@@ -1646,7 +1652,7 @@ mod verifying_key__traits {
 	#[test]
 	fn display() {
 		let key = VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() };
-		assert_eq!(format!("{}", key), TEST_PUBKEY_HEX);
+		assert_eq!(format!("{key}"), TEST_PUBKEY_HEX);
 	}
 	
 	//		from																
@@ -1698,30 +1704,30 @@ mod verifying_key__traits {
 	//		force_from															
 	#[test]
 	fn force_from__byte_slice() {
-		let key = VerifyingKey::force_from(&TEST_PUBKEY[..]);
-		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+		let key1 = VerifyingKey::force_from(&TEST_PUBKEY[..]);
+		assert_eq!(key1, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
 		
-		let key = VerifyingKey::force_from(&TEST_PUBKEY[..31]);
-		assert_ne!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
-		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap() });
+		let key2 = VerifyingKey::force_from(&TEST_PUBKEY[..31]);
+		assert_ne!(key2, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+		assert_eq!(key2, VerifyingKey { key: RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap() });
 	}
 	#[test]
 	fn force_from__vec_u8() {
-		let key = VerifyingKey::force_from(TEST_PUBKEY.to_vec());
-		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+		let key1 = VerifyingKey::force_from(TEST_PUBKEY.to_vec());
+		assert_eq!(key1, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
 		
-		let key = VerifyingKey::force_from(TEST_PUBKEY[..31].to_vec());
-		assert_ne!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
-		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap() });
+		let key2 = VerifyingKey::force_from(TEST_PUBKEY[..31].to_vec());
+		assert_ne!(key2, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+		assert_eq!(key2, VerifyingKey { key: RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap() });
 	}
 	#[test]
 	fn force_from__vec_u8_ref() {
-		let key = VerifyingKey::force_from(&TEST_PUBKEY.to_vec());
-		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+		let key1 = VerifyingKey::force_from(&TEST_PUBKEY.to_vec());
+		assert_eq!(key1, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
 		
-		let key = VerifyingKey::force_from(&TEST_PUBKEY[..31].to_vec());
-		assert_ne!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
-		assert_eq!(key, VerifyingKey { key: RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap() });
+		let key2 = VerifyingKey::force_from(&TEST_PUBKEY[..31].to_vec());
+		assert_ne!(key2, VerifyingKey { key: RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap() });
+		assert_eq!(key2, VerifyingKey { key: RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap() });
 	}
 	
 	//		hash																
@@ -1885,11 +1891,11 @@ mod verifying_key_ext__bytesized {
 	//		from_base64															
 	#[test]
 	fn from_base64__valid() {
-		let key = RealVerifyingKey::from_base64(TEST_PUBKEY_B64).unwrap();
-		assert_eq!(key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		let key1 = RealVerifyingKey::from_base64(TEST_PUBKEY_B64).unwrap();
+		assert_eq!(key1, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
 		
-		let key = RealVerifyingKey::from_base64("").unwrap();
-		assert_eq!(key, RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap());
+		let key2 = RealVerifyingKey::from_base64("").unwrap();
+		assert_eq!(key2, RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap());
 	}
 	#[test]
 	fn from_base64__invalid() {
@@ -1906,11 +1912,11 @@ mod verifying_key_ext__bytesized {
 	//		from_hex															
 	#[test]
 	fn from_hex__valid() {
-		let key = RealVerifyingKey::from_hex(TEST_PUBKEY_HEX).unwrap();
-		assert_eq!(key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		let key1 = RealVerifyingKey::from_hex(TEST_PUBKEY_HEX).unwrap();
+		assert_eq!(key1, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
 		
-		let key = RealVerifyingKey::from_hex("").unwrap();
-		assert_eq!(key, RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap());
+		let key2 = RealVerifyingKey::from_hex("").unwrap();
+		assert_eq!(key2, RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap());
 	}
 	#[test]
 	fn from_hex__invalid() {
@@ -1942,30 +1948,30 @@ mod verifying_key_ext__traits {
 	//		force_from															
 	#[test]
 	fn force_from__byte_slice() {
-		let key = RealVerifyingKey::force_from(&TEST_PUBKEY[..]);
-		assert_eq!(key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		let key1 = RealVerifyingKey::force_from(&TEST_PUBKEY[..]);
+		assert_eq!(key1, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
 		
-		let key = RealVerifyingKey::force_from(&TEST_PUBKEY[..31]);
-		assert_ne!(key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
-		assert_eq!(key, RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap());
+		let key2 = RealVerifyingKey::force_from(&TEST_PUBKEY[..31]);
+		assert_ne!(key2, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		assert_eq!(key2, RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap());
 	}
 	#[test]
 	fn force_from__vec_u8() {
-		let key = RealVerifyingKey::force_from(TEST_PUBKEY.to_vec());
-		assert_eq!(key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		let key1 = RealVerifyingKey::force_from(TEST_PUBKEY.to_vec());
+		assert_eq!(key1, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
 		
-		let key = RealVerifyingKey::force_from(TEST_PUBKEY[..31].to_vec());
-		assert_ne!(key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
-		assert_eq!(key, RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap());
+		let key2 = RealVerifyingKey::force_from(TEST_PUBKEY[..31].to_vec());
+		assert_ne!(key2, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		assert_eq!(key2, RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap());
 	}
 	#[test]
 	fn force_from__vec_u8_ref() {
-		let key = RealVerifyingKey::force_from(&TEST_PUBKEY.to_vec());
-		assert_eq!(key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		let key1 = RealVerifyingKey::force_from(&TEST_PUBKEY.to_vec());
+		assert_eq!(key1, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
 		
-		let key = RealVerifyingKey::force_from(&TEST_PUBKEY[..31].to_vec());
-		assert_ne!(key, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
-		assert_eq!(key, RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap());
+		let key2 = RealVerifyingKey::force_from(&TEST_PUBKEY[..31].to_vec());
+		assert_ne!(key2, RealVerifyingKey::from_bytes(&TEST_PUBKEY).unwrap());
+		assert_eq!(key2, RealVerifyingKey::from_bytes(&EMPTY_256_HASH).unwrap());
 	}
 }
 

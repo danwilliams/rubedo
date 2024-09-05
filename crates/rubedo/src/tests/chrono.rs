@@ -1,5 +1,3 @@
-#![allow(non_snake_case)]
-
 //		Packages
 
 use super::*;
@@ -262,36 +260,36 @@ mod duration_ext {
 	//		humanize															
 	#[test]
 	fn humanize() {
-		assert_eq!(Duration::try_seconds(          0).unwrap().humanize(), "0 seconds");
-		assert_eq!(Duration::try_seconds(          1).unwrap().humanize(), "1 second");
-		assert_eq!(Duration::try_seconds(          2).unwrap().humanize(), "2 seconds");
-		assert_eq!(Duration::try_seconds(         59).unwrap().humanize(), "59 seconds");
-		assert_eq!(Duration::try_seconds(         60).unwrap().humanize(), "1 minute");
-		assert_eq!(Duration::try_seconds(         61).unwrap().humanize(), "1 minute");
-		assert_eq!(Duration::try_seconds(        130).unwrap().humanize(), "2 minutes");
-		assert_eq!(Duration::try_seconds(       3599).unwrap().humanize(), "59 minutes");
-		assert_eq!(Duration::try_seconds(       3600).unwrap().humanize(), "1 hour");
-		assert_eq!(Duration::try_seconds(       3601).unwrap().humanize(), "1 hour");
-		assert_eq!(Duration::try_seconds(       7200).unwrap().humanize(), "2 hours");
-		assert_eq!(Duration::try_seconds(      86399).unwrap().humanize(), "23 hours");
-		assert_eq!(Duration::try_seconds(      86400).unwrap().humanize(), "1 day");
-		assert_eq!(Duration::try_seconds(      86401).unwrap().humanize(), "1 day");
-		assert_eq!(Duration::try_seconds(     172800).unwrap().humanize(), "2 days");
-		assert_eq!(Duration::try_seconds(     604799).unwrap().humanize(), "6 days");
-		assert_eq!(Duration::try_seconds(     604800).unwrap().humanize(), "1 week");
-		assert_eq!(Duration::try_seconds(     604801).unwrap().humanize(), "1 week");
-		assert_eq!(Duration::try_seconds(    1209600).unwrap().humanize(), "2 weeks");
-		assert_eq!(Duration::try_seconds(    2591999).unwrap().humanize(), "4 weeks");
-		assert_eq!(Duration::try_seconds(    2592000).unwrap().humanize(), "1 month");
-		assert_eq!(Duration::try_seconds(    2592001).unwrap().humanize(), "1 month");
-		assert_eq!(Duration::try_seconds(    5184000).unwrap().humanize(), "2 months");
-		assert_eq!(Duration::try_seconds(   31535999).unwrap().humanize(), "12 months");
-		assert_eq!(Duration::try_seconds(   31536000).unwrap().humanize(), "1 year");
-		assert_eq!(Duration::try_seconds(   31536001).unwrap().humanize(), "1 year");
-		assert_eq!(Duration::try_seconds(   63072000).unwrap().humanize(), "2 years");
-		assert_eq!(Duration::try_seconds(  315360000).unwrap().humanize(), "10 years");
-		assert_eq!(Duration::try_seconds( 3153600000).unwrap().humanize(), "100 years");
-		assert_eq!(Duration::try_seconds(31536000000).unwrap().humanize(), "1000 years");
+		assert_eq!(Duration::try_seconds(             0).unwrap().humanize(), "0 seconds");
+		assert_eq!(Duration::try_seconds(             1).unwrap().humanize(), "1 second");
+		assert_eq!(Duration::try_seconds(             2).unwrap().humanize(), "2 seconds");
+		assert_eq!(Duration::try_seconds(            59).unwrap().humanize(), "59 seconds");
+		assert_eq!(Duration::try_seconds(            60).unwrap().humanize(), "1 minute");
+		assert_eq!(Duration::try_seconds(            61).unwrap().humanize(), "1 minute");
+		assert_eq!(Duration::try_seconds(           130).unwrap().humanize(), "2 minutes");
+		assert_eq!(Duration::try_seconds(         3_599).unwrap().humanize(), "59 minutes");
+		assert_eq!(Duration::try_seconds(         3_600).unwrap().humanize(), "1 hour");
+		assert_eq!(Duration::try_seconds(         3_601).unwrap().humanize(), "1 hour");
+		assert_eq!(Duration::try_seconds(         7_200).unwrap().humanize(), "2 hours");
+		assert_eq!(Duration::try_seconds(        86_399).unwrap().humanize(), "23 hours");
+		assert_eq!(Duration::try_seconds(        86_400).unwrap().humanize(), "1 day");
+		assert_eq!(Duration::try_seconds(        86_401).unwrap().humanize(), "1 day");
+		assert_eq!(Duration::try_seconds(       172_800).unwrap().humanize(), "2 days");
+		assert_eq!(Duration::try_seconds(       604_799).unwrap().humanize(), "6 days");
+		assert_eq!(Duration::try_seconds(       604_800).unwrap().humanize(), "1 week");
+		assert_eq!(Duration::try_seconds(       604_801).unwrap().humanize(), "1 week");
+		assert_eq!(Duration::try_seconds(     1_209_600).unwrap().humanize(), "2 weeks");
+		assert_eq!(Duration::try_seconds(     2_591_999).unwrap().humanize(), "4 weeks");
+		assert_eq!(Duration::try_seconds(     2_592_000).unwrap().humanize(), "1 month");
+		assert_eq!(Duration::try_seconds(     2_592_001).unwrap().humanize(), "1 month");
+		assert_eq!(Duration::try_seconds(     5_184_000).unwrap().humanize(), "2 months");
+		assert_eq!(Duration::try_seconds(    31_535_999).unwrap().humanize(), "12 months");
+		assert_eq!(Duration::try_seconds(    31_536_000).unwrap().humanize(), "1 year");
+		assert_eq!(Duration::try_seconds(    31_536_001).unwrap().humanize(), "1 year");
+		assert_eq!(Duration::try_seconds(    63_072_000).unwrap().humanize(), "2 years");
+		assert_eq!(Duration::try_seconds(   315_360_000).unwrap().humanize(), "10 years");
+		assert_eq!(Duration::try_seconds( 3_153_600_000).unwrap().humanize(), "100 years");
+		assert_eq!(Duration::try_seconds(31_536_000_000).unwrap().humanize(), "1000 years");
 	}
 	
 	//		nanoseconds_full													
@@ -371,19 +369,19 @@ mod duration_ext {
 	}
 	#[test]
 	fn num_nanoseconds_full__beyond_normal_limits() {
-		let duration = Duration::nanoseconds(Duration::MAX_NANOSECONDS)
+		let duration1 = Duration::nanoseconds(Duration::MAX_NANOSECONDS)
 			.checked_add(&Duration::nanoseconds(Duration::MAX_NANOSECONDS))
 			.unwrap()
 		;
-		assert!(duration.num_nanoseconds().is_none());
-		assert_eq!(duration.num_nanoseconds_full(), Duration::MAX_NANOSECONDS as i128 * 2);
+		assert!(duration1.num_nanoseconds().is_none());
+		assert_eq!(duration1.num_nanoseconds_full(), Duration::MAX_NANOSECONDS as i128 * 2);
 		
-		let duration = Duration::nanoseconds(Duration::MIN_NANOSECONDS)
+		let duration2 = Duration::nanoseconds(Duration::MIN_NANOSECONDS)
 			.checked_add(&Duration::nanoseconds(Duration::MIN_NANOSECONDS))
 			.unwrap()
 		;
-		assert!(duration.num_nanoseconds().is_none());
-		assert_eq!(duration.num_nanoseconds_full(), Duration::MIN_NANOSECONDS as i128 * 2);
+		assert!(duration2.num_nanoseconds().is_none());
+		assert_eq!(duration2.num_nanoseconds_full(), Duration::MIN_NANOSECONDS as i128 * 2);
 	}
 	
 	//		num_microseconds_full												
@@ -399,19 +397,19 @@ mod duration_ext {
 	}
 	#[test]
 	fn num_microseconds_full__beyond_normal_limits() {
-		let duration = Duration::microseconds(Duration::MAX_MICROSECONDS)
+		let duration1 = Duration::microseconds(Duration::MAX_MICROSECONDS)
 			.checked_add(&Duration::microseconds(Duration::MAX_MICROSECONDS))
 			.unwrap()
 		;
-		assert!(duration.num_microseconds().is_none());
-		assert_eq!(duration.num_microseconds_full(), Duration::MAX_MICROSECONDS as i128 * 2);
+		assert!(duration1.num_microseconds().is_none());
+		assert_eq!(duration1.num_microseconds_full(), Duration::MAX_MICROSECONDS as i128 * 2);
 		
-		let duration = Duration::microseconds(Duration::MAX_MICROSECONDS)
+		let duration2 = Duration::microseconds(Duration::MAX_MICROSECONDS)
 			.checked_add(&Duration::microseconds(Duration::MAX_MICROSECONDS))
 			.unwrap()
 		;
-		assert!(duration.num_microseconds().is_none());
-		assert_eq!(duration.num_microseconds_full(), Duration::MAX_MICROSECONDS as i128 * 2);
+		assert!(duration2.num_microseconds().is_none());
+		assert_eq!(duration2.num_microseconds_full(), Duration::MAX_MICROSECONDS as i128 * 2);
 	}
 }
 
@@ -469,6 +467,7 @@ mod months_ext {
 	}
 	
 	//		num_years															
+	#[allow(clippy::integer_division)]
 	#[test]
 	fn num_years() {
 		assert_eq!(Months::new(0).num_years(), 0);
@@ -487,6 +486,7 @@ mod naivedate_ext {
 	use super::*;
 	
 	//		MAX_YEAR															
+	#[allow(clippy::decimal_literal_representation)]
 	#[test]
 	fn max_year__max_allowed() {
 		assert_eq!(Utc.with_ymd_and_hms(NaiveDate::MAX_YEAR, 12, 31, 00, 00, 00).unwrap(), Utc.with_ymd_and_hms(262_142, 12, 31, 00, 00, 00).unwrap());
@@ -498,6 +498,7 @@ mod naivedate_ext {
 	}
 	
 	//		MIN_YEAR															
+	#[allow(clippy::decimal_literal_representation)]
 	#[test]
 	fn min_year__min_allowed() {
 		assert_eq!(Utc.with_ymd_and_hms(NaiveDate::MIN_YEAR, 1, 1, 00, 00, 00).unwrap(), Utc.with_ymd_and_hms(-262_143, 1, 1, 00, 00, 00).unwrap());
@@ -524,119 +525,119 @@ mod naivedate_ext {
 	//		days_in_month														
 	#[test]
 	fn days_in_month() {
-		let date = NaiveDate::from_ymd_opt(2000, 1, 1).unwrap();
+		let date = NaiveDate::from_ymd_opt(2_000, 1, 1).unwrap();
 		assert_eq!(date.days_in_month(), 31);
 	}
 	
 	//		days_in_month_opt													
 	#[test]
 	fn days_in_month_opt__valid() {
-		assert_some_eq!(NaiveDate::days_in_month_opt(2000, 1), 31);
+		assert_some_eq!(NaiveDate::days_in_month_opt(2_000, 1), 31);
 	}
 	#[test]
 	fn days_in_month_opt__invalid() {
-		assert_none!(NaiveDate::days_in_month_opt(2000, 13));
+		assert_none!(NaiveDate::days_in_month_opt(2_000, 13));
 	}
 	
 	//		days_in_year														
 	#[test]
 	fn days_in_year__normal() {
-		let date = NaiveDate::from_ymd_opt(2001, 1, 1).unwrap();
+		let date = NaiveDate::from_ymd_opt(2_001, 1, 1).unwrap();
 		assert_eq!(date.days_in_year(), 365);
 	}
 	#[test]
 	fn days_in_year__leap() {
-		let date = NaiveDate::from_ymd_opt(2000, 1, 1).unwrap();
+		let date = NaiveDate::from_ymd_opt(2_000, 1, 1).unwrap();
 		assert_eq!(date.days_in_year(), 366);
 	}
 	
 	//		days_in_year_opt													
 	#[test]
 	fn days_in_year_opt__normal() {
-		assert_some_eq!(NaiveDate::days_in_year_opt(2001), 365);
+		assert_some_eq!(NaiveDate::days_in_year_opt(2_001), 365);
 	}
 	#[test]
 	fn days_in_year_opt__leap() {
-		assert_some_eq!(NaiveDate::days_in_year_opt(2000), 366);
+		assert_some_eq!(NaiveDate::days_in_year_opt(2_000), 366);
 	}
 	
 	//		is_leap_year														
 	#[test]
 	fn is_leap_year() {
-		let date = NaiveDate::from_ymd_opt(2000, 1, 1).unwrap();
-		assert_eq!(date.is_leap_year(), true);
+		let date1 = NaiveDate::from_ymd_opt(2_000, 1, 1).unwrap();
+		assert!( date1.is_leap_year());
 		
-		let date = NaiveDate::from_ymd_opt(2001, 1, 1).unwrap();
-		assert_eq!(date.is_leap_year(), false);
+		let date2 = NaiveDate::from_ymd_opt(2_001, 1, 1).unwrap();
+		assert!(!date2.is_leap_year());
 	}
 	
 	//		is_leap_year_opt													
 	#[test]
 	fn is_leap_year_opt() {
-		assert_some_eq!(NaiveDate::is_leap_year_opt(2000), true);
-		assert_some_eq!(NaiveDate::is_leap_year_opt(2001), false);
+		assert_some_eq!(NaiveDate::is_leap_year_opt(2_000), true);
+		assert_some_eq!(NaiveDate::is_leap_year_opt(2_001), false);
 	}
 	
 	//		start_of_month														
 	#[test]
 	fn start_of_month() {
-		let date = NaiveDate::from_ymd_opt(2000, 1, 20).unwrap();
-		assert_eq!(date.start_of_month(), NaiveDate::from_ymd_opt(2000, 1, 1).unwrap());
+		let date = NaiveDate::from_ymd_opt(2_000, 1, 20).unwrap();
+		assert_eq!(date.start_of_month(), NaiveDate::from_ymd_opt(2_000, 1, 1).unwrap());
 	}
 	
 	//		start_of_month_opt													
 	#[test]
 	fn start_of_month_opt__valid() {
-		assert_some_eq!(NaiveDate::start_of_month_opt(2000, 1), NaiveDate::from_ymd_opt(2000, 1, 1).unwrap());
+		assert_some_eq!(NaiveDate::start_of_month_opt(2_000, 1), NaiveDate::from_ymd_opt(2_000, 1, 1).unwrap());
 	}
 	#[test]
 	fn start_of_month_opt__invalid() {
-		assert_none!(NaiveDate::start_of_month_opt(2000, 13));
+		assert_none!(NaiveDate::start_of_month_opt(2_000, 13));
 	}
 	
 	//		end_of_month														
 	#[test]
 	fn end_of_month() {
-		let date = NaiveDate::from_ymd_opt(2000, 1, 20).unwrap();
-		assert_eq!(date.end_of_month(), NaiveDate::from_ymd_opt(2000, 1, 31).unwrap());
+		let date = NaiveDate::from_ymd_opt(2_000, 1, 20).unwrap();
+		assert_eq!(date.end_of_month(), NaiveDate::from_ymd_opt(2_000, 1, 31).unwrap());
 	}
 	
 	//		end_of_month_opt													
 	#[test]
 	fn end_of_month_opt__valid() {
-		assert_some_eq!(NaiveDate::end_of_month_opt(2000, 1), NaiveDate::from_ymd_opt(2000, 1, 31).unwrap());
+		assert_some_eq!(NaiveDate::end_of_month_opt(2_000, 1), NaiveDate::from_ymd_opt(2_000, 1, 31).unwrap());
 	}
 	#[test]
 	fn end_of_month_opt__invalid() {
-		assert_none!(NaiveDate::end_of_month_opt(2000, 13));
-		assert_none!(NaiveDate::end_of_month_opt(2000000, 1));
-		assert_none!(NaiveDate::end_of_month_opt(2000000, 13));
+		assert_none!(NaiveDate::end_of_month_opt(    2_000, 13));
+		assert_none!(NaiveDate::end_of_month_opt(2_000_000,  1));
+		assert_none!(NaiveDate::end_of_month_opt(2_000_000, 13));
 	}
 	
 	//		start_of_year														
 	#[test]
 	fn start_of_year() {
-		let date = NaiveDate::from_ymd_opt(2000, 2, 20).unwrap();
-		assert_eq!(date.start_of_year(), NaiveDate::from_ymd_opt(2000, 1, 1).unwrap());
+		let date = NaiveDate::from_ymd_opt(2_000, 2, 20).unwrap();
+		assert_eq!(date.start_of_year(), NaiveDate::from_ymd_opt(2_000, 1, 1).unwrap());
 	}
 	
 	//		start_of_year_opt													
 	#[test]
 	fn start_of_year_opt() {
-		assert_some_eq!(NaiveDate::start_of_year_opt(2000), NaiveDate::from_ymd_opt(2000, 1, 1).unwrap());
+		assert_some_eq!(NaiveDate::start_of_year_opt(2_000), NaiveDate::from_ymd_opt(2_000, 1, 1).unwrap());
 	}
 	
 	//		end_of_year														
 	#[test]
 	fn end_of_year() {
-		let date = NaiveDate::from_ymd_opt(2000, 2, 20).unwrap();
-		assert_eq!(date.end_of_year(), NaiveDate::from_ymd_opt(2000, 12, 31).unwrap());
+		let date = NaiveDate::from_ymd_opt(2_000, 2, 20).unwrap();
+		assert_eq!(date.end_of_year(), NaiveDate::from_ymd_opt(2_000, 12, 31).unwrap());
 	}
 	
 	//		end_of_year_opt													
 	#[test]
 	fn end_of_year_opt() {
-		assert_some_eq!(NaiveDate::end_of_year_opt(2000), NaiveDate::from_ymd_opt(2000, 12, 31).unwrap());
+		assert_some_eq!(NaiveDate::end_of_year_opt(2_000), NaiveDate::from_ymd_opt(2_000, 12, 31).unwrap());
 	}
 }
 

@@ -1,5 +1,29 @@
-#![allow(non_snake_case)]
 #![allow(unused_crate_dependencies)]
+
+//	Lints specifically disabled for integration tests
+#![cfg_attr(test, allow(
+	non_snake_case,
+	clippy::cast_lossless,
+	clippy::cast_precision_loss,
+	clippy::cognitive_complexity,
+	clippy::default_numeric_fallback,
+	clippy::exhaustive_enums,
+	clippy::exhaustive_structs,
+	clippy::expect_used,
+	clippy::indexing_slicing,
+	clippy::let_underscore_must_use,
+	clippy::let_underscore_untyped,
+	clippy::missing_assert_message,
+	clippy::missing_panics_doc,
+	clippy::must_use_candidate,
+	clippy::panic,
+	clippy::print_stdout,
+	clippy::tests_outside_test_module,
+	clippy::unwrap_in_result,
+	clippy::unwrap_used,
+))]
+
+
 
 //		Constants
 
@@ -53,17 +77,17 @@ mod signing_key__traits {
 		let mut pair = vec![];
 		pair.extend_from_slice(&TEST_256_HASH);
 		pair.extend_from_slice(&TEST_PUBKEY);
-		assert_eq!(key.to_keypair_bytes(), &pair[..]);
+		assert_eq!(key.to_keypair_bytes(), &*pair);
 	}
 	
 	//		force_from															
 	#[test]
 	fn force_from__byte_slice() {
-		let key = SigningKey::force_from(&TEST_256_HASH[..]);
-		assert_eq!(key.as_bytes(), &TEST_256_HASH);
+		let key1 = SigningKey::force_from(&TEST_256_HASH[..]);
+		assert_eq!(key1.as_bytes(), &TEST_256_HASH);
 		
-		let key = SigningKey::force_from(&TEST_256_HASH[..31]);
-		assert_ne!(key.as_bytes(), &TEST_256_HASH);
+		let key2 = SigningKey::force_from(&TEST_256_HASH[..31]);
+		assert_ne!(key2.as_bytes(), &TEST_256_HASH);
 	}
 }
 
