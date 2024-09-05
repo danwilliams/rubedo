@@ -6,11 +6,27 @@
 
 
 
+//		Global configuration
+
+//	Customisations of the standard linting configuration
+#![allow(clippy::expect_used)] // Okay in a proc macro
+#![allow(clippy::panic)]       // Okay in a proc macro
+
+
+
+//		Modules
+
+/// List of crates used only in integration tests.
+#[cfg(test)]
+mod integration_tests {
+	use trybuild as _;
+}
+
 //		Packages
 
+use core::net::IpAddr;
 use proc_macro::{TokenStream, TokenTree};
 use quote::quote;
-use std::net::IpAddr;
 
 
 
@@ -102,18 +118,22 @@ pub fn ip(input: TokenStream) -> TokenStream {
 		if count == 0 || count == 2 || count == 4 || count == 6 {
 			match token {
 				TokenTree::Literal(lit) => str.push_str(&lit.to_string().replace('"', "")),
-				_                       => panic!("Invalid IP address")
+				TokenTree::Group(_)     |
+				TokenTree::Ident(_)     |
+				TokenTree::Punct(_)     => panic!("Invalid IP address"),
 			}
 		} else if count == 1 || count == 3 || count == 5 {
 			match token {
 				TokenTree::Punct(punct) => {
-					match punct.to_string().chars().next().unwrap() {
+					match punct.to_string().chars().next().expect("Invalid IP address") {
 						'.'             => str.push('.'),
 						','             => str.push(','),
 						_               => panic!("Invalid IP address")
 					}
 				},
-				_                       => panic!("Invalid IP address")
+				TokenTree::Group(_)   |
+				TokenTree::Ident(_)   |
+				TokenTree::Literal(_) => panic!("Invalid IP address"),
 			}
 		} else {
 			panic!("Invalid IP address")
@@ -128,9 +148,7 @@ pub fn ip(input: TokenStream) -> TokenStream {
 	//	dots and commas.
 	let count_dots   = str.matches('.').count();
 	let count_commas = str.matches(',').count();
-	if !((count_dots == 3 && count_commas == 0) || (count_dots == 0 && count_commas == 3)) {
-		panic!("Invalid IP address");
-	}
+	assert!(((count_dots == 3 && count_commas == 0) || (count_dots == 0 && count_commas == 3)), "Invalid IP address");
 	let ip_addr      = str.replace(',', ".").parse::<IpAddr>().expect("Invalid IP address").to_string();
 	quote! {
 		#ip_addr.parse::<std::net::IpAddr>().unwrap()
