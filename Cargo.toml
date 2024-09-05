@@ -1,21 +1,21 @@
 [workspace]
 resolver = "2"
-members = ["crates/*"]
+members  = ["crates/*"]
 
 [workspace.package]
-version = "0.5.3"
-edition = "2021"
-license = "MIT"
-authors = ["Dan Williams <dan@dotfive.co.uk>"]
+version    = "0.5.3"
+edition    = "2021"
+license    = "MIT"
+authors    = ["Dan Williams <dan@dotfive.co.uk>"]
 repository = "https://github.com/danwilliams/rubedo"
-readme = "README.md"
+readme     = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [profile.release]
-strip = true     # Automatically strip symbols from the binary
-opt-level = 3    # Maximum optimisation (this is the cargo default)
-lto = "thin"     # Enable link-time optimisation (fast)
+strip     = true   # Automatically strip symbols from the binary
+opt-level = 3      # Maximum optimisation (this is the cargo default)
+lto       = "thin" # Enable link-time optimisation (fast)
 
 #=================================[  LINTS  ]===================================
 

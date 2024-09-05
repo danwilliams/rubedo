@@ -1,14 +1,14 @@
 [package]
-name = "rubedo-macros"
-version = "0.5.3"
-description = "Proc macros for Rubedo"
-categories = ["development-tools"]
-keywords = ["macro", "library", "utility"]
-edition.workspace = true
-license.workspace = true
-authors.workspace = true
+name                 = "rubedo-macros"
+version              = "0.5.3"
+description          = "Proc macros for Rubedo"
+categories           = ["development-tools"]
+keywords             = ["macro", "library", "utility"]
+edition.workspace    = true
+license.workspace    = true
+authors.workspace    = true
 repository.workspace = true
-readme = "README.md"
+readme               = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -18,10 +18,10 @@ proc-macro = true
 #==============================[  DEPENDENCIES  ]===============================
 
 [dependencies]
-quote = "1.0.37"
+quote              = "1.0.37"
 
 [dev-dependencies]
-trybuild = "1.0.99"
+trybuild           = "1.0.99"
 
 #=================================[  LINTS  ]===================================
 
