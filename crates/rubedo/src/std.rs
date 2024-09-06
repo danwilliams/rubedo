@@ -1,6 +1,3 @@
-#![allow(clippy::std_instead_of_core,
-reason = "False positive due to bug: https://github.com/rust-lang/rust-clippy/issues/12438"
-)]
 //! This module provides extensions to the Rust standard library.
 
 
@@ -22,6 +19,7 @@ use crate::{
 use base64::DecodeError;
 use core::{
 	convert::TryFrom,
+	error::Error,
 	fmt::{Debug, Display, self},
 	future::Future,
 	hash::Hash,
@@ -37,7 +35,6 @@ use serde::{Deserialize, Serialize};
 use std::{
 	borrow::Cow,
 	env,
-	error::Error,
 	ffi::OsString,
 	fs::File,
 	io::{BufReader, Error as IoError, Read},
