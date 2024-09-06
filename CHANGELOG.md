@@ -12,6 +12,17 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.6.0 (06 September 2024)
+
+### Added
+
+  - Added MSRV (Minimum Supported Rust Version) in `Cargo.toml`, set to 1.81.0
+
+### Changed
+
+  - Upgraded to [Axum][] 0.7 and [Hyper][] 1.0
+
+
 ## 0.5.4 (05 September 2024)
 
 ### Changed
@@ -21,7 +32,7 @@ The format is based on [Keep a Changelog][], and this project adheres to
   - Updated lint configuration for Rust 1.81
   - Updated crate dependencies
   - Linted tests
-  - Moved linting configuration to Cargo.toml
+  - Moved linting configuration to `Cargo.toml`
 
 
 ## 0.5.3 (03 May 2024)
