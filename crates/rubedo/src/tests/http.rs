@@ -4,14 +4,96 @@ use super::*;
 use crate::sugar::s;
 use assert_json_diff::assert_json_eq;
 use axum::response::IntoResponse;
+use bytes::Bytes;
 use claims::{assert_err, assert_ok, assert_ok_eq};
-use core::str::from_utf8;
+use core::{
+	convert::Infallible,
+	future::Future,
+	net::SocketAddr,
+	pin::Pin,
+	str::from_utf8,
+};
+use http::{Request, Response};
+use http_body_util::Full;
+use hyper::{
+	body::Incoming,
+	server::conn::http1,
+	service::Service,
+};
+use hyper_util::{
+	client::legacy::Client,
+	rt::{TokioExecutor, TokioIo},
+};
 use serde_assert::{
 	Deserializer as TestDeserializer,
-	Serializer as TestSerializer,
+	Serializer   as TestSerializer,
 	token::Token,
 };
 use serde_json::json;
+use tokio::{
+	net::TcpListener,
+	spawn,
+};
+
+
+
+//		Structs
+
+//		TestService																
+struct TestService(Bytes);
+
+//󰭅		TestService																
+impl TestService {
+	const fn new(data: Bytes) -> Self {
+		Self(data)
+	}
+}
+
+//󰭅		Service																	
+impl Service<Request<Incoming>> for TestService {
+	type Response = Response<Full<Bytes>>;
+	type Error    = Infallible;
+	type Future   = Pin<Box<dyn Future<Output = Result<Self::Response, Self::Error>> + Send>>;
+	
+	//		call																
+	fn call(&self, _req: Request<Incoming>) -> Self::Future {
+		let data = self.0.clone();
+		Box::pin(async move { Ok(Response::new(Full::new(data))) })
+	}
+}
+
+
+
+//		Functions
+
+//		create_incoming_for_testing												
+async fn create_incoming_for_testing(data: Bytes) -> Incoming {
+	//	Bind to a local address on a random port. It isn't ideal to have to use
+	//	actual network calls to test Incoming, but there is no way to create an
+	//	Instance directly, and this is the only way to actually obtain one.
+	let listener = TcpListener::bind(SocketAddr::from(([127, 0, 0, 1], 0))).await.unwrap();
+	let address  = listener.local_addr().unwrap();
+	
+	//	Spawn the server task to listen and send the specified data back. This
+	//	will respond to a single request and then stop.
+	let handle   = spawn(async move {
+		let (stream, _) = listener.accept().await.unwrap();
+		let io          = TokioIo::new(stream);
+		let service     = TestService::new(data.clone());
+		
+		http1::Builder::new().serve_connection(io, service).await.expect("Error serving connection");
+	});
+	
+	//	Create a client and send a request
+	let incoming = Client::builder(TokioExecutor::new())
+		.build_http::<Full<Bytes>>()
+		.get(format!("http://{address}").parse().unwrap()).await.unwrap()
+		.into_body()
+	;
+	
+	handle.await.unwrap();
+	incoming
+}
 
 
 
@@ -1051,17 +1133,30 @@ mod unpacked_response_body__traits {
 		assert_eq!(body, UnpackedResponseBody { body: s!("𐍈").into_bytes(), ..Default::default() });
 	}
 	#[test]
-	fn from__hyper_body() {
-		let body1       = UnpackedResponseBody::from(HyperBody::from("This is a test"));
+	fn from__full() {
+		let body1 = UnpackedResponseBody::from(Full::new(Bytes::from("This is a test")));
 		assert_eq!(body1, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
 		
-		let hyper_body = HyperBody::from("This is another test");
-		let body2      = UnpackedResponseBody::from(hyper_body);
+		let full  = Full::new(Bytes::from("This is another test"));
+		let body2 = UnpackedResponseBody::from(full);
 		assert_eq!(body2, UnpackedResponseBody { body: b"This is another test".to_vec(), ..Default::default() });
-		//	We cannot compare to the original hyper body after calling from(),
+		//	We cannot compare to the original Full after calling from(),
 		//	because it has been consumed.
 		//	Uncommenting the line below would cause a compilation error:
-		//assert_eq!(hyper_body, "This is another test");
+		//assert_eq!(full, "This is another test");
+	}
+	#[tokio::test]
+	async fn from__incoming() {
+		let body1    = UnpackedResponseBody::from(create_incoming_for_testing(Bytes::from("This is a test")).await);
+		assert_eq!(body1, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
+		
+		let incoming = create_incoming_for_testing(Bytes::from("This is another test")).await;
+		let body2    = UnpackedResponseBody::from(incoming);
+		assert_eq!(body2, UnpackedResponseBody { body: b"This is another test".to_vec(), ..Default::default() });
+		//	We cannot compare to the original incoming after calling from(),
+		//	because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(incoming, "This is another test");
 	}
 	#[test]
 	fn from__json() {
@@ -1168,19 +1263,6 @@ mod unpacked_response_body__traits {
 		//	because it has been consumed.
 		//	Uncommenting the line below would cause a compilation error:
 		//assert_eq!(cow, "This is a test");
-	}
-	#[test]
-	fn from__unsync_box_body() {
-		let body1       = UnpackedResponseBody::from(UnsyncBoxBody::new(s!("This is a test")));
-		assert_eq!(body1, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
-		
-		let unsync_box = UnsyncBoxBody::new(s!("This is another test"));
-		let body2      = UnpackedResponseBody::from(unsync_box);
-		assert_eq!(body2, UnpackedResponseBody { body: b"This is another test".to_vec(), ..Default::default() });
-		//	We cannot compare to the original unsync box after calling from(),
-		//	because it has been consumed.
-		//	Uncommenting the line below would cause a compilation error:
-		//assert_eq!(unsync_box, "This is another test");
 	}
 	#[test]
 	fn from__u8() {
@@ -1324,7 +1406,7 @@ mod response_ext {
 	fn unpack__hyper_body() {
 		let mut response = Response::builder()
 			.status(StatusCode::OK)
-			.body(HyperBody::from("This is a test"))
+			.body(Full::new(Bytes::from("This is a test")))
 			.unwrap()
 		;
 		let unpacked     = response.unpack();

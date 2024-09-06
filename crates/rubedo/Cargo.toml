@@ -15,16 +15,19 @@ readme               = "README.md"
 #==============================[  DEPENDENCIES  ]===============================
 
 [dependencies]
+axum               = "0.7.5"
 base64             = "0.22.1"
+bytes              = "1.7.1"
 chrono             = { version = "0.4.38", features = ["alloc", "clock", "std"] }
 digest             = { version = "0.10.7", features = ["rand_core"] }
 ed25519-dalek      = { version = "2.1.1", features = ["rand_core"] }
 futures            = "0.3.30"
+futures-util       = "0.3.30"
 generic-array      = "0.14.7" # Cannot move to 1.0.0 until the digest crate does
 hex                = "0.4.3"
-http               = "0.2.12"
-http-body          = "0.4.6"
-hyper              = "0.14.28"
+http               = "1.1.0"
+http-body-util     = "0.1.2"
+hyper              = "1.4.1"
 rand_core          = "0.6.4"
 rubedo-macros      = { path = "../rubedo-macros", version = "0.5.4" }
 rust_decimal       = "1.36.0"
@@ -35,8 +38,8 @@ tokio              = { version = "1.40.0", features = ["fs", "io-std", "io-util"
 
 [dev-dependencies]
 assert-json-diff   = "2.0.2"
-axum               = "0.6.20"
 claims             = "0.7.1"
+hyper-util         = { version = "0.1.7", features = ["client-legacy"] }
 rand               = "0.8.5"
 serde_assert       = "0.8.0"
 tempfile           = "3.12.0"

@@ -17,20 +17,24 @@ mod tests;
 
 //		Packages
 
+use axum::body::{Body as AxumBody, to_bytes};
 use base64::{DecodeError, engine::{Engine as _, general_purpose::STANDARD as BASE64}};
+use bytes::Bytes;
 use core::{
 	cmp::Ordering,
 	convert::Infallible,
 	error::Error,
 	fmt::{Debug, Display, Write, self},
+	mem,
 	ops::{Add, AddAssign},
 	str::FromStr,
 };
 use futures::executor;
+use futures_util::FutureExt;
 use http::{Response, StatusCode};
-use http_body::combinators::UnsyncBoxBody;
+use http_body_util::{BodyExt, Collected, Full};
 use hyper::{
-	body::{Body as HyperBody, Bytes, to_bytes},
+	body::Incoming,
 	HeaderMap,
 	header::HeaderValue,
 };
@@ -1201,6 +1205,31 @@ impl From<&char> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		From Full<Bytes>														
+impl From<Full<Bytes>> for UnpackedResponseBody {
+	//		from																
+	/// Converts a [`Full<Bytes>`](Full) to an [`UnpackedResponseBody`].
+	fn from(b: Full<Bytes>) -> Self {
+		//	Collect the body into Collected<Bytes>
+		let collected = b.collect().now_or_never()
+			.unwrap_or_else(|| Ok(Collected::default()))
+			.unwrap_or_else(|_| Collected::default())
+		;
+		Self { body: collected.to_bytes().to_vec(), ..Default::default() }
+	}
+}
+
+//󰭅		From Incoming															
+impl From<Incoming> for UnpackedResponseBody {
+	//		from																
+	/// Converts an [`Incoming`] to an [`UnpackedResponseBody`].
+	fn from(b: Incoming) -> Self {
+		//	Collect the body into Collected<Bytes>
+		let collected = executor::block_on(b.collect()).unwrap_or_else(|_| Collected::default());
+		Self { body: collected.to_bytes().to_vec(), ..Default::default() }
+	}
+}
+
 //󰭅		From Json																
 impl From<Json> for UnpackedResponseBody {
 	//		from																
@@ -1217,18 +1246,6 @@ impl From<&Json> for UnpackedResponseBody {
 	/// [`UnpackedResponseBody`].
 	fn from(j: &Json) -> Self {
 		Self { body: j.to_string().into_bytes(), ..Default::default() }
-	}
-}
-
-//󰭅		From HyperBody															
-impl From<HyperBody> for UnpackedResponseBody {
-	//		from																
-	/// Converts a [`UnsyncBoxBody<Bytes, E>`](UnsyncBoxBody) to an
-	/// [`UnpackedResponseBody`].
-	fn from(b: HyperBody) -> Self {
-		let bytes = executor::block_on(to_bytes(b));
-		let body  = bytes.map_or_else(|_| b"Conversion error".to_vec(), |body| body.to_vec());
-		Self { body, ..Default::default() }
 	}
 }
 
@@ -1285,21 +1302,6 @@ impl<'a> From<Cow<'a, str>> for UnpackedResponseBody {
 	/// [`UnpackedResponseBody`].
 	fn from(s: Cow<'a, str>) -> Self {
 		Self { body: s.into_owned().into_bytes(), ..Default::default() }
-	}
-}
-
-//󰭅		From UnsyncBoxBody<Bytes>												
-impl<E> From<UnsyncBoxBody<Bytes, E>> for UnpackedResponseBody
-where
-	E: Error + 'static,
-{
-	//		from																
-	/// Converts a [`UnsyncBoxBody<Bytes, E>`](UnsyncBoxBody) to an
-	/// [`UnpackedResponseBody`].
-	fn from(b: UnsyncBoxBody<Bytes, E>) -> Self {
-		let bytes = executor::block_on(to_bytes(b));
-		let body  = bytes.map_or_else(|_| b"Conversion error".to_vec(), |body| body.to_vec());
-		Self { body, ..Default::default() }
 	}
 }
 
@@ -1483,30 +1485,41 @@ impl ResponseExt for Response<()> {
 	}
 }
 
-//󰭅		Response<UnsyncBoxBody<Bytes>>											
-impl<E> ResponseExt for Response<UnsyncBoxBody<Bytes, E>>
-where
-	E: Error + 'static,
-{
+//󰭅		Response<AxumBody>														
+impl ResponseExt for Response<AxumBody> {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
-		let result = executor::block_on(to_bytes(self.body_mut()));
-		match result {
-			Ok(body) => Ok(convert_response(self.status(), self.headers(), &body)),
-			Err(err) => Err(ResponseError::ConversionError(Box::new(err))),
-		}
+		let status  = self.status();
+		let headers = self.headers().clone();
+		let bytes   = executor::block_on(to_bytes(mem::replace(self.body_mut(), AxumBody::empty()), usize::MAX))
+			.map_err(|e| ResponseError::ConversionError(Box::new(e)))?
+		;
+		Ok(convert_response(status, &headers, &bytes))
 	}
 }
 
-//󰭅		Response<HyperBody>														
-impl ResponseExt for Response<HyperBody> {
+//󰭅		Response<Full<Bytes>>													
+impl ResponseExt for Response<Full<Bytes>> {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
-		let result = executor::block_on(to_bytes(self.body_mut()));
-		match result {
-			Ok(body) => Ok(convert_response(self.status(), self.headers(), &body)),
-			Err(err) => Err(ResponseError::ConversionError(Box::new(err))),
-		}
+		//	Collect the body into Collected<Bytes>
+		let collected = self.body().clone().collect().now_or_never()
+			.unwrap_or_else(|| Ok(Collected::default()))
+			.map_err(|e| ResponseError::ConversionError(Box::new(e)))?
+		;
+		Ok(convert_response(self.status(), self.headers(), &collected.to_bytes()))
+	}
+}
+
+//󰭅		Response<Incoming>														
+impl ResponseExt for Response<Incoming> {
+	//		unpack																
+	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
+		//	Collect the body into Collected<Bytes>
+		let collected = executor::block_on(self.body_mut().collect())
+			.map_err(|e| ResponseError::ConversionError(Box::new(e)))?
+		;
+		Ok(convert_response(self.status(), self.headers(), &collected.to_bytes()))
 	}
 }
 
@@ -1514,11 +1527,7 @@ impl ResponseExt for Response<HyperBody> {
 impl ResponseExt for Response<String> {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {
-		let result = executor::block_on(to_bytes(self.body_mut()));
-		match result {
-			Ok(body) => Ok(convert_response(self.status(), self.headers(), &body)),
-			Err(err) => Err(ResponseError::ConversionError(Box::new(err))),
-		}
+		Ok(convert_response(self.status(), self.headers(), &Bytes::from(self.body().clone())))
 	}
 }
 
