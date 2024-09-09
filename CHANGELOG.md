@@ -12,6 +12,13 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.6.1 (09 September 2024)
+
+### Added
+
+  - Added feature flags for each module
+
+
 ## 0.6.0 (06 September 2024)
 
 ### Added
