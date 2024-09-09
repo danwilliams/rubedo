@@ -13,37 +13,53 @@ readme                 = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+#================================[  FEATURES  ]=================================
+
+[features]
+#default = ["std", "sugar"] # Will be applied in the next minor version
+default = ["full"]          # Current choice to avoid breaking changes - disable with { default-features = false }
+full    = ["axum", "chrono", "crypto", "http", "serde", "std", "sugar"]
+axum    = ["http",  "dep:axum"]
+chrono  = ["sugar", "dep:chrono"]
+crypto  = ["std",   "dep:digest", "dep:ed25519-dalek", "dep:generic-array", "dep:rand_core", "dep:sha2", "dep:tokio"]
+http    = [         "dep:base64", "dep:bytes", "dep:futures", "dep:futures-util", "dep:http", "dep:http-body-util", "dep:hyper", "dep:serde", "dep:serde_json"]
+serde   = ["std",   "dep:serde"]
+std     = ["sugar", "dep:base64", "dep:hex", "dep:rust_decimal", "dep:serde"]
+sugar   = [         "dep:rubedo-macros"]
+
 #==============================[  DEPENDENCIES  ]===============================
 
 [dependencies]
-axum               = "0.7.5"
-base64             = "0.22.1"
-bytes              = "1.7.1"
-chrono             = { version = "0.4.38", features = ["alloc", "clock", "std"] }
-digest             = { version = "0.10.7", features = ["rand_core"] }
-ed25519-dalek      = { version = "2.1.1", features = ["rand_core"] }
-futures            = "0.3.30"
-futures-util       = "0.3.30"
-generic-array      = "0.14.7" # Cannot move to 1.0.0 until the digest crate does
-hex                = "0.4.3"
-http               = "1.1.0"
-http-body-util     = "0.1.2"
-hyper              = "1.4.1"
-rand_core          = "0.6.4"
-rubedo-macros      = { path = "../rubedo-macros", version = "0.6.0" }
-rust_decimal       = "1.36.0"
-serde              = { version = "1.0.209", features = ["derive"] }
-serde_json         = { version = "1.0.128", features = ["preserve_order"] }
-sha2               = "0.10.8"
-tokio              = { version = "1.40.0", features = ["fs", "io-std", "io-util", "macros"] }
+axum               = { optional = true, version = "0.7.5" }
+base64             = { optional = true, version = "0.22.1" }
+bytes              = { optional = true, version = "1.7.1" }
+chrono             = { optional = true, version = "0.4.38", features = ["alloc", "clock", "std"] }
+digest             = { optional = true, version = "0.10.7", features = ["rand_core"] }
+ed25519-dalek      = { optional = true, version = "2.1.1", features = ["rand_core"] }
+futures            = { optional = true, version = "0.3.30" }
+futures-util       = { optional = true, version = "0.3.30" }
+generic-array      = { optional = true, version = "0.14.7" } # Cannot move to 1.0.0 until the digest crate does
+hex                = { optional = true, version = "0.4.3" }
+http               = { optional = true, version = "1.1.0" }
+http-body-util     = { optional = true, version = "0.1.2" }
+hyper              = { optional = true, version = "1.4.1" }
+rand_core          = { optional = true, version = "0.6.4" }
+rubedo-macros      = { optional = true, version = "0.6.0", path = "../rubedo-macros" }
+rust_decimal       = { optional = true, version = "1.36.0" }
+serde              = { optional = true, version = "1.0.209", features = ["derive"] }
+serde_json         = { optional = true, version = "1.0.128", features = ["preserve_order"] }
+sha2               = { optional = true, version = "0.10.8" }
+tokio              = { optional = true, version = "1.40.0", features = ["fs", "io-std", "io-util", "macros"] }
 
 [dev-dependencies]
 assert-json-diff   = "2.0.2"
 claims             = "0.7.1"
 hyper-util         = { version = "0.1.7", features = ["client-legacy"] }
 rand               = "0.8.5"
+rubedo             = { path = ".", features = ["sugar"] }
 serde_assert       = "0.8.0"
 tempfile           = "3.12.0"
+tokio              = { version = "1.40.0", features = ["fs", "io-std", "io-util", "macros"] }
 
 #=================================[  LINTS  ]===================================
 

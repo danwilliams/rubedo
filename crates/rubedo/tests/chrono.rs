@@ -1,3 +1,4 @@
+#![cfg(feature = "chrono")]
 #![allow(unused_crate_dependencies, reason = "Creates a lot of noise")]
 
 //	Lints specifically disabled for integration tests

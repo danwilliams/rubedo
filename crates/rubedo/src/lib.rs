@@ -40,11 +40,23 @@
 
 //		Modules
 
+#[cfg(feature = "chrono")]
 pub mod chrono;
+#[cfg(feature = "crypto")]
 pub mod crypto;
+#[cfg(feature = "http")]
 pub mod http;
+#[cfg(feature = "serde")]
 pub mod serde;
+#[cfg(feature = "std")]
 pub mod std;
+#[cfg(feature = "sugar")]
 pub mod sugar;
+
+/// List of crates used only in integration tests.
+#[cfg(test)]
+mod integration_tests {
+	use rubedo as _;
+}
 
 

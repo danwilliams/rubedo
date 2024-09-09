@@ -12,20 +12,15 @@ mod tests;
 
 //		Packages
 
-use crate::{
-	crypto::Hashed,
-	sugar::s,
-};
+use crate::sugar::s;
 use base64::DecodeError;
 use core::{
 	convert::TryFrom,
 	error::Error,
 	fmt::{Debug, Display, self},
-	future::Future,
 	hash::Hash,
 	str::FromStr,
 };
-use digest::Digest;
 use hex::FromHexError;
 use rust_decimal::{
 	Decimal,
@@ -36,13 +31,23 @@ use std::{
 	borrow::Cow,
 	env,
 	ffi::OsString,
-	fs::File,
-	io::{BufReader, Error as IoError, Read},
 	path::{Component as PathComponent, Path, PathBuf},
 };
-use tokio::{
-	fs::File as AsyncFile,
-	io::{AsyncReadExt, BufReader as AsyncBufReader},
+
+#[cfg(feature = "crypto")]
+use crate::crypto::Hashed;
+#[cfg(feature = "crypto")]
+use ::{
+	core::future::Future,
+	digest::Digest,
+	std::{
+		fs::File,
+		io::{BufReader, Error as IoError, Read},
+	},
+	tokio::{
+		fs::File as AsyncFile,
+		io::{AsyncReadExt, BufReader as AsyncBufReader},
+	},
 };
 
 
@@ -615,6 +620,7 @@ pub trait ByteSizedMut<const SIZE: usize>:
 
 //§		FileExt																	
 /// This trait provides additional functionality to [`File`].
+#[cfg(feature = "crypto")]
 pub trait FileExt {
 	/// Hashes the contents of a file.
 	/// 
@@ -635,6 +641,7 @@ pub trait FileExt {
 }
 
 //󰭅		File																	
+#[cfg(feature = "crypto")]
 impl FileExt for File {
 	fn hash<T: Hashed>(path: &Path) -> Result<T, IoError> {
 		let file       = Self::open(path)?;
@@ -655,6 +662,7 @@ impl FileExt for File {
 
 //§		AsyncFileExt															
 /// This trait provides additional functionality to [`AsyncFile`].
+#[cfg(feature = "crypto")]
 pub trait AsyncFileExt {
 	/// Hashes the contents of a file asynchronously.
 	/// 
@@ -677,6 +685,7 @@ pub trait AsyncFileExt {
 }
 
 //󰭅		AsyncFile																
+#[cfg(feature = "crypto")]
 impl AsyncFileExt for AsyncFile {
 	async fn hash<T: Hashed>(path: &Path) -> Result<T, IoError> {
 		let file       = Self::open(path).await?;

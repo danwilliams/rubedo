@@ -17,7 +17,6 @@ mod tests;
 
 //		Packages
 
-use axum::body::{Body as AxumBody, to_bytes};
 use base64::{DecodeError, engine::{Engine as _, general_purpose::STANDARD as BASE64}};
 use bytes::Bytes;
 use core::{
@@ -25,7 +24,6 @@ use core::{
 	convert::Infallible,
 	error::Error,
 	fmt::{Debug, Display, Write, self},
-	mem,
 	ops::{Add, AddAssign},
 	str::FromStr,
 };
@@ -41,6 +39,12 @@ use hyper::{
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as DeError};
 use serde_json::Value as Json;
 use std::borrow::Cow;
+
+#[cfg(feature = "axum")]
+use ::{
+	axum::body::{Body as AxumBody, to_bytes},
+	core::mem,
+};
 
 
 
@@ -1486,6 +1490,7 @@ impl ResponseExt for Response<()> {
 }
 
 //󰭅		Response<AxumBody>														
+#[cfg(feature = "axum")]
 impl ResponseExt for Response<AxumBody> {
 	//		unpack																
 	fn unpack(&mut self) -> Result<UnpackedResponse, ResponseError> {

@@ -25,4 +25,13 @@ The modules provided are:
   - [serde](docs/serde.md)
   - [sugar](docs/sugar.md)
 
+Note, each module is behind a feature flag, in order to keep the crate size down
+for those who don't need all the functionality.
+
+At present the default is for all features to be enabled, for
+backwards-compatibility. This will change to a smaller set of default features
+in the next minor version. The defaults can be overridden in your `Cargo.toml`
+file by setting the `default-features` key to `false` and then enabling the
+features you want.
+
 
