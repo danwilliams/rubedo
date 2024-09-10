@@ -1209,6 +1209,15 @@ impl From<&char> for UnpackedResponseBody {
 	}
 }
 
+//󰭅		From AxumBody															
+#[cfg(feature = "axum")]
+impl From<AxumBody> for UnpackedResponseBody {
+	//		from																
+	fn from(b: AxumBody) -> Self {
+		Self { body: executor::block_on(to_bytes(b, usize::MAX)).unwrap_or_default().to_vec(), ..Default::default() }
+	}
+}
+
 //󰭅		From Full<Bytes>														
 impl From<Full<Bytes>> for UnpackedResponseBody {
 	//		from																

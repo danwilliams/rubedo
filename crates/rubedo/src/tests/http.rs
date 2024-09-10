@@ -1062,6 +1062,19 @@ mod unpacked_response_body__traits {
 	
 	//		from																
 	#[test]
+	fn from__axum_body() {
+		let body1 = UnpackedResponseBody::from(AxumBody::from("This is a test"));
+		assert_eq!(body1, UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
+		
+		let axum  = AxumBody::from("This is another test");
+		let body2 = UnpackedResponseBody::from(axum);
+		assert_eq!(body2, UnpackedResponseBody { body: b"This is another test".to_vec(), ..Default::default() });
+		//	We cannot compare to the original AxumBody after calling from(),
+		//	because it has been consumed.
+		//	Uncommenting the line below would cause a compilation error:
+		//assert_eq!(axum, "This is another test");
+	}
+	#[test]
 	fn from__byte_array() {
 		let body1      = UnpackedResponseBody::from(b"This is a test");
 		assert_eq!(body1,      UnpackedResponseBody { body: b"This is a test".to_vec(), ..Default::default() });
