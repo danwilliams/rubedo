@@ -16,6 +16,7 @@
 //	Lints specifically disabled for unit tests
 #![cfg_attr(test, allow(
 	non_snake_case,
+	clippy::arithmetic_side_effects,
 	clippy::cast_lossless,
 	clippy::cast_precision_loss,
 	clippy::cognitive_complexity,
@@ -31,6 +32,7 @@
 	clippy::must_use_candidate,
 	clippy::panic,
 	clippy::print_stdout,
+	clippy::too_many_lines,
 	clippy::unwrap_in_result,
 	clippy::unwrap_used,
 	reason = "Not useful in unit tests"
