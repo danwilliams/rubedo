@@ -9,6 +9,7 @@
 //		Global configuration
 
 //	Customisations of the standard linting configuration
+#![allow(clippy::absolute_paths,          reason = "Needed in the re-exported docs")]
 #![allow(clippy::expect_used,             reason = "Okay in a proc macro")]
 #![allow(clippy::items_after_test_module, reason = "Not needed with separated tests")]
 #![allow(clippy::panic,                   reason = "Also okay in a proc macro")]
@@ -27,7 +28,6 @@ mod integration_tests {
 
 //		Packages
 
-use core::net::IpAddr;
 use proc_macro::{TokenStream, TokenTree};
 use quote::quote;
 
@@ -38,8 +38,8 @@ use quote::quote;
 //		ip!																		
 /// Builds an IP address from a range of input types.
 /// 
-/// This macro provides syntactic sugar to build an [`IpAddr`] from a range of
-/// input types.
+/// This macro provides syntactic sugar to build an [`IpAddr`](core::net::IpAddr)
+/// from a range of input types.
 /// 
 /// If left empty, it will default to `0.0.0.0`.
 /// 
@@ -51,15 +51,16 @@ use quote::quote;
 /// 
 /// Note that this macro will panic if it fails to parse a string literal as an
 /// IP address. This is by design, so that all variants of IP creation return an
-/// [`IpAddr`] instance, just like [`IpAddr::from()`]. This macro is intended to
-/// be used with hard-coded addresses. If you need to handle errors, use the
-/// standard [`IpAddr::from_str()`](IpAddr) method instead.
+/// [`IpAddr`](core::net::IpAddr) instance, just like [`IpAddr::from()`](core::net::IpAddr::from()).
+/// This macro is intended to be used with hard-coded addresses. If you need to
+/// handle errors, use the standard [`IpAddr::from_str()`](core::str::FromStr::from_str())
+/// method instead.
 /// 
 /// # Examples
 /// 
 /// ```
 /// use rubedo_macros::ip;
-/// use std::net::IpAddr;
+/// use core::net::IpAddr;
 /// 
 /// assert_eq!(ip!(1.2.3.4), IpAddr::from([1, 2, 3, 4]));
 /// assert_eq!(ip!("1.2.3.4"), IpAddr::from([1, 2, 3, 4]));
@@ -68,7 +69,7 @@ use quote::quote;
 /// 
 /// # See also
 /// 
-/// * [`IpAddr`]
+/// * [`IpAddr`](core::net::IpAddr)
 /// 
 #[proc_macro]
 pub fn ip(input: TokenStream) -> TokenStream {
@@ -144,17 +145,17 @@ pub fn ip(input: TokenStream) -> TokenStream {
 	}
 	if str.is_empty() {
 		return quote! {
-			std::net::IpAddr::from([0, 0, 0, 0])
+			core::net::IpAddr::from([0, 0, 0, 0])
 		}.into();
 	}
 	//	We should not have more than 3 dots, more than 3 commas, or a mixture of
 	//	dots and commas.
 	let count_dots   = str.matches('.').count();
 	let count_commas = str.matches(',').count();
-	assert!(((count_dots == 3 && count_commas == 0) || (count_dots == 0 && count_commas == 3)), "Invalid IP address");
-	let ip_addr      = str.replace(',', ".").parse::<IpAddr>().expect("Invalid IP address").to_string();
+	assert!((count_dots == 3 && count_commas == 0) || (count_dots == 0 && count_commas == 3), "Invalid IP address");
+	let ip_addr      = str.replace(',', ".").parse::<core::net::IpAddr>().expect("Invalid IP address").to_string();
 	quote! {
-		#ip_addr.parse::<std::net::IpAddr>().unwrap()
+		#ip_addr.parse::<core::net::IpAddr>().unwrap()
 	}.into()
 }
 
