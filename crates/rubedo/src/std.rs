@@ -1376,15 +1376,15 @@ impl PathExt for Path {
 		if self.as_os_str().is_empty() {
 			return basepath;
 		}
-		let mut path = if self.is_absolute() {
+		let path = if self.is_absolute() {
 			self.to_path_buf()
 		} else {
 			basepath.join(self)
 		}.normalize();
-		if !path.starts_with(&basepath) {
-			path = basepath;
+		match path.strip_prefix(&basepath) {
+			Ok(_)  => path,
+			Err(_) => basepath,
 		}
-		path
 	}
 	
 	//		strip_parentdirs													
