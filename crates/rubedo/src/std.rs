@@ -1337,12 +1337,18 @@ impl PathExt for Path {
 			return cwd;
 		}
 		let mut segments: Vec<OsString> = vec![];
+		let mut had_prefix              = false;
+		let mut had_root                = false;
 		for (i, component) in self.components().enumerate() {
 			match component {
-				PathComponent::Prefix(_) |
-				PathComponent::RootDir   => {
-					if i == 0 {
+				PathComponent::Prefix(prefix) => {
+					segments.push(prefix.as_os_str().to_os_string());
+					had_prefix = true;
+				},
+				PathComponent::RootDir => {
+					if had_prefix || i == 0 {
 						segments.push(component.as_os_str().to_os_string());
+						had_root = true;
 					}
 				},
 				PathComponent::CurDir    |
@@ -1355,8 +1361,11 @@ impl PathExt for Path {
 								.as_mut()
 						);
 					}
-					if component == PathComponent::ParentDir && segments.len() > 1 {
-						drop(segments.pop());
+					if component == PathComponent::ParentDir {
+						//	Only pop if we have segments beyond the root components
+						if segments.len() > usize::from(had_prefix).saturating_add(usize::from(had_root)) {
+							drop(segments.pop());
+						}
 					}
 				},
 				PathComponent::Normal(_) => {
@@ -1430,7 +1439,14 @@ impl PathExt for Path {
 				},
 			}
 		}
-		segments.iter().collect()
+		if cfg!(windows) {
+			segments.iter()
+				.collect::<PathBuf>()
+				.to_str()
+				.map_or_else(PathBuf::new, |s| PathBuf::from(s.trim_start_matches('\\')))
+		} else {
+			segments.iter().collect()
+		}
 	}
 }
 

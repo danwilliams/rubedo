@@ -625,6 +625,38 @@ mod path_ext {
 		path = PathBuf::from("tests/🥳.rs");
 		assert_eq!(path.normalize(), cwd.join("tests/🥳.rs"));
 		
+		if cfg!(windows) {
+			path = PathBuf::from(r"C:\tests\std.rs");
+			assert_eq!(path.normalize(), PathBuf::from(r"C:\tests\std.rs"));
+			
+			path = PathBuf::from(r"C:\tests\\std.rs");
+			assert_eq!(path.normalize(), PathBuf::from(r"C:\tests\std.rs"));
+			
+			path = PathBuf::from(r"C:\tests\.\std.rs");
+			assert_eq!(path.normalize(), PathBuf::from(r"C:\tests\std.rs"));
+			
+			path = PathBuf::from(r"C:\tests\..\std.rs");
+			assert_eq!(path.normalize(), PathBuf::from(r"C:\std.rs"));
+			
+			path = PathBuf::from(r"C:\tests\..\..\std.rs");
+			assert_eq!(path.normalize(), PathBuf::from(r"C:\std.rs"));
+			
+			path = PathBuf::from(r"\\SERVER\Share\tests\\std.rs");
+			assert_eq!(path.normalize(), PathBuf::from(r"\\SERVER\Share\tests\std.rs"));
+			
+			path = PathBuf::from(r"\\SERVER\Share\tests\std.rs");
+			assert_eq!(path.normalize(), PathBuf::from(r"\\SERVER\Share\tests\std.rs"));
+			
+			path = PathBuf::from(r"\\SERVER\Share\tests\.\std.rs");
+			assert_eq!(path.normalize(), PathBuf::from(r"\\SERVER\Share\tests\std.rs"));
+			
+			path = PathBuf::from(r"\\SERVER\Share\tests\..\std.rs");
+			assert_eq!(path.normalize(), PathBuf::from(r"\\SERVER\Share\std.rs"));
+			
+			path = PathBuf::from(r"\\SERVER\Share\tests\..\..\std.rs");
+			assert_eq!(path.normalize(), PathBuf::from(r"\\SERVER\Share\std.rs"));
+		}
+		
 		let path2: &Path = Path::new("/tests/std.rs");
 		assert_eq!(path2.normalize(), Path::new("/tests/std.rs"));
 		assert_eq!(path2.normalize(), PathBuf::from("/tests/std.rs"));
