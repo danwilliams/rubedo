@@ -797,26 +797,44 @@ mod path_ext {
 		path = PathBuf::from("..");
 		assert_eq!(path.strip_root(), path);
 		
-		path = PathBuf::from("/");
-		assert_eq!(path.strip_root(), PathBuf::from(""));
-		
-		path = PathBuf::from("/tests/std.rs");
-		assert_eq!(path.strip_root(), PathBuf::from("tests/std.rs"));
-		
-		path = PathBuf::from("//tests/std.rs");
-		assert_eq!(path.strip_root(), PathBuf::from("tests/std.rs"));
+		if cfg!(unix) {
+			path = PathBuf::from("/");
+			assert_eq!(path.strip_root(), PathBuf::from(""));
+			
+			path = PathBuf::from("/tests/std.rs");
+			assert_eq!(path.strip_root(), PathBuf::from("tests/std.rs"));
+			
+			path = PathBuf::from("//tests/std.rs");
+			assert_eq!(path.strip_root(), PathBuf::from("tests/std.rs"));
+		}
 		
 		if cfg!(windows) {
+			//	A leading single slash is seen as relative
+			path = PathBuf::from(r"\");
+			assert_eq!(path.strip_root(), PathBuf::from(r"\"));
+			
+			//	A leading double-slash without any qualifying path is seen as relative
+			path = PathBuf::from(r"\\");
+			assert_eq!(path.strip_root(), PathBuf::from(r"\\"));
+			
+			//	A path with a prefix but no slash is seen as relative
+			path = PathBuf::from(r"C:tests\std.rs");
+			assert_eq!(path.strip_root(), PathBuf::from(r"C:tests\std.rs"));
+			
 			path = PathBuf::from(r"C:\tests\std.rs");
 			assert_eq!(path.strip_root(), PathBuf::from(r"tests\std.rs"));
 			
-			path = PathBuf::from(r"C:tests\std.rs");
-			assert_eq!(path.strip_root(), PathBuf::from(r"tests\std.rs"));
-			
+			//	A leading single slash is seen as relative
 			path = PathBuf::from(r"\tests\std.rs");
-			assert_eq!(path.strip_root(), PathBuf::from(r"tests\std.rs"));
+			assert_eq!(path.strip_root(), PathBuf::from(r"\tests\std.rs"));
 			
+			//	A leading double-slash means a UNC (Universal Naming Convention)
+			//	path, which expects a server name and share name, so the entire
+			//	path here is interpreted as being the prefix
 			path = PathBuf::from(r"\\tests\std.rs");
+			assert_eq!(path.strip_root(), PathBuf::from(""));
+			
+			path = PathBuf::from(r"\\SERVER\Share\tests\std.rs");
 			assert_eq!(path.strip_root(), PathBuf::from(r"tests\std.rs"));
 		}
 		
