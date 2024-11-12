@@ -23,9 +23,9 @@ full    = ["axum", "chrono", "crypto", "http", "serde", "std", "sugar"]
 axum    = ["http",  "dep:axum"]
 chrono  = ["sugar", "dep:chrono"]
 crypto  = ["std",   "dep:digest", "dep:ed25519-dalek", "dep:generic-array", "dep:rand_core", "dep:sha2", "dep:tokio"]
-http    = [         "dep:base64", "dep:bytes", "dep:futures", "dep:futures-util", "dep:http", "dep:http-body-util", "dep:hyper", "dep:serde", "dep:serde_json"]
+http    = [         "dep:base64", "dep:bytes", "dep:futures", "dep:futures-util", "dep:http", "dep:http-body-util", "dep:hyper", "dep:serde", "dep:serde_json", "dep:thiserror"]
 serde   = ["std",   "dep:serde"]
-std     = ["sugar", "dep:base64", "dep:hex", "dep:rust_decimal", "dep:serde"]
+std     = [         "dep:base64", "dep:hex", "dep:rust_decimal", "dep:serde", "dep:thiserror"]
 sugar   = [         "dep:rubedo-macros"]
 
 #==============================[  DEPENDENCIES  ]===============================
@@ -50,6 +50,7 @@ rust_decimal       = { optional = true, version = "1.36.0" }
 serde              = { optional = true, version = "1.0.209", features = ["derive"] }
 serde_json         = { optional = true, version = "1.0.128", features = ["preserve_order"] }
 sha2               = { optional = true, version = "0.10.8" }
+thiserror          = { optional = true, version = "2.0.3" }
 tokio              = { optional = true, version = "1.40.0", features = ["fs", "io-std", "io-util", "macros"] }
 
 [dev-dependencies]

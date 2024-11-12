@@ -12,12 +12,10 @@ mod tests;
 
 //		Packages
 
-use crate::sugar::s;
 use base64::DecodeError;
 use core::{
 	convert::TryFrom,
-	error::Error,
-	fmt::{Debug, Display, self},
+	fmt::{Debug, Display},
 	hash::Hash,
 	str::FromStr,
 };
@@ -33,6 +31,7 @@ use std::{
 	ffi::OsString,
 	path::{Component as PathComponent, Path, PathBuf},
 };
+use thiserror::Error as ThisError;
 
 #[cfg(feature = "crypto")]
 use crate::crypto::Hashed;
@@ -56,38 +55,25 @@ use ::{
 
 //		ByteSizedError															
 /// The possible errors that can occur when working with [`ByteSized`] types.
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, ThisError)]
 #[non_exhaustive]
 pub enum ByteSizedError {
 	/// The supplied data is longer than `ByteSized::SIZE` bytes.
+	#[error("The supplied data is longer than {0} bytes")]
 	DataTooLong(usize),
 	
 	/// The supplied data is shorter than `ByteSized::SIZE` bytes.
+	#[error("The supplied data is shorter than {0} bytes")]
 	DataTooShort(usize),
 	
 	/// The supplied string is not in valid base64 format.
+	#[error("The supplied data is not in valid base64 format")]
 	InvalidBase64String,
 	
 	/// The supplied string is not in valid hexadecimal format.
+	#[error("The supplied data is not in valid hexadecimal format")]
 	InvalidHexString,
 }
-
-//󰭅		Display																	
-impl Display for ByteSizedError {
-	//		fmt																	
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		let description = match *self {
-			Self::DataTooLong(size)   => format!("The supplied data is longer than {size} bytes"),
-			Self::DataTooShort(size)  => format!("The supplied data is shorter than {size} bytes"),
-			Self::InvalidBase64String => s!(     "The supplied data is not in valid base64 format"),
-			Self::InvalidHexString    => s!(     "The supplied data is not in valid hexadecimal format"),
-		};
-		write!(f, "{description}")
-	}
-}
-
-//󰭅		Error																	
-impl Error for ByteSizedError {}
 
 
 

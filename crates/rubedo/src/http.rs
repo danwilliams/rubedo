@@ -39,6 +39,7 @@ use hyper::{
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as DeError};
 use serde_json::Value as Json;
 use std::borrow::Cow;
+use thiserror::Error as ThisError;
 
 #[cfg(feature = "axum")]
 use ::{
@@ -77,27 +78,13 @@ pub enum ContentType {
 
 //		ResponseError															
 /// The possible errors that can occur when working with an HTTP response.
-#[derive(Debug)]
+#[derive(Debug, ThisError)]
 #[non_exhaustive]
 pub enum ResponseError {
 	/// An error encountered while converting the response body to bytes.
+	#[error("Error encountered while converting response body to bytes: {0}")]
 	ConversionError(Box<dyn Error>),
 }
-
-//󰭅		Display																	
-impl Display for ResponseError {
-	//		fmt																	
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		#[expect(clippy::pattern_type_mismatch, reason = "Cannot dereference a Box")]
-		let description = match self {
-			Self::ConversionError(err) => format!("Error encountered while converting response body to bytes: {err}"),
-		};
-		write!(f, "{description}")
-	}
-}
-
-//󰭅		Error																	
-impl Error for ResponseError {}
 
 
 
