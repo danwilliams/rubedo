@@ -12,6 +12,22 @@ The format is based on [Keep a Changelog][], and this project adheres to
 [Semantic Versioning][].
 
 
+## 0.6.3 (12 November 2024)
+
+### Fixed
+
+  - Fixed `std::PathExt.normalize()` on Windows
+  - Fixed `std::PathExt.restrict()` on Windows
+  - Fixed `std::PathExt.strip_root()` tests on Windows
+  - Adjusted `IpAddr` referencing in the `ip!` macro
+
+### Changed
+
+  - Implemented `ThisError` for error types
+  - Updated lint configuration for Rust 1.82
+  - Updated crate dependencies
+
+
 ## 0.6.2 (10 September 2024)
 
 ### Added
