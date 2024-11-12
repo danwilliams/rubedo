@@ -23,7 +23,7 @@ proc-macro = true
 quote              = "1.0.37"
 
 [dev-dependencies]
-trybuild           = "1.0.99"
+trybuild           = "1.0.101"
 
 #=================================[  LINTS  ]===================================
 
