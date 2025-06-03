@@ -31,7 +31,7 @@
 
 
 
-//		Packages
+//		Packages																										
 
 use rubedo::{
 	serde::as_str,
@@ -42,7 +42,7 @@ use serde::{Serialize, Serializer};
 
 
 
-//		Structs
+//		Structs																											
 
 //		AsStrAsStr																
 #[derive(Serialize)]
@@ -60,7 +60,7 @@ struct AsStrHelper {
 
 
 
-//		Functions
+//		Functions																										
 
 //		helper																	
 fn helper<T, S>(value: &T, serializer: S) -> Result<S::Ok, S::Error>
@@ -73,7 +73,7 @@ where
 
 
 
-//		Tests
+//		Tests																											
 
 //		AsStr																	
 #[test]

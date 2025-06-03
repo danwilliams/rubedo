@@ -3,7 +3,7 @@
 
 
 
-//		Modules
+//		Modules																											
 
 #[cfg(test)]
 #[path = "tests/crypto.rs"]
@@ -11,7 +11,7 @@ mod tests;
 
 
 
-//		Packages
+//		Packages																										
 
 use crate::std::{ByteSized, ByteSizedError, ByteSizedFull, ByteSizedMut, ForceFrom};
 use base64::{DecodeError, engine::{Engine as _, general_purpose::STANDARD as BASE64}};
@@ -38,7 +38,7 @@ use std::borrow::Cow;
 
 
 
-//		Structs
+//		Structs																											
 
 //		Sha256Hash																
 /// A SHA256 hash.
@@ -1342,7 +1342,7 @@ impl TryFrom<&Vec<u8>> for VerifyingKey {
 
 
 
-//		Traits
+//		Traits																											
 
 //§		Hashed																	
 /// This trait provides a formal representation of actual hash values.

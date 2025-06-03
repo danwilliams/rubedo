@@ -31,7 +31,7 @@
 
 
 
-//		Constants
+//		Constants																										
 
 const TEST_256_HASH:   [u8; 32] = [
 	0xbe, 0xef, 0x1a, 0x2b, 0x3c, 0x4d, 0x5e, 0x6f, 0x7a, 0x8b, 0x9c, 0x0d, 0x1e, 0x2f, 0x3a, 0x4b,
@@ -46,7 +46,7 @@ const TEST_256_BASE64: &str     = "vu8aKzxNXm96i5wNHi86S1xtfo+aCxwtPk9aa3yNng8="
 
 
 
-//		Tests
+//		Tests																											
 
 //		SigningKey																
 #[cfg(test)]

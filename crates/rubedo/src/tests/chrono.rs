@@ -1,4 +1,4 @@
-//		Packages
+//		Packages																										
 
 use super::*;
 use chrono::{DateTime, TimeZone as _};
@@ -6,7 +6,7 @@ use claims::{assert_none, assert_some_eq};
 
 
 
-//		Tests
+//		Tests																											
 
 //§		DurationExt																
 #[cfg(test)]

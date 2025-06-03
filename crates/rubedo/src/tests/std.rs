@@ -1,4 +1,4 @@
-//		Packages
+//		Packages																										
 
 use super::*;
 use crate::{
@@ -11,7 +11,7 @@ use tempfile::{TempDir, tempdir};
 
 
 
-//		Constants
+//		Constants																										
 
 const HASH_INPUT:      &str     = "This is a test";
 const TEST_256_HASH:   [u8; 32] = [
@@ -27,7 +27,7 @@ const TEST_512_HASH:   [u8; 64] = [
 
 
 
-//		Common
+//		Common																											
 
 //		setup_files																
 fn setup_files() -> (TempDir, PathBuf) {
@@ -39,7 +39,7 @@ fn setup_files() -> (TempDir, PathBuf) {
 
 
 
-//		Tests
+//		Tests																											
 
 //§		AsStr																	
 #[cfg(test)]

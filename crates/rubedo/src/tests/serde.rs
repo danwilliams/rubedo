@@ -1,4 +1,4 @@
-//		Packages
+//		Packages																										
 
 use super::*;
 use crate::sugar::s;
@@ -8,7 +8,7 @@ use serde::Serialize;
 
 
 
-//		Enums
+//		Enums																											
 
 //		Position																
 /// This enum is used to test the `into` and `try_from` functions. It represents
@@ -167,7 +167,7 @@ impl From<u8> for PositionInfallible {
 
 
 
-//		Structs
+//		Structs																											
 
 //		StringStandard															
 #[derive(Serialize)]
@@ -426,7 +426,7 @@ struct ToPence {
 
 
 
-//		Tests
+//		Tests																											
 
 //		as_str																	
 #[test]

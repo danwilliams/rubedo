@@ -129,7 +129,7 @@
 
 
 
-//		Modules
+//		Modules																											
 
 #[cfg(test)]
 #[path = "tests/serde.rs"]
@@ -137,7 +137,7 @@ mod tests;
 
 
 
-//		Packages
+//		Packages																										
 
 use crate::std::{AsStr, FromIntWithScale, ToIntWithScale};
 use core::{
@@ -149,7 +149,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as DeErr
 
 
 
-//		Functions
+//		Functions																										
 
 //		as_str																	
 /// Returns a string representation of a type from a string slice.

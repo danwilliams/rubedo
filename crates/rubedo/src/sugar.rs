@@ -5,7 +5,7 @@
 
 
 
-//		Modules
+//		Modules																											
 
 #[cfg(test)]
 #[path = "tests/sugar.rs"]
@@ -13,13 +13,13 @@ mod tests;
 
 
 
-//		Packages
+//		Packages																										
 
 pub use rubedo_macros::ip;
 
 
 
-//		Macros
+//		Macros																											
 
 //		s!																		
 /// Converts a [`str`] string literal to an owned [`String`].

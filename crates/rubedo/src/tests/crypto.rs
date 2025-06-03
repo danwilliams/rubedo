@@ -1,4 +1,4 @@
-//		Packages
+//		Packages																										
 
 use super::*;
 use crate::sugar::s;
@@ -10,7 +10,7 @@ use std::hash::DefaultHasher;
 
 
 
-//		Constants
+//		Constants																										
 
 const HASH_INPUT:      &str     = "This is a test";
 const EMPTY_256_HASH:  [u8; 32] = [0; 32];
@@ -46,7 +46,7 @@ const TEST_PUBKEY_B64: &str     = "n9e55yjeR6t9nYFucFdgbdMC843e5kJy4O2TPwiWvI4="
 
 
 
-//		Tests
+//		Tests																											
 
 //		Sha256Hash																
 #[cfg(test)]

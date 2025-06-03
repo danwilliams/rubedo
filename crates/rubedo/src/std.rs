@@ -2,7 +2,7 @@
 
 
 
-//		Modules
+//		Modules																											
 
 #[cfg(test)]
 #[path = "tests/std.rs"]
@@ -10,7 +10,7 @@ mod tests;
 
 
 
-//		Packages
+//		Packages																										
 
 use base64::DecodeError;
 use core::{
@@ -51,7 +51,7 @@ use ::{
 
 
 
-//		Enums
+//		Enums																											
 
 //		ByteSizedError															
 /// The possible errors that can occur when working with [`ByteSized`] types.
@@ -77,7 +77,7 @@ pub enum ByteSizedError {
 
 
 
-//		Structs
+//		Structs																											
 
 //		LimitIterator															
 /// This struct provides an iterator that limits the number of items returned.
@@ -123,7 +123,7 @@ impl<I: Iterator> Iterator for LimitIterator<I> {
 
 
 
-//		Traits
+//		Traits																											
 
 //§		AsStr																	
 /// This trait provides an [`as_str()`](AsStr::as_str()) method.

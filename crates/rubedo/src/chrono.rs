@@ -3,7 +3,7 @@
 
 
 
-//		Modules
+//		Modules																											
 
 #[cfg(test)]
 #[path = "tests/chrono.rs"]
@@ -11,7 +11,7 @@ mod tests;
 
 
 
-//		Packages
+//		Packages																										
 
 use crate::sugar::s;
 use chrono::{Datelike as _, Duration, Months, NaiveDate, Utc};
@@ -19,7 +19,7 @@ use core::ops::Neg as _;
 
 
 
-//		Traits
+//		Traits																											
 
 //§		DurationExt																
 /// This trait provides additional functionality to [`Duration`].

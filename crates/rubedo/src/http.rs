@@ -7,7 +7,7 @@
 
 
 
-//		Modules
+//		Modules																											
 
 #[cfg(test)]
 #[path = "tests/http.rs"]
@@ -15,7 +15,7 @@ mod tests;
 
 
 
-//		Packages
+//		Packages																										
 
 use base64::{DecodeError, engine::{Engine as _, general_purpose::STANDARD as BASE64}};
 use bytes::Bytes;
@@ -49,7 +49,7 @@ use ::{
 
 
 
-//		Enums
+//		Enums																											
 
 //		ContentType																
 /// The content type of an HTTP response, for use by [`UnpackedResponseBody`].
@@ -88,7 +88,7 @@ pub enum ResponseError {
 
 
 
-//		Structs
+//		Structs																											
 
 //		UnpackedResponse														
 /// An HTTP response in comparison-friendly form for interrogation.
@@ -1431,7 +1431,7 @@ impl Write for UnpackedResponseBody {
 
 
 
-//		Traits
+//		Traits																											
 
 //§		ResponseExt																
 /// This trait provides additional functionality to [`Response`].
@@ -1534,7 +1534,7 @@ impl ResponseExt for Response<String> {
 
 
 
-//		Functions
+//		Functions																										
 
 //		convert_headers															
 /// Returns a vector of unpacked response headers.

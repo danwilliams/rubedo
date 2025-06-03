@@ -6,7 +6,7 @@
 
 
 
-//		Global configuration
+//		Global configuration																							
 
 //	Customisations of the standard linting configuration
 #![allow(clippy::absolute_paths,          reason = "Needed in the re-exported docs")]
@@ -16,7 +16,7 @@
 
 
 
-//		Modules
+//		Modules																											
 
 /// List of crates used only in integration tests.
 #[cfg(test)]
@@ -26,14 +26,14 @@ mod integration_tests {
 
 
 
-//		Packages
+//		Packages																										
 
 use proc_macro::{TokenStream, TokenTree};
 use quote::quote;
 
 
 
-//		Macros
+//		Macros																											
 
 //		ip!																		
 /// Builds an IP address from a range of input types.
