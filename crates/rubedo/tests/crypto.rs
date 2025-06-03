@@ -1,3 +1,5 @@
+//! Integration tests for the `crypto` module.
+
 #![cfg(feature = "crypto")]
 #![allow(unused_crate_dependencies, reason = "Creates a lot of noise")]
 
@@ -51,7 +53,7 @@ const TEST_256_BASE64: &str     = "vu8aKzxNXm96i5wNHi86S1xtfo+aCxwtPk9aa3yNng8="
 mod signing_key__bytesized {
 	use super::*;
 	use rubedo::crypto::SigningKey;
-	use rubedo::std::ByteSized;
+	use rubedo::std::ByteSized as _;
 	
 	//		to_hex																
 	#[test]
@@ -72,7 +74,7 @@ mod signing_key__bytesized {
 mod signing_key__traits {
 	use super::*;
 	use rubedo::crypto::SigningKey;
-	use rubedo::std::ForceFrom;
+	use rubedo::std::ForceFrom as _;
 	
 	//		deref																
 	#[test]
@@ -100,7 +102,7 @@ mod signing_key__traits {
 mod signing_key_ext {
 	use super::*;
 	use ed25519_dalek::SigningKey;
-	use rubedo::std::ByteSized;
+	use rubedo::std::ByteSized as _;
 	
 	//		to_base64															
 	#[test]

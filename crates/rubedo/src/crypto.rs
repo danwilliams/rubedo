@@ -33,7 +33,7 @@ use generic_array::{
 };
 use hex::{FromHexError, self};
 use rand_core::CryptoRngCore;
-use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as DeError};
+use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as _};
 use std::borrow::Cow;
 
 

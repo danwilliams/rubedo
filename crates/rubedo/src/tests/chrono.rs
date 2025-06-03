@@ -1,7 +1,7 @@
 //		Packages
 
 use super::*;
-use chrono::{DateTime, TimeZone};
+use chrono::{DateTime, TimeZone as _};
 use claims::{assert_none, assert_some_eq};
 
 

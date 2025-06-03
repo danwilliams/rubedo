@@ -6,7 +6,7 @@ use crate::{
 	sugar::s,
 };
 use rust_decimal::prelude::*;
-use std::io::Write;
+use std::io::Write as _;
 use tempfile::{TempDir, tempdir};
 
 
@@ -55,7 +55,7 @@ mod as_str {
 	#[test]
 	fn as_str__str() {
 		let foo = "Test";
-		assert_eq!(foo.as_str(), "Test");
+		assert_eq!(AsStr::as_str(foo), "Test");
 	}
 }
 

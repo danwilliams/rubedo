@@ -1,3 +1,5 @@
+//! Integration tests for the `chrono` module.
+
 #![cfg(feature = "chrono")]
 #![allow(unused_crate_dependencies, reason = "Creates a lot of noise")]
 
@@ -32,7 +34,7 @@
 //		Packages
 
 use chrono::{NaiveDate, Utc};
-use rubedo::chrono::NaiveDateExt;
+use rubedo::chrono::NaiveDateExt as _;
 
 
 

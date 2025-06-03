@@ -333,7 +333,7 @@ where
 	T::Err: Display,
 	D:      Deserializer<'de>,
 {
-	String::deserialize(deserializer).and_then(|s| T::from_str(&s).map_err(DeError::custom))
+	T::from_str(&String::deserialize(deserializer)?).map_err(DeError::custom)
 }
 
 //		into																	
@@ -714,7 +714,7 @@ where
 	T::Error: Display,
 	D:        Deserializer<'de>,
 {
-	U::deserialize(deserializer).and_then(|value| T::try_from(value).map_err(DeError::custom))
+	T::try_from(U::deserialize(deserializer)?).map_err(DeError::custom)
 }
 
 //		try_from_string															
@@ -762,7 +762,7 @@ where
 	T::Error: Display,
 	D:        Deserializer<'de>,
 {
-	String::deserialize(deserializer).and_then(|value| T::try_from(value).map_err(DeError::custom))
+	T::try_from(String::deserialize(deserializer)?).map_err(DeError::custom)
 }
 
 //		try_from_int_with_scale													
@@ -822,9 +822,8 @@ where
 	U: Deserialize<'de>,
 	D: Deserializer<'de>,
 {
-	U::deserialize(deserializer).and_then(|value| {
-		T::from_int_with_scale(value, scale).ok_or_else(|| DeError::custom("Failed to convert from integer with scale"))
-	})
+	T::from_int_with_scale(U::deserialize(deserializer)?, scale)
+		.ok_or_else(|| DeError::custom("Failed to convert from integer with scale"))
 }
 
 //		try_from_int_1dp														
@@ -1002,8 +1001,8 @@ where
 	S: Serializer,
 {
 	T::to_int_with_scale(value, scale)
-		.ok_or_else(|| SerError::custom("Failed to convert to integer with scale"))
-		.and_then(|scaled_value| scaled_value.serialize(serializer))
+		.ok_or_else(|| SerError::custom("Failed to convert to integer with scale"))?
+		.serialize(serializer)
 }
 
 //		try_to_int_1dp															

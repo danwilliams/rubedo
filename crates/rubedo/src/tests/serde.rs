@@ -25,7 +25,6 @@ enum Position {
 
 impl AsStr for Position {
 	//		as_str																
-	#[must_use]
 	fn as_str(&self) -> &'static str {
 		match *self {
 			Self::Zero => "Zero",
@@ -86,7 +85,7 @@ impl FromStr for Position {
 	
 	//		from_str															
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		match s.as_str() {
+		match AsStr::as_str(s) {
 			"Zero" => Ok(Self::Zero),
 			"One"  => Ok(Self::One),
 			"Two"  => Ok(Self::Two),

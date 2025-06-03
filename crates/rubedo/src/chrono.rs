@@ -14,8 +14,8 @@ mod tests;
 //		Packages
 
 use crate::sugar::s;
-use chrono::{Datelike, Duration, Months, NaiveDate, Utc};
-use core::ops::Neg;
+use chrono::{Datelike as _, Duration, Months, NaiveDate, Utc};
+use core::ops::Neg as _;
 
 
 

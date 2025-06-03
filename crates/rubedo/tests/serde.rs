@@ -1,3 +1,5 @@
+//! Integration tests for the `serde` module.
+
 #![cfg(feature = "serde")]
 #![allow(unused_crate_dependencies, reason = "Creates a lot of noise")]
 

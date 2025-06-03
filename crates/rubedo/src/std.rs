@@ -22,7 +22,7 @@ use core::{
 use hex::FromHexError;
 use rust_decimal::{
 	Decimal,
-	prelude::ToPrimitive,
+	prelude::ToPrimitive as _,
 };
 use serde::{Deserialize, Serialize};
 use std::{
@@ -38,14 +38,14 @@ use crate::crypto::Hashed;
 #[cfg(feature = "crypto")]
 use ::{
 	core::future::Future,
-	digest::Digest,
+	digest::Digest as _,
 	std::{
 		fs::File,
-		io::{BufReader, Error as IoError, Read},
+		io::{BufReader, Error as IoError, Read as _},
 	},
 	tokio::{
 		fs::File as AsyncFile,
-		io::{AsyncReadExt, BufReader as AsyncBufReader},
+		io::{AsyncReadExt as _, BufReader as AsyncBufReader},
 	},
 };
 
@@ -221,7 +221,6 @@ impl AsStr for str {
 /// * [`ByteSizedFull`]
 /// * [`ByteSizedMut`]
 /// 
-#[expect(clippy::trait_duplication_in_bounds, reason = "Not actually duplicates")]
 pub trait ByteSized<const SIZE: usize>:
 	Sized
 	+ Clone
@@ -458,7 +457,6 @@ pub trait ByteSized<const SIZE: usize>:
 /// * [`ByteSized`]
 /// * [`ByteSizedMut`]
 /// 
-#[expect(clippy::trait_duplication_in_bounds, reason = "Not actually duplicates")]
 pub trait ByteSizedFull<const SIZE: usize>:
 	ByteSized<SIZE>
 	+ AsRef<[u8; SIZE]>

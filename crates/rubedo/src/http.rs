@@ -28,9 +28,9 @@ use core::{
 	str::FromStr,
 };
 use futures::executor;
-use futures_util::FutureExt;
+use futures_util::FutureExt as _;
 use http::{Response, StatusCode};
-use http_body_util::{BodyExt, Collected, Full};
+use http_body_util::{BodyExt as _, Collected, Full};
 use hyper::{
 	body::Incoming,
 	HeaderMap,
@@ -376,7 +376,7 @@ impl UnpackedResponseBody {
 	/// * [`ContentType`]
 	/// * [`UnpackedResponseBody::content_type()`]
 	/// 
-	pub fn set_content_type(&mut self, content_type: ContentType) -> &mut Self {
+	pub const fn set_content_type(&mut self, content_type: ContentType) -> &mut Self {
 		self.content_type = content_type;
 		self
 	}
@@ -482,7 +482,7 @@ impl UnpackedResponseBody {
 	/// * [`UnpackedResponseBody::into_bytes()`]
 	/// * [`UnpackedResponseBody::to_bytes()`]
 	/// 
-	pub fn as_mut_bytes(&mut self) -> &mut Vec<u8> {
+	pub const fn as_mut_bytes(&mut self) -> &mut Vec<u8> {
 		&mut self.body
 	}
 	

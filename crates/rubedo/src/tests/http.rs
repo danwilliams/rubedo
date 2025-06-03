@@ -3,7 +3,7 @@
 use super::*;
 use crate::sugar::s;
 use assert_json_diff::assert_json_eq;
-use axum::response::IntoResponse;
+use axum::response::IntoResponse as _;
 use bytes::Bytes;
 use claims::{assert_err, assert_ok, assert_ok_eq};
 use core::{
